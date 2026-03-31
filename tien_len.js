@@ -1,0 +1,585 @@
+// ── SOUND SYSTEM (Web Audio API) ───────────────────────────
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function getCtx(){ if(!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
+
+const SFX = {
+  // Card select click
+  click(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(1200,t); o.frequency.exponentialRampToValueAtTime(800,t+0.06);
+    g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.08);
+  },
+
+  // Card deselect
+  deselect(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(800,t); o.frequency.exponentialRampToValueAtTime(500,t+0.06);
+    g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.06);
+  },
+
+  // Play cards (slam down)
+  play(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    // Thud noise
+    const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.03));
+    const src=ctx.createBufferSource(); src.buffer=buf;
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=600;
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    src.connect(flt); flt.connect(g); g.connect(ctx.destination); src.start(t);
+    // Snap tone
+    const o=ctx.createOscillator(), g2=ctx.createGain();
+    o.type='triangle'; o.frequency.setValueAtTime(300,t); o.frequency.exponentialRampToValueAtTime(100,t+0.08);
+    g2.gain.setValueAtTime(0.15,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+    o.connect(g2); g2.connect(ctx.destination); o.start(t); o.stop(t+0.1);
+  },
+
+  // AI plays cards (softer version)
+  aiPlay(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const buf=ctx.createBuffer(1,ctx.sampleRate*0.1,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.02));
+    const src=ctx.createBufferSource(); src.buffer=buf;
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=500;
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.18,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+    src.connect(flt); flt.connect(g); g.connect(ctx.destination); src.start(t);
+  },
+
+  // Pass
+  pass(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(500,t); o.frequency.exponentialRampToValueAtTime(300,t+0.15);
+    g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.15);
+  },
+
+  // Invalid move
+  error(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='square'; o.frequency.setValueAtTime(200,t); o.frequency.setValueAtTime(150,t+0.1);
+    g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+0.25);
+  },
+
+  // Win fanfare
+  win(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const notes=[523,659,784,1047]; // C5 E5 G5 C6
+    notes.forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='triangle';
+      o.frequency.setValueAtTime(f,t+i*0.12);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.2,t+i*0.12);
+      g.gain.setValueAtTime(0.2,t+i*0.12); g.gain.exponentialRampToValueAtTime(0.001,t+i*0.12+0.35);
+      o.connect(g); g.connect(ctx.destination); o.start(t+i*0.12); o.stop(t+i*0.12+0.35);
+    });
+  },
+
+  // Lose sound
+  lose(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    const notes=[400,350,280,200];
+    notes.forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(f,t+i*0.15);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.12,t+i*0.15);
+      g.gain.setValueAtTime(0.12,t+i*0.15); g.gain.exponentialRampToValueAtTime(0.001,t+i*0.15+0.3);
+      o.connect(g); g.connect(ctx.destination); o.start(t+i*0.15); o.stop(t+i*0.15+0.3);
+    });
+  },
+
+  // Deal / new game
+  deal(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    for(let i=0;i<6;i++){
+      const buf=ctx.createBuffer(1,ctx.sampleRate*0.04,ctx.sampleRate);
+      const data=buf.getChannelData(0);
+      for(let j=0;j<data.length;j++) data[j]=(Math.random()*2-1)*Math.exp(-j/(ctx.sampleRate*0.008));
+      const src=ctx.createBufferSource(); src.buffer=buf;
+      const flt=ctx.createBiquadFilter(); flt.type='highpass'; flt.frequency.value=800;
+      const g=ctx.createGain(); g.gain.setValueAtTime(0.1,t+i*0.06); g.gain.exponentialRampToValueAtTime(0.001,t+i*0.06+0.04);
+      src.connect(flt); flt.connect(g); g.connect(ctx.destination); src.start(t+i*0.06);
+    }
+  },
+
+  // Bomb (four of a kind)
+  bomb(){
+    const ctx=getCtx(), t=ctx.currentTime;
+    // Explosion rumble
+    const buf=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.12));
+    const src=ctx.createBufferSource(); src.buffer=buf;
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.setValueAtTime(400,t); flt.frequency.exponentialRampToValueAtTime(80,t+0.4);
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.4,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+    src.connect(flt); flt.connect(g); g.connect(ctx.destination); src.start(t);
+    // Impact tone
+    const o=ctx.createOscillator(), g2=ctx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(30,t+0.3);
+    g2.gain.setValueAtTime(0.2,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    o.connect(g2); g2.connect(ctx.destination); o.start(t); o.stop(t+0.35);
+  }
+};
+
+// ── CONSTANTS ──────────────────────────────────────────────
+const SUITS = ['♠','♣','♦','♥'];
+const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
+const SUIT_VAL = {'♠':0,'♣':1,'♦':2,'♥':3};
+const RANK_VAL = {};
+RANKS.forEach((r,i) => RANK_VAL[r] = i);
+
+function cardValue(c){ return RANK_VAL[c.rank]*4 + SUIT_VAL[c.suit]; }
+function sortHand(h){ h.sort((a,b) => cardValue(a)-cardValue(b)); }
+
+function createDeck(){
+  const d=[];
+  for(const s of SUITS) for(const r of RANKS) d.push({rank:r,suit:s});
+  for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]; }
+  return d;
+}
+
+// ── STATE ──────────────────────────────────────────────────
+let hands=[[],[],[],[]];
+let current=0;
+let lastPlayed=[];
+let lastPlayer=-1;
+let passCount=0;
+let selected=[];
+let scores=[0,0,0,0];
+let gameOver=false;
+let betAmount=100;
+let wallets=[1000,1000,1000,1000]; // 0=you, 1-3=cpu
+
+// ── INIT ───────────────────────────────────────────────────
+function newGame(){
+  document.getElementById('overlay').classList.add('hidden');
+  gameOver=false; selected=[];
+  const deck=createDeck();
+  hands=[[],[],[],[]];
+  for(let i=0;i<52;i++) hands[i%4].push(deck[i]);
+  hands.forEach(h=>sortHand(h));
+  lastPlayed=[]; lastPlayer=-1; passCount=0;
+  current=0;
+  for(let p=0;p<4;p++){
+    if(hands[p].some(c=>c.rank==='3'&&c.suit==='♠')){ current=p; break; }
+  }
+  setMsg('');
+  SFX.deal();
+  render();
+  if(current!==0) setTimeout(aiTurn,800);
+  else setMsg('Your turn — you have 3♠, lead freely!');
+}
+
+// ── RENDER ─────────────────────────────────────────────────
+function render(){
+  const yh=document.getElementById('your-hand');
+  yh.innerHTML='';
+  hands[0].forEach((c,i)=>{
+    const el=makeCardEl(c);
+    el.onclick=()=>toggleSelect(i);
+    if(selected.includes(i)) el.classList.add('selected');
+    yh.appendChild(el);
+  });
+
+  for(let p=1;p<=3;p++){
+    const el=document.getElementById('hand-cpu'+p);
+    el.innerHTML='';
+    hands[p].forEach(()=>{
+      const d=document.createElement('div');
+      d.className='card-sm'; el.appendChild(d);
+    });
+  }
+
+  ['you','cpu1','cpu2','cpu3'].forEach((id,i)=>{
+    const el=document.getElementById('lbl-'+id);
+    el.className='player-label'+(current===i?' active-player':'');
+    let name=id==='you'?'YOU':'CPU '+id.slice(3);
+    if(hands[i].length===0) name+=' ✓';
+    el.textContent=name;
+  });
+
+  const pa=document.getElementById('played-cards');
+  pa.innerHTML='';
+  lastPlayed.forEach(c=>{ pa.appendChild(makeCardEl(c,'small')); });
+
+  const wp=document.getElementById('whose-play');
+  if(lastPlayed.length>0){
+    const who=lastPlayer===0?'You':('CPU '+lastPlayer);
+    const ctype=classify(lastPlayed);
+    wp.textContent=who+' played '+(ctype?ctype.label:'');
+  } else {
+    wp.textContent='';
+  }
+
+  const myTurn=current===0&&!gameOver;
+  document.getElementById('btn-play').disabled=!myTurn;
+  document.getElementById('btn-pass').disabled=!myTurn||lastPlayed.length===0;
+}
+
+function makeCardEl(c, size=''){
+  const div=document.createElement('div');
+  div.className='card';
+  if(size==='small'){ div.style.width='50px'; div.style.height='72px'; }
+  const isRed=c.suit==='♥'||c.suit==='♦';
+  div.innerHTML=`<div class="card-face ${isRed?'red':'black'}">
+    <div><div class="rank">${c.rank}</div><div class="suit">${c.suit}</div></div>
+    <div class="center-suit">${c.suit}</div>
+    <div class="bottom"><div class="rank">${c.rank}</div><div class="suit">${c.suit}</div></div>
+  </div>`;
+  return div;
+}
+
+// ── SELECT ─────────────────────────────────────────────────
+function toggleSelect(i){
+  if(current!==0||gameOver) return;
+  const idx=selected.indexOf(i);
+  if(idx>=0){ selected.splice(idx,1); SFX.deselect(); }
+  else { selected.push(i); SFX.click(); }
+  render();
+}
+
+// ── PLAY ───────────────────────────────────────────────────
+function playSelected(){
+  if(current!==0||gameOver||selected.length===0) return;
+  const cards=selected.map(i=>hands[0][i]);
+  const combo=classify(cards);
+  if(!combo){ SFX.error(); setMsg('❌ Invalid combination'); return; }
+  if(lastPlayed.length>0){
+    if(!beats(combo, lastPlayed)){ SFX.error(); setMsg('❌ Cannot beat the last play'); return; }
+  }
+  if(combo.type==='quad') SFX.bomb(); else SFX.play();
+  selected.sort((a,b)=>b-a).forEach(i=>hands[0].splice(i,1));
+  selected=[];
+  lastPlayed=cards; lastPlayer=0; passCount=0;
+  setMsg('');
+  if(hands[0].length===0){ render(); endGame(0); return; }
+  current=nextAlive(1); render(); setTimeout(aiTurn,700);
+}
+
+function pass(){
+  if(current!==0||lastPlayed.length===0||gameOver) return;
+  SFX.pass();
+  passCount++;
+  setMsg('You passed.');
+  advanceAfterPass();
+}
+
+function nextAlive(from){
+  let n=from%4;
+  while(hands[n].length===0) n=(n+1)%4;
+  return n;
+}
+
+function advanceAfterPass(){
+  const activePlayers=hands.filter(h=>h.length>0).length;
+  if(passCount>=activePlayers-1){
+    passCount=0; lastPlayed=[]; lastPlayer=-1;
+    const winner=current===0?'Your':('CPU '+current);
+    setMsg(winner+' leads freely!');
+  }
+  const next=nextAlive((current+1)%4);
+  current=next;
+  render();
+  if(current!==0) setTimeout(aiTurn,600);
+  else {
+    if(lastPlayed.length===0) setMsg('Your turn — lead freely!');
+    else setMsg('Your turn!');
+  }
+}
+
+// ── AI ─────────────────────────────────────────────────────
+function aiTurn(){
+  if(gameOver) return;
+  const p=current;
+  if(hands[p].length===0){ current=nextAlive((p+1)%4); render(); if(current!==0) setTimeout(aiTurn,600); return; }
+
+  let played = lastPlayed.length===0 ? aiLead(p) : aiRespond(p, lastPlayed);
+
+  if(played){
+    const aiCombo=classify(played);
+    if(aiCombo&&aiCombo.type==='quad') SFX.bomb(); else SFX.aiPlay();
+    played.forEach(pc=>{ const idx=hands[p].findIndex(x=>x===pc); if(idx>=0) hands[p].splice(idx,1); });
+    lastPlayed=played; lastPlayer=p; passCount=0;
+    setMsg('');
+    if(hands[p].length===0){ render(); endGame(p); return; }
+    current=nextAlive((p+1)%4); render();
+    if(current!==0) setTimeout(aiTurn,700);
+    else setMsg('Your turn!');
+  } else {
+    passCount++;
+    advanceAfterPass();
+  }
+}
+
+function aiLead(p){
+  const hand=hands[p];
+  const all=getAllValidCombos(hand);
+  if(hand.length<=3) return all.sort((a,b)=>b.length-a.length)[0]||[hand[0]];
+
+  function scoreCombo(cards){
+    const c=classify(cards);
+    if(!c) return -999;
+    let s=cards.length*10;
+    if(cards.some(x=>x.rank==='2')) s-=25;
+    s-=c.highVal*0.4;
+    if(c.type==='pair') s+=5;
+    if(c.type==='triple') s+=8;
+    if(c.type==='pairseq') s+=c.len*6;
+    if(c.type==='straight') s+=c.len*4;
+    if(c.type==='quad') s-=40;
+    return s;
+  }
+  all.sort((a,b)=>scoreCombo(b)-scoreCombo(a));
+  return all[0]||[hand[0]];
+}
+
+function aiRespond(p, lp){
+  const hand=hands[p];
+  const all=getAllValidCombos(hand);
+  const beaters=all.filter(cards=>{ const c=classify(cards); return c&&beats(c,lp); });
+  if(beaters.length===0) return null;
+
+  const lastHandSize=lastPlayer>=0?hands[lastPlayer].length:99;
+  const urgent=lastHandSize<=3;
+
+  const bombs=beaters.filter(c=>classify(c)?.type==='quad');
+  const normal=beaters.filter(c=>classify(c)?.type!=='quad');
+
+  function scoreBeater(cards){
+    const c=classify(cards);
+    let s=0;
+    s-=c.highVal;
+    s+=cards.length*2;
+    if(cards.some(x=>x.rank==='2')) s-=15;
+    if(urgent) s+=c.highVal*0.4;
+    return s;
+  }
+
+  if(normal.length>0){
+    normal.sort((a,b)=>scoreBeater(b)-scoreBeater(a));
+    return normal[0];
+  }
+  if(bombs.length>0) return bombs[0];
+  return null;
+}
+
+function getAllValidCombos(hand){
+  const results=[];
+  hand.forEach(c=>results.push([c]));
+  for(let sz=2;sz<=4;sz++){
+    getCombos(hand,sz).forEach(combo=>{ if(classify(combo)) results.push(combo); });
+  }
+  for(let len=3;len<=hand.length;len++){
+    getCombos(hand,len).forEach(combo=>{
+      const c=classify(combo);
+      if(c&&(c.type==='straight'||c.type==='pairseq')) results.push(combo);
+    });
+  }
+  return results;
+}
+
+// ── COMBO LOGIC ────────────────────────────────────────────
+/*
+  Types: single, pair, triple, quad, straight, pairseq
+  pairseq = consecutive pairs (3+ pairs), e.g. 3-3,4-4,5-5
+  Bombs: quad beats everything; pairseq of 3+ beats a single 2
+*/
+function classify(cards){
+  const n=cards.length;
+  if(n===0) return null;
+  const sorted=cards.slice().sort((a,b)=>cardValue(a)-cardValue(b));
+  const ranks=sorted.map(c=>c.rank);
+  const rvals=sorted.map(c=>RANK_VAL[c.rank]);
+  const uniqRanks=[...new Set(ranks)];
+  const highVal=cardValue(sorted[n-1]);
+
+  // Single
+  if(n===1) return {type:'single', highVal, label:'single'};
+
+  // Pair
+  if(n===2&&uniqRanks.length===1)
+    return {type:'pair', highVal, label:'pair of '+ranks[0]};
+
+  // Triple
+  if(n===3&&uniqRanks.length===1)
+    return {type:'triple', highVal, label:'triple '+ranks[0]};
+
+  // Four of a kind (bomb)
+  if(n===4&&uniqRanks.length===1)
+    return {type:'quad', highVal, label:'BOMB (four '+ranks[0]+'s)'};
+
+  // Straight: 3+ consecutive ranks, no 2s
+  if(n>=3&&n%2!==0||n>=3){
+    if(!rvals.includes(12)){
+      const uniqRV=[...new Set(rvals)].sort((a,b)=>a-b);
+      if(uniqRV.length===n){
+        const consecutive=uniqRV.every((v,i)=>i===0||v===uniqRV[i-1]+1);
+        if(consecutive)
+          return {type:'straight', len:n, highVal, label:n+'-card straight'};
+      }
+    }
+  }
+
+  // Pair sequence: must be even count ≥6 (3 pairs), consecutive ranks, no 2s
+  if(n>=6&&n%2===0){
+    const pairCount=n/2;
+    if(!rvals.includes(12)){
+      // Group by rank
+      const rankGroups={};
+      sorted.forEach(c=>{ rankGroups[c.rank]=(rankGroups[c.rank]||[]).concat(c); });
+      const groupRanks=Object.keys(rankGroups);
+      if(groupRanks.length===pairCount && groupRanks.every(r=>rankGroups[r].length===2)){
+        const gRvals=groupRanks.map(r=>RANK_VAL[r]).sort((a,b)=>a-b);
+        const consec=gRvals.every((v,i)=>i===0||v===gRvals[i-1]+1);
+        if(consec)
+          return {type:'pairseq', len:pairCount, highVal, label:pairCount+'-pair sequence'};
+      }
+    }
+  }
+
+  return null;
+}
+
+function beats(combo, prevCards){
+  const prev=classify(prevCards);
+  if(!prev) return true;
+
+  // Quad (bomb) beats everything except a higher quad
+  if(combo.type==='quad'){
+    if(prev.type==='quad') return combo.highVal>prev.highVal;
+    return true; // bomb beats all
+  }
+
+  // Pair sequence of 3+ pairs can chop a single 2
+  if(combo.type==='pairseq'&&combo.len>=3&&prev.type==='single'&&prevCards[0].rank==='2')
+    return true;
+
+  // Must match type
+  if(combo.type!==prev.type) return false;
+
+  // Straight: must match length
+  if(combo.type==='straight'&&combo.len!==prev.len) return false;
+
+  // Pair seq: must match number of pairs
+  if(combo.type==='pairseq'&&combo.len!==prev.len) return false;
+
+  return combo.highVal>prev.highVal;
+}
+
+function getCombos(arr,k){
+  const result=[];
+  function bt(start,cur){
+    if(cur.length===k){ result.push([...cur]); return; }
+    for(let i=start;i<=arr.length-(k-cur.length);i++){
+      cur.push(arr[i]); bt(i+1,cur); cur.pop();
+    }
+  }
+  bt(0,[]);
+  return result;
+}
+
+// ── END GAME ───────────────────────────────────────────────
+function endGame(winner){
+  gameOver=true;
+  if(winner===0) SFX.win(); else SFX.lose();
+  scores[winner]++;
+
+  // Money: winner gets betAmount from each other player
+  const gain = betAmount * 3;
+  for(let p=0;p<4;p++){
+    if(p===winner) wallets[p]+=gain;
+    else wallets[p]-=betAmount;
+  }
+
+  updateScores();
+  updateWallets();
+
+  const ov=document.getElementById('overlay');
+  ov.classList.remove('hidden');
+  document.getElementById('ov-title').textContent=winner===0?'🎉 You Win!':'CPU '+winner+' Wins!';
+  document.getElementById('ov-msg').textContent=winner===0?'You emptied your hand first!':'Better luck next round!';
+
+  const moneyEl=document.getElementById('ov-money');
+  if(winner===0){
+    moneyEl.textContent='+$'+gain+' 🤑';
+    moneyEl.className='ov-money win';
+  } else {
+    moneyEl.textContent='-$'+betAmount;
+    moneyEl.className='ov-money lose';
+  }
+
+  document.getElementById('ov-wallets').textContent=
+    `You $${wallets[0]}  •  CPU1 $${wallets[1]}  •  CPU2 $${wallets[2]}  •  CPU3 $${wallets[3]}`;
+  document.getElementById('ov-score').textContent=
+    `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
+}
+
+function resetScore(){
+  scores=[0,0,0,0];
+  wallets=[1000,1000,1000,1000];
+  updateScores();
+  updateWallets();
+  document.getElementById('ov-money').textContent='';
+  document.getElementById('ov-wallets').textContent='Wallets & scores reset!';
+  document.getElementById('ov-score').textContent='';
+}
+
+function updateScores(){
+  document.getElementById('sc-you').textContent=scores[0];
+  document.getElementById('sc-cpu1').textContent=scores[1];
+  document.getElementById('sc-cpu2').textContent=scores[2];
+  document.getElementById('sc-cpu3').textContent=scores[3];
+}
+
+function updateWallets(){
+  const ids=['you','cpu1','cpu2','cpu3'];
+  ids.forEach((id,i)=>{
+    const el=document.getElementById('wallet-'+id);
+    el.textContent='$'+wallets[i];
+    el.className='wallet'+(wallets[i]>1000?' gain':wallets[i]<1000?' loss':'');
+  });
+}
+
+// ── BET MODAL ──────────────────────────────────────────────
+function openBetModal(){
+  document.getElementById('bet-input').value=betAmount;
+  highlightPreset(betAmount);
+  document.getElementById('bet-modal').classList.remove('hidden');
+}
+function closeBetModal(){
+  document.getElementById('bet-modal').classList.add('hidden');
+}
+function selectPreset(val){
+  betAmount=val;
+  document.getElementById('bet-input').value=val;
+  highlightPreset(val);
+}
+function highlightPreset(val){
+  document.querySelectorAll('.bet-preset').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.textContent.replace('$',''))===val);
+  });
+}
+function confirmBet(){
+  const v=parseInt(document.getElementById('bet-input').value)||100;
+  betAmount=Math.max(1,v);
+  document.getElementById('bet-display').textContent='$'+betAmount;
+  closeBetModal();
+}
+
+function setMsg(t){ document.getElementById('msg').textContent=t; }
+
+function toggleRules(){
+  document.getElementById('rules-panel').classList.toggle('hidden');
+}
+
+newGame();
