@@ -1,5 +1,498 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@300;400;700&display=swap');
 
+/* ════════════════════════════════════════════════════════════
+   START SCREEN — Pixel Art Night Sky Theme
+   ════════════════════════════════════════════════════════════ */
+
+#start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(180deg, 
+    #0a0e27 0%, 
+    #0f1847 25%, 
+    #162060 45%, 
+    #1a2a6c 60%, 
+    #2a3a8c 75%, 
+    #1a2a6c 90%, 
+    #0f1847 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+#start-screen.fade-out {
+  opacity: 0;
+  transform: scale(1.1);
+  pointer-events: none;
+}
+
+/* ── Pixel Stars ── */
+.pixel-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pixel-star {
+  position: absolute;
+  background: #fff;
+  image-rendering: pixelated;
+  animation: twinkle var(--dur, 2s) ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%   { opacity: 0.2; transform: scale(0.8); }
+  50%  { opacity: 1;   transform: scale(1.2); }
+  100% { opacity: 0.4; transform: scale(1);   }
+}
+
+/* ── Pixel Clouds ── */
+.pixel-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pixel-cloud {
+  position: absolute;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  opacity: 0.6;
+}
+
+/* Build clouds from box-shadows for pixel look */
+.pixel-cloud::before,
+.pixel-cloud::after {
+  content: '';
+  position: absolute;
+  image-rendering: pixelated;
+}
+
+.cloud-1 {
+  top: 8%;
+  width: 80px; height: 24px;
+  background: #2a3a8c;
+  box-shadow:
+    8px -8px 0 0 #2a3a8c,
+    16px -8px 0 0 #2a3a8c,
+    24px -8px 0 0 #2a3a8c,
+    32px -8px 0 0 #2a3a8c,
+    16px -16px 0 0 #2a3a8c,
+    24px -16px 0 0 #2a3a8c,
+    40px 0 0 0 #2a3a8c,
+    -8px 0 0 0 #2a3a8c;
+  animation: floatCloud 18s linear infinite;
+  animation-delay: 0s;
+}
+
+.cloud-2 {
+  top: 18%;
+  width: 64px; height: 20px;
+  background: #3a4a9c;
+  box-shadow:
+    8px -8px 0 0 #3a4a9c,
+    16px -8px 0 0 #3a4a9c,
+    24px -8px 0 0 #3a4a9c,
+    32px 0 0 0 #3a4a9c,
+    -8px 0 0 0 #3a4a9c;
+  animation: floatCloud 22s linear infinite;
+  animation-delay: -5s;
+}
+
+.cloud-3 {
+  top: 72%;
+  width: 96px; height: 24px;
+  background: #1e2e7c;
+  box-shadow:
+    8px -8px 0 0 #1e2e7c,
+    16px -8px 0 0 #1e2e7c,
+    24px -8px 0 0 #1e2e7c,
+    32px -8px 0 0 #1e2e7c,
+    40px -8px 0 0 #1e2e7c,
+    16px -16px 0 0 #1e2e7c,
+    24px -16px 0 0 #1e2e7c,
+    32px -16px 0 0 #1e2e7c,
+    48px 0 0 0 #1e2e7c,
+    -8px 0 0 0 #1e2e7c;
+  animation: floatCloud 25s linear infinite;
+  animation-delay: -8s;
+}
+
+.cloud-4 {
+  top: 82%;
+  width: 72px; height: 20px;
+  background: #2a3a8c;
+  box-shadow:
+    8px -8px 0 0 #2a3a8c,
+    16px -8px 0 0 #2a3a8c,
+    24px -8px 0 0 #2a3a8c,
+    -8px 0 0 0 #2a3a8c,
+    32px 0 0 0 #2a3a8c;
+  animation: floatCloud 20s linear infinite;
+  animation-delay: -12s;
+}
+
+.cloud-5 {
+  top: 35%;
+  width: 56px; height: 18px;
+  background: #253580;
+  box-shadow:
+    8px -8px 0 0 #253580,
+    16px -8px 0 0 #253580,
+    24px 0 0 0 #253580,
+    -8px 0 0 0 #253580;
+  animation: floatCloud 28s linear infinite;
+  animation-delay: -3s;
+}
+
+.cloud-6 {
+  top: 55%;
+  width: 88px; height: 22px;
+  background: #1e2e7c;
+  box-shadow:
+    8px -8px 0 0 #1e2e7c,
+    16px -8px 0 0 #1e2e7c,
+    24px -8px 0 0 #1e2e7c,
+    32px -8px 0 0 #1e2e7c,
+    8px -16px 0 0 #1e2e7c,
+    16px -16px 0 0 #1e2e7c,
+    40px 0 0 0 #1e2e7c,
+    -8px 0 0 0 #1e2e7c;
+  animation: floatCloud 15s linear infinite;
+  animation-delay: -7s;
+}
+
+@keyframes floatCloud {
+  0%   { left: -150px; }
+  100% { left: calc(100vw + 50px); }
+}
+
+/* ── UFO ── */
+.pixel-ufo {
+  position: absolute;
+  top: 6%;
+  animation: ufoFloat 6s ease-in-out infinite, ufoDrift 20s linear infinite;
+  z-index: 2;
+}
+
+.ufo-body {
+  width: 48px;
+  height: 20px;
+  background: linear-gradient(180deg, #8899cc, #667799);
+  border-radius: 50%;
+  position: relative;
+  image-rendering: pixelated;
+  box-shadow:
+    0 -8px 0 4px #aabbdd,
+    0 4px 0 0 #556688,
+    -4px 0 0 0 #7788aa,
+    4px 0 0 0 #7788aa;
+}
+
+.ufo-body::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 10px;
+  background: #99aacc;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 0 6px rgba(100, 200, 255, 0.4);
+}
+
+.ufo-body::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 6px; height: 6px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  box-shadow:
+    10px 0 0 #5bff5b,
+    20px 0 0 #ff6b6b,
+    30px 0 0 #5bff5b;
+  animation: ufoLights 0.8s ease-in-out infinite alternate;
+}
+
+.ufo-beam {
+  width: 24px;
+  height: 50px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(100,200,255,0.3), transparent);
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  animation: beamPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes ufoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes ufoDrift {
+  0%   { left: 5%; }
+  50%  { left: 85%; }
+  100% { left: 5%; }
+}
+
+@keyframes ufoLights {
+  0%   { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes beamPulse {
+  0%   { opacity: 0.3; width: 20px; }
+  100% { opacity: 0.7; width: 28px; }
+}
+
+/* ── Start Panel ── */
+.start-panel {
+  position: relative;
+  z-index: 10;
+  width: min(520px, 90vw);
+  padding: 4px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1a6cff, #0044cc, #0033aa);
+  box-shadow:
+    0 0 40px rgba(30, 100, 255, 0.4),
+    0 0 80px rgba(30, 100, 255, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  animation: panelPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes panelPulse {
+  0%   { box-shadow: 0 0 40px rgba(30, 100, 255, 0.3), 0 0 80px rgba(30, 100, 255, 0.1), inset 0 1px 0 rgba(255,255,255,0.2); }
+  100% { box-shadow: 0 0 60px rgba(30, 100, 255, 0.5), 0 0 120px rgba(30, 100, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.3); }
+}
+
+.panel-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 2px solid rgba(100, 180, 255, 0.5);
+  pointer-events: none;
+  animation: glowBorder 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowBorder {
+  0%   { border-color: rgba(100, 180, 255, 0.3); }
+  100% { border-color: rgba(100, 180, 255, 0.7); }
+}
+
+.panel-content {
+  background: linear-gradient(180deg, #0a1a4a 0%, #0c1f5c 30%, #0e2468 60%, #0a1a4a 100%);
+  border-radius: 10px;
+  padding: 40px 30px 35px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  z-index: 1;
+}
+
+/* ── Decorative Cards ── */
+.pixel-cards-deco {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.deco-card {
+  font-size: 2rem;
+  animation: cardBounce 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(100, 180, 255, 0.5));
+}
+
+.deco-card-1 { animation-delay: 0s; color: #ff6b6b; }
+.deco-card-2 { animation-delay: 0.15s; color: #ffd93d; }
+.deco-card-3 { animation-delay: 0.3s; color: #6bff6b; }
+.deco-card-4 { animation-delay: 0.45s; color: #6bcdff; }
+
+@keyframes cardBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* ── Start Logo ── */
+.start-logo {
+  width: min(140px, 40vw);
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(100, 180, 255, 0.4));
+  animation: logoFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoFloat {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.02); }
+}
+
+/* ── Title ── */
+.start-title {
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: clamp(1.5rem, 5vw, 2.8rem) !important;
+  color: #fff !important;
+  text-shadow:
+    0 0 10px rgba(100, 180, 255, 0.8),
+    0 0 30px rgba(100, 180, 255, 0.4),
+    0 4px 0 #0a1a4a,
+    0 5px 0 #071240 !important;
+  letter-spacing: 0.08em !important;
+  padding: 0 !important;
+  margin-bottom: 8px;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0%   { text-shadow: 0 0 10px rgba(100, 180, 255, 0.6), 0 0 30px rgba(100, 180, 255, 0.3), 0 4px 0 #0a1a4a, 0 5px 0 #071240; }
+  100% { text-shadow: 0 0 20px rgba(100, 180, 255, 1), 0 0 50px rgba(100, 180, 255, 0.5), 0 4px 0 #0a1a4a, 0 5px 0 #071240; }
+}
+
+.start-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.45rem, 1.5vw, 0.65rem);
+  color: rgba(150, 200, 255, 0.7);
+  letter-spacing: 0.15em;
+  margin-bottom: 28px;
+  text-transform: uppercase;
+}
+
+/* ── PLAY Button ── */
+.pixel-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 48px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ff8844 0%, #ff6622 50%, #dd4400 100%);
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow:
+    0 4px 0 #aa3300,
+    0 6px 20px rgba(255, 100, 30, 0.4),
+    0 0 40px rgba(255, 100, 30, 0.2);
+  animation: playPulse 1.5s ease-in-out infinite;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  letter-spacing: 0.12em;
+  image-rendering: pixelated;
+  z-index: 2;
+}
+
+.pixel-play-btn::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 11px;
+  border: 2px solid rgba(255, 200, 100, 0.5);
+  pointer-events: none;
+  animation: btnBorderGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes btnBorderGlow {
+  0%   { border-color: rgba(255, 200, 100, 0.3); }
+  100% { border-color: rgba(255, 200, 100, 0.8); }
+}
+
+.pixel-play-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 7px 0 #aa3300,
+    0 10px 30px rgba(255, 100, 30, 0.5),
+    0 0 60px rgba(255, 100, 30, 0.3);
+}
+
+.pixel-play-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #aa3300,
+    0 2px 10px rgba(255, 100, 30, 0.4);
+}
+
+@keyframes playPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+.play-btn-icon {
+  font-size: 0.85em;
+  filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));
+}
+
+/* ── Hint Text ── */
+.start-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.35rem, 1vw, 0.5rem);
+  color: rgba(150, 200, 255, 0.35);
+  margin-top: 20px;
+  letter-spacing: 0.1em;
+  animation: hintBlink 2s ease-in-out infinite;
+}
+
+@keyframes hintBlink {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+
+/* ── Ground ── */
+.pixel-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10, 14, 39, 0.8) 100%);
+  pointer-events: none;
+}
+
+/* ── Game Room Hidden/Visible ── */
+.game-room-hidden {
+  display: none !important;
+}
+
+#game-room {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: gameRoomFadeIn 0.6s ease-out;
+}
+
+@keyframes gameRoomFadeIn {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 :root {
   --felt: #1a5c38;
   --felt-dark: #0f3d25;

@@ -761,4 +761,66 @@ function toggleRules(){
   document.getElementById('rules-panel').classList.toggle('hidden');
 }
 
-newGame();
+// ── START SCREEN ───────────────────────────────────────────
+
+// Generate twinkling pixel stars
+function generatePixelStars(){
+  const container = document.getElementById('pixel-stars');
+  if(!container) return;
+  const count = 80;
+  for(let i=0; i<count; i++){
+    const star = document.createElement('div');
+    star.className = 'pixel-star';
+    const size = Math.random() < 0.3 ? 3 : Math.random() < 0.6 ? 2 : 1;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.setProperty('--dur', (1.5 + Math.random() * 3) + 's');
+    star.style.animationDelay = (Math.random() * 3) + 's';
+    // Slight color variation
+    const colors = ['#ffffff', '#aaccff', '#ffe4b5', '#c5d0ff', '#ffd700'];
+    star.style.background = colors[Math.floor(Math.random() * colors.length)];
+    star.style.boxShadow = '0 0 ' + (size+1) + 'px ' + star.style.background;
+    container.appendChild(star);
+  }
+}
+
+// Play a retro "start" sound
+function playStartSFX(){
+  const ctx = getCtx(), t = ctx.currentTime;
+  // Rising arpeggio
+  const notes = [262, 330, 392, 523, 659, 784];
+  notes.forEach((f, i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(f, t + i * 0.08);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.12, t + i * 0.08);
+    g.gain.setValueAtTime(0.12, t + i * 0.08);
+    g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.2);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t + i * 0.08); o.stop(t + i * 0.08 + 0.2);
+  });
+}
+
+// Transition from start screen to game room
+function enterGameRoom(){
+  playStartSFX();
+  const startScreen = document.getElementById('start-screen');
+  const gameRoom = document.getElementById('game-room');
+  
+  // Fade out start screen
+  startScreen.classList.add('fade-out');
+  
+  // After animation, show game room and start game
+  setTimeout(() => {
+    startScreen.style.display = 'none';
+    gameRoom.classList.remove('game-room-hidden');
+    newGame();
+  }, 800);
+}
+
+// Initialize start screen
+generatePixelStars();
+
