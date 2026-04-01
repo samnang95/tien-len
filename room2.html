@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiến Lên — Multiplayer</title>
+<meta name="description" content="Play Tiến Lên multiplayer with friends. Share a room code to play together.">
+<link rel="icon" type="image/png" href="assets/images/game_logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tien_len.css">
+<link rel="stylesheet" href="room2.css">
+
+<!-- Firebase SDK (compat for CDN usage) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<!-- ══════ LOBBY SCREEN ══════ -->
+<div id="lobby-screen">
+  <div class="pixel-stars" id="pixel-stars"></div>
+  <div class="pixel-clouds">
+    <div class="pixel-cloud cloud-1"></div>
+    <div class="pixel-cloud cloud-2"></div>
+    <div class="pixel-cloud cloud-3"></div>
+    <div class="pixel-cloud cloud-4"></div>
+  </div>
+
+  <div class="lobby-panel">
+    <div class="panel-glow"></div>
+    <div class="panel-content">
+      <img src="assets/images/game_logo.png" alt="Tiến Lên" class="start-logo">
+      <h1 class="start-title" style="font-size:clamp(1.2rem,4vw,2rem);">MULTIPLAYER</h1>
+      <p class="start-subtitle">Play with friends online</p>
+
+      <!-- Main Lobby Choices -->
+      <div id="lobby-main">
+        <div class="lobby-nickname">
+          <label class="lobby-label">Your nickname</label>
+          <input type="text" id="nickname-input" class="lobby-input" placeholder="Enter your name" maxlength="12">
+        </div>
+        <div class="start-btn-row" style="margin-top:18px;">
+          <button class="pixel-play-btn" onclick="showCreateRoom()" id="btn-create">
+            <span class="play-btn-text">CREATE ROOM</span>
+          </button>
+          <button class="pixel-play-btn room-2-btn" onclick="showJoinRoom()" id="btn-join">
+            <span class="play-btn-text">JOIN ROOM</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Create Room Form -->
+      <div id="create-form" class="hidden">
+        <p class="lobby-info">Creating a new room...</p>
+        <button class="pixel-play-btn" onclick="createRoom()" id="btn-create-go">
+          <span class="play-btn-text">CREATE</span>
+        </button>
+        <button class="lobby-back-btn" onclick="showLobbyMain()">← Back</button>
+      </div>
+
+      <!-- Join Room Form -->
+      <div id="join-form" class="hidden">
+        <div class="lobby-nickname">
+          <label class="lobby-label">Room Code</label>
+          <input type="text" id="room-code-input" class="lobby-input code-input" placeholder="ABC123" maxlength="6" style="text-transform:uppercase; letter-spacing:0.3em; text-align:center;">
+        </div>
+        <button class="pixel-play-btn room-2-btn" onclick="joinRoom()" id="btn-join-go" style="margin-top:14px;">
+          <span class="play-btn-text">JOIN</span>
+        </button>
+        <button class="lobby-back-btn" onclick="showLobbyMain()">← Back</button>
+      </div>
+
+      <div id="lobby-error" class="lobby-error hidden"></div>
+
+      <a href="tien_len.html" class="lobby-back-link">← Back to Main Menu</a>
+    </div>
+    <div class="panel-scanlines"></div>
+  </div>
+</div>
+
+<!-- ══════ WAITING ROOM ══════ -->
+<div id="waiting-room" class="hidden">
+  <div class="pixel-stars" id="pixel-stars-2"></div>
+  <div class="waiting-panel">
+    <div class="panel-glow"></div>
+    <div class="panel-content">
+      <h2 class="waiting-title">WAITING FOR PLAYERS</h2>
+      <div class="room-code-display">
+        <span class="room-code-label">Room Code:</span>
+        <span class="room-code-value" id="display-room-code">------</span>
+        <button class="copy-btn" onclick="copyRoomCode()" title="Copy code">📋</button>
+      </div>
+
+      <div class="player-slots" id="player-slots">
+        <div class="player-slot empty" id="slot-0"><span class="slot-num">1</span><span class="slot-name">Waiting...</span></div>
+        <div class="player-slot empty" id="slot-1"><span class="slot-num">2</span><span class="slot-name">Waiting...</span></div>
+        <div class="player-slot empty" id="slot-2"><span class="slot-num">3</span><span class="slot-name">Waiting...</span></div>
+        <div class="player-slot empty" id="slot-3"><span class="slot-num">4</span><span class="slot-name">Waiting...</span></div>
+      </div>
+
+      <p class="waiting-status" id="waiting-status">Waiting for players to join...</p>
+
+      <button class="pixel-play-btn" id="btn-start-game" onclick="startGame()" style="display:none;">
+        <span class="play-btn-icon">▶</span>
+        <span class="play-btn-text">START GAME</span>
+      </button>
+
+      <button class="lobby-back-btn" onclick="leaveRoom()" style="margin-top:16px;">← Leave Room</button>
+    </div>
+    <div class="panel-scanlines"></div>
+  </div>
+</div>
+
+<!-- ══════ GAME TABLE ══════ -->
+<div id="mp-game" class="hidden">
+  <img src="assets/images/game_logo.png" alt="Tiến Lên" class="game-logo" style="width:100px;">
+  <p class="subtitle">Multiplayer — Room <span id="game-room-code"></span></p>
+
+  <div id="mp-scoreboard">
+    <div class="score-chip" id="mp-sc-0">P1 <span>0</span></div>
+    <div class="score-chip" id="mp-sc-1">P2 <span>0</span></div>
+    <div class="score-chip" id="mp-sc-2">P3 <span>0</span></div>
+    <div class="score-chip" id="mp-sc-3">P4 <span>0</span></div>
+  </div>
+
+  <div id="mp-table">
+    <!-- Opponent top (seat across from you) -->
+    <div class="player-zone">
+      <div class="player-label" id="mp-lbl-top">Opponent</div>
+      <div class="hand-row" id="mp-hand-top"></div>
+    </div>
+
+    <!-- Left + Play area + Right -->
+    <div style="display:flex; width:100%; gap:10px; align-items:center;">
+      <div class="player-zone" style="width:110px;flex-shrink:0;">
+        <div class="player-label" id="mp-lbl-left">Opponent</div>
+        <div class="hand-row" id="mp-hand-left"></div>
+      </div>
+
+      <div id="play-area" style="flex:1;">
+        <div class="label">LAST PLAYED</div>
+        <div id="mp-played-cards"></div>
+        <div id="mp-whose-play"></div>
+        <div id="mp-msg"></div>
+        <div id="mp-turn-timer"></div>
+      </div>
+
+      <div class="player-zone" style="width:110px;flex-shrink:0;">
+        <div class="player-label" id="mp-lbl-right">Opponent</div>
+        <div class="hand-row" id="mp-hand-right"></div>
+      </div>
+    </div>
+
+    <!-- YOUR HAND -->
+    <div id="your-hand-wrap">
+      <div class="player-label" id="mp-lbl-you">YOU</div>
+      <div id="mp-your-hand"></div>
+      <div class="btn-row">
+        <button class="btn btn-play" id="mp-btn-play" onclick="mpPlaySelected()">Play</button>
+        <button class="btn btn-pass" id="mp-btn-pass" onclick="mpPass()">Pass</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win overlay -->
+  <div id="mp-overlay" class="hidden">
+    <div class="overlay-box">
+      <h2 id="mp-ov-title">🎉 Game Over!</h2>
+      <p id="mp-ov-msg"></p>
+      <div class="ov-score" id="mp-ov-score"></div>
+      <div class="overlay-btn-row">
+        <button class="btn btn-new" id="mp-btn-newgame" onclick="hostNewGame()" style="display:none;">▶ New Game</button>
+        <button class="btn-reset" onclick="leaveRoom()">← Leave Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="room2.js"></script>
+</body>
+</html>

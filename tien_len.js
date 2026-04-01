@@ -821,6 +821,16 @@ function enterGameRoom(){
   }, 800);
 }
 
+// Room 2 — Multiplayer (navigate to room2.html)
+function enterRoom2(){
+  playStartSFX();
+  const startScreen = document.getElementById('start-screen');
+  startScreen.classList.add('fade-out');
+  setTimeout(() => {
+    window.location.href = 'room2.html';
+  }, 800);
+}
+
 // Initialize start screen
 generatePixelStars();
 

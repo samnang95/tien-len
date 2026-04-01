@@ -40,11 +40,17 @@
       <img src="assets/images/game_logo.png" alt="Tiến Lên" class="start-logo">
       <h1 class="start-title">TIẾN LÊN</h1>
       <p class="start-subtitle">Southern Vietnamese Card Game</p>
-      <button id="btn-start-play" class="pixel-play-btn" onclick="enterGameRoom()">
-        <span class="play-btn-icon">▶</span>
-        <span class="play-btn-text">PLAY</span>
-      </button>
-      <p class="start-hint">Press PLAY to enter the game room</p>
+      <div class="start-btn-row">
+        <button id="btn-room-1" class="pixel-play-btn" onclick="enterGameRoom()">
+          <span class="play-btn-icon">▶</span>
+          <span class="play-btn-text">ROOM 1</span>
+        </button>
+        <button id="btn-room-2" class="pixel-play-btn room-2-btn" onclick="enterRoom2()">
+          <span class="play-btn-icon">▶</span>
+          <span class="play-btn-text">ROOM 2</span>
+        </button>
+      </div>
+      <p class="start-hint">Select a room to start playing</p>
     </div>
     <div class="panel-scanlines"></div>
   </div>

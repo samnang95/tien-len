@@ -449,6 +449,47 @@
   filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));
 }
 
+/* ── Button Row ── */
+.start-btn-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  z-index: 2;
+  position: relative;
+}
+
+.start-btn-row .pixel-play-btn {
+  padding: 14px 36px;
+  font-size: clamp(0.75rem, 2vw, 1rem);
+}
+
+/* Room 2 button — green variant */
+.room-2-btn {
+  background: linear-gradient(180deg, #27ae60 0%, #1e8449 50%, #196f3d 100%) !important;
+  box-shadow:
+    0 4px 0 #145a32,
+    0 6px 20px rgba(39, 174, 96, 0.4),
+    0 0 40px rgba(39, 174, 96, 0.2) !important;
+}
+
+.room-2-btn::before {
+  border: 2px solid rgba(100, 255, 150, 0.5) !important;
+}
+
+.room-2-btn:hover {
+  box-shadow:
+    0 7px 0 #145a32,
+    0 10px 30px rgba(39, 174, 96, 0.5),
+    0 0 60px rgba(39, 174, 96, 0.3) !important;
+}
+
+.room-2-btn:active {
+  box-shadow:
+    0 1px 0 #145a32,
+    0 2px 10px rgba(39, 174, 96, 0.4) !important;
+}
+
 /* ── Hint Text ── */
 .start-hint {
   font-family: 'Press Start 2P', monospace;
