@@ -137,9 +137,33 @@ const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
 const SUIT_VAL = {'♠':0,'♣':1,'♦':2,'♥':3};
 const RANK_VAL = {};
 RANKS.forEach((r,i) => RANK_VAL[r] = i);
+const TWO_CUT_PENALTY = {'♠': 10, '♣': 20, '♦': 30, '♥': 40};
 
 function cardValue(c){ return RANK_VAL[c.rank]*4 + SUIT_VAL[c.suit]; }
 function sortHand(h){ h.sort((a,b) => cardValue(a)-cardValue(b)); }
+
+// ── CUT 2 PENALTY ─────────────────────────────────────────
+// When a 2 is beaten ("cut"), money transfers based on suit
+function applyCutTwoPenalty(cuttingPlayer, cutCards, cutPlayer) {
+  if (cutPlayer < 0) return;
+  let totalPenalty = 0;
+  const details = [];
+  cutCards.forEach(c => {
+    if (c.rank === '2') {
+      const penalty = TWO_CUT_PENALTY[c.suit];
+      totalPenalty += penalty;
+      details.push('2' + c.suit + ' ($' + penalty + ')');
+    }
+  });
+  if (totalPenalty > 0) {
+    wallets[cuttingPlayer] += totalPenalty;
+    wallets[cutPlayer] -= totalPenalty;
+    updateWallets();
+    const cutterName = cuttingPlayer === 0 ? 'You' : 'CPU ' + cuttingPlayer;
+    const loserName = cutPlayer === 0 ? 'You' : 'CPU ' + cutPlayer;
+    setMsg('🐷 ' + cutterName + ' cut ' + details.join(', ') + '! ' + loserName + ' -$' + totalPenalty);
+  }
+}
 
 function createDeck(){
   const d=[];
@@ -159,11 +183,87 @@ let scores=[0,0,0,0];
 let gameOver=false;
 let betAmount=100;
 let wallets=[1000,1000,1000,1000]; // 0=you, 1-3=cpu
+let finishOrder=[]; // tracks order players empty their hands
+const RANK_REWARDS=[30, 15, -15, -30]; // 1st, 2nd, 3rd, 4th
+
+// ── TIMER ─────────────────────────────────────────────────
+const TURN_TIME = 10; // seconds per turn
+let turnTimer = null;
+let turnTimeLeft = 0;
+let aiActionTimer = null;
+
+const RING_CIRCUMFERENCE = 2 * Math.PI * 11; // radius=11 for 28px SVG
+
+function startTurnTimer(){
+  clearTurnTimer();
+  turnTimeLeft = TURN_TIME;
+  updateTimerDisplay();
+  turnTimer = setInterval(()=>{
+    turnTimeLeft--;
+    updateTimerDisplay();
+    if(turnTimeLeft <= 0){
+      clearTurnTimer();
+      onTimerExpired();
+    }
+  }, 1000);
+}
+
+function clearTurnTimer(){
+  if(turnTimer){ clearInterval(turnTimer); turnTimer=null; }
+  if(aiActionTimer){ clearTimeout(aiActionTimer); aiActionTimer=null; }
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('turn-timer');
+  const fraction = turnTimeLeft / TURN_TIME;
+  const dashOffset = RING_CIRCUMFERENCE * (1 - fraction);
+
+  // Color class based on time left
+  el.className = turnTimeLeft <= 3 ? 'danger' : turnTimeLeft <= 5 ? 'warn' : '';
+
+  const who = current===0 ? 'YOUR TURN' : 'CPU '+current+' THINKING';
+  el.innerHTML = `
+    <div class="timer-ring">
+      <svg viewBox="0 0 28 28">
+        <circle class="ring-bg" cx="14" cy="14" r="11"/>
+        <circle class="ring-fg" cx="14" cy="14" r="11"
+          stroke-dasharray="${RING_CIRCUMFERENCE}"
+          stroke-dashoffset="${dashOffset}"/>
+      </svg>
+    </div>
+    <span class="timer-text">${turnTimeLeft}</span>
+    <span class="timer-label">${who}</span>
+  `;
+}
+
+function hideTimer(){
+  clearTurnTimer();
+  document.getElementById('turn-timer').innerHTML = '';
+}
+
+function onTimerExpired(){
+  if(gameOver) return;
+  if(current === 0){
+    // Human auto-pass
+    if(lastPlayed.length > 0){
+      SFX.pass();
+      passCount++;
+      setMsg('Time\'s up! You auto-passed.');
+      advanceAfterPass();
+    } else {
+      // Must lead: play lowest card automatically
+      selected = [0];
+      playSelected();
+    }
+  }
+  // AI timer expiry is handled by aiTurn scheduling
+}
 
 // ── INIT ───────────────────────────────────────────────────
 function newGame(){
   document.getElementById('overlay').classList.add('hidden');
-  gameOver=false; selected=[];
+  gameOver=false; selected=[]; finishOrder=[];
+  hideTimer();
   const deck=createDeck();
   hands=[[],[],[],[]];
   for(let i=0;i<52;i++) hands[i%4].push(deck[i]);
@@ -176,8 +276,8 @@ function newGame(){
   setMsg('');
   SFX.deal();
   render();
-  if(current!==0) setTimeout(aiTurn,800);
-  else setMsg('Your turn — you have 3♠, lead freely!');
+  if(current!==0) scheduleAiTurn();
+  else { setMsg('Your turn — you have 3♠, lead freely!'); startTurnTimer(); }
 }
 
 // ── RENDER ─────────────────────────────────────────────────
@@ -194,9 +294,19 @@ function render(){
   for(let p=1;p<=3;p++){
     const el=document.getElementById('hand-cpu'+p);
     el.innerHTML='';
-    hands[p].forEach(()=>{
-      const d=document.createElement('div');
-      d.className='card-sm'; el.appendChild(d);
+    // Show cards face-up for 4th place player when game ends
+    const showCards = gameOver && hands[p].length > 0;
+    hands[p].forEach(c=>{
+      if(showCards){
+        const cardEl=makeCardEl(c);
+        cardEl.style.width='50px'; cardEl.style.height='72px';
+        cardEl.style.fontSize='0.75rem';
+        cardEl.style.cursor='default';
+        el.appendChild(cardEl);
+      } else {
+        const d=document.createElement('div');
+        d.className='card-sm'; el.appendChild(d);
+      }
     });
   }
 
@@ -251,23 +361,31 @@ function toggleSelect(i){
 // ── PLAY ───────────────────────────────────────────────────
 function playSelected(){
   if(current!==0||gameOver||selected.length===0) return;
+  clearTurnTimer();
   const cards=selected.map(i=>hands[0][i]);
   const combo=classify(cards);
-  if(!combo){ SFX.error(); setMsg('❌ Invalid combination'); return; }
+  if(!combo){ SFX.error(); setMsg('❌ Invalid combination'); startTurnTimer(); return; }
   if(lastPlayed.length>0){
-    if(!beats(combo, lastPlayed)){ SFX.error(); setMsg('❌ Cannot beat the last play'); return; }
+    if(!beats(combo, lastPlayed)){ SFX.error(); setMsg('❌ Cannot beat the last play'); startTurnTimer(); return; }
   }
+  if(lastPlayed.length>0) applyCutTwoPenalty(0, lastPlayed, lastPlayer);
   if(combo.type==='quad') SFX.bomb(); else SFX.play();
   selected.sort((a,b)=>b-a).forEach(i=>hands[0].splice(i,1));
   selected=[];
   lastPlayed=cards; lastPlayer=0; passCount=0;
   setMsg('');
-  if(hands[0].length===0){ render(); endGame(0); return; }
-  current=nextAlive(1); render(); setTimeout(aiTurn,700);
+  if(hands[0].length===0){
+    if(!finishOrder.includes(0)) finishOrder.push(0);
+    if(finishOrder.length>=3){ hideTimer(); render(); endGame(); return; }
+  }
+  current=nextAlive((0+1)%4); render();
+  if(current!==0) scheduleAiTurn();
+  else { setMsg('Your turn!'); startTurnTimer(); }
 }
 
 function pass(){
   if(current!==0||lastPlayed.length===0||gameOver) return;
+  clearTurnTimer();
   SFX.pass();
   passCount++;
   setMsg('You passed.');
@@ -290,32 +408,47 @@ function advanceAfterPass(){
   const next=nextAlive((current+1)%4);
   current=next;
   render();
-  if(current!==0) setTimeout(aiTurn,600);
+  if(current!==0) scheduleAiTurn();
   else {
     if(lastPlayed.length===0) setMsg('Your turn — lead freely!');
     else setMsg('Your turn!');
+    startTurnTimer();
   }
 }
 
 // ── AI ─────────────────────────────────────────────────────
+function scheduleAiTurn(){
+  startTurnTimer();
+  // AI acts after random 2-5 seconds within the 10s window
+  const delay = 2000 + Math.floor(Math.random() * 3000);
+  aiActionTimer = setTimeout(aiTurn, delay);
+}
+
 function aiTurn(){
   if(gameOver) return;
+  clearTurnTimer();
   const p=current;
-  if(hands[p].length===0){ current=nextAlive((p+1)%4); render(); if(current!==0) setTimeout(aiTurn,600); return; }
+  if(hands[p].length===0){ current=nextAlive((p+1)%4); render(); if(current!==0) scheduleAiTurn(); else { startTurnTimer(); } return; }
 
   let played = lastPlayed.length===0 ? aiLead(p) : aiRespond(p, lastPlayed);
 
   if(played){
+    if(lastPlayed.length>0) applyCutTwoPenalty(p, lastPlayed, lastPlayer);
     const aiCombo=classify(played);
     if(aiCombo&&aiCombo.type==='quad') SFX.bomb(); else SFX.aiPlay();
     played.forEach(pc=>{ const idx=hands[p].findIndex(x=>x===pc); if(idx>=0) hands[p].splice(idx,1); });
     lastPlayed=played; lastPlayer=p; passCount=0;
     setMsg('');
-    if(hands[p].length===0){ render(); endGame(p); return; }
+    if(hands[p].length===0){
+      if(!finishOrder.includes(p)) finishOrder.push(p);
+      if(finishOrder.length>=3){ hideTimer(); render(); endGame(); return; }
+    }
     current=nextAlive((p+1)%4); render();
-    if(current!==0) setTimeout(aiTurn,700);
-    else setMsg('Your turn!');
+    if(current!==0) scheduleAiTurn();
+    else { setMsg('Your turn!'); startTurnTimer(); }
   } else {
+    SFX.pass();
+    setMsg('CPU '+p+' passed.');
     passCount++;
     advanceAfterPass();
   }
@@ -489,16 +622,43 @@ function getCombos(arr,k){
 }
 
 // ── END GAME ───────────────────────────────────────────────
-function endGame(winner){
+function endGame(){
   gameOver=true;
+
+  // Determine 4th place: the player not in finishOrder
+  for(let p=0;p<4;p++){
+    if(!finishOrder.includes(p)) finishOrder.push(p);
+  }
+
+  const winner=finishOrder[0];
   if(winner===0) SFX.win(); else SFX.lose();
   scores[winner]++;
 
-  // Money: winner gets betAmount from each other player
-  const gain = betAmount * 3;
-  for(let p=0;p<4;p++){
-    if(p===winner) wallets[p]+=gain;
-    else wallets[p]-=betAmount;
+  // Apply ranking rewards: 1st +$30, 2nd +$15, 3rd -$15, 4th -$30
+  const rankLabels=['1st','2nd','3rd','4th'];
+  const rankDetails=[];
+  for(let i=0;i<4;i++){
+    const p=finishOrder[i];
+    wallets[p]+=RANK_REWARDS[i];
+    const name=p===0?'You':'CPU '+p;
+    const reward=RANK_REWARDS[i];
+    rankDetails.push(rankLabels[i]+' '+name+': '+(reward>=0?'+$'+reward:'-$'+Math.abs(reward)));
+  }
+
+  // 4th place penalty for holding 2s
+  const loserPlayer = finishOrder[3];
+  const loserCards = hands[loserPlayer];
+  let twoPenalty = 0;
+  const twoPenaltyDetails = [];
+  loserCards.forEach(c => {
+    if(c.rank === '2'){
+      const penalty = TWO_CUT_PENALTY[c.suit];
+      twoPenalty += penalty;
+      twoPenaltyDetails.push('2'+c.suit+' (-$'+penalty+')');
+    }
+  });
+  if(twoPenalty > 0){
+    wallets[loserPlayer] -= twoPenalty;
   }
 
   updateScores();
@@ -507,14 +667,18 @@ function endGame(winner){
   const ov=document.getElementById('overlay');
   ov.classList.remove('hidden');
   document.getElementById('ov-title').textContent=winner===0?'🎉 You Win!':'CPU '+winner+' Wins!';
-  document.getElementById('ov-msg').textContent=winner===0?'You emptied your hand first!':'Better luck next round!';
+  document.getElementById('ov-msg').textContent=rankDetails.join('  •  ');
 
   const moneyEl=document.getElementById('ov-money');
-  if(winner===0){
-    moneyEl.textContent='+$'+gain+' 🤑';
+  const yourRank=finishOrder.indexOf(0);
+  const yourReward=RANK_REWARDS[yourRank];
+  let yourTotal = yourReward;
+  if(yourRank === 3) yourTotal -= twoPenalty; // if you are 4th, include 2s penalty
+  if(yourTotal>=0){
+    moneyEl.textContent='+$'+yourTotal+' 🤑 ('+rankLabels[yourRank]+')';
     moneyEl.className='ov-money win';
   } else {
-    moneyEl.textContent='-$'+betAmount;
+    moneyEl.textContent='-$'+Math.abs(yourTotal)+' ('+rankLabels[yourRank]+')';
     moneyEl.className='ov-money lose';
   }
 
@@ -522,6 +686,21 @@ function endGame(winner){
     `You $${wallets[0]}  •  CPU1 $${wallets[1]}  •  CPU2 $${wallets[2]}  •  CPU3 $${wallets[3]}`;
   document.getElementById('ov-score').textContent=
     `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
+
+  // Show 4th place player's remaining cards + 2s penalty
+  const loserCardsEl = document.getElementById('ov-loser-cards');
+  if(loserCards.length > 0){
+    const loserName = loserPlayer===0 ? 'Your' : 'CPU '+loserPlayer+"'s";
+    let penaltyHtml = '';
+    if(twoPenalty > 0){
+      penaltyHtml = `<div class="loser-penalty">🐷 Holding 2s penalty: ${twoPenaltyDetails.join(', ')} → Total -$${twoPenalty}</div>`;
+    }
+    loserCardsEl.innerHTML = `<div class="loser-label">🃏 ${loserName} remaining cards (4th place):</div><div class="loser-hand"></div>${penaltyHtml}`;
+    const handEl = loserCardsEl.querySelector('.loser-hand');
+    loserCards.forEach(c => { handEl.appendChild(makeCardEl(c)); });
+  } else {
+    loserCardsEl.innerHTML = '';
+  }
 }
 
 function resetScore(){
