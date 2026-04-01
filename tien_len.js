@@ -210,7 +210,7 @@ function render(){
 
   const pa=document.getElementById('played-cards');
   pa.innerHTML='';
-  lastPlayed.forEach(c=>{ pa.appendChild(makeCardEl(c,'small')); });
+  lastPlayed.forEach(c=>{ pa.appendChild(makeCardEl(c)); });
 
   const wp=document.getElementById('whose-play');
   if(lastPlayed.length>0){

@@ -18,9 +18,10 @@
 
 body {
   background: var(--felt-dark);
-  background-image:
-    radial-gradient(ellipse at center, #237a4b 0%, #0f3d25 70%),
-    repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.01) 4px, rgba(255,255,255,0.01) 8px);
+  background-image: url('assets/images/felt_background.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   font-family: 'Lato', sans-serif;
   color: var(--cream);
   min-height: 100vh;
@@ -38,6 +39,15 @@ h1 {
   text-shadow: 0 0 20px rgba(212,168,67,0.5), 2px 2px 0 rgba(0,0,0,0.5);
   letter-spacing: 0.15em;
   padding: 14px 0 6px;
+}
+
+/* ── LOGO ── */
+.game-logo {
+  width: min(180px, 50vw);
+  height: auto;
+  margin-top: 10px;
+  border-radius: 16px;
+  filter: drop-shadow(0 4px 20px rgba(212,168,67,0.4));
 }
 .subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing: 0.2em; margin-bottom: 8px; }
 
@@ -58,7 +68,7 @@ h1 {
 /* ── TABLE ── */
 #table {
   width: min(780px, 98vw);
-  background: radial-gradient(ellipse at center, #1e6e42 0%, #143d26 100%);
+  background: url('assets/images/felt_background.png') center/cover;
   border-radius: 24px;
   border: 3px solid rgba(212,168,67,0.25);
   box-shadow: 0 0 60px rgba(0,0,0,0.7), inset 0 0 40px rgba(0,0,0,0.3);
@@ -67,6 +77,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 
 /* ── PLAYER ZONES ── */
@@ -130,21 +141,19 @@ h1 {
 .card-back {
   width: 100%; height: 100%;
   border-radius: 7px;
-  background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #1a237e 100%);
-  border: 3px solid rgba(255,255,255,0.15);
+  background: url('assets/images/card_back.png') center/cover;
+  border: 2px solid rgba(255,255,255,0.2);
   box-shadow: var(--shadow);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem; color: rgba(255,255,255,0.15);
 }
-.card-back::after { content: '♦'; }
+.card-back::after { content: ''; }
 
 /* small back for AI */
 .card-sm {
   width: 28px;
   height: 40px;
   border-radius: 4px;
-  background: linear-gradient(135deg, #1a237e, #283593);
-  border: 2px solid rgba(255,255,255,0.15);
+  background: url('assets/images/card_back.png') center/cover;
+  border: 1.5px solid rgba(255,255,255,0.2);
   box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
 }
 
