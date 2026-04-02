@@ -289,7 +289,7 @@
 }
 
 #mp-table {
-  width: min(1200px, 120vw);
+  width: min(1200px, 96vw);
   background: url('assets/images/felt_background.png') center/cover;
   border-radius: 48px;
   border: 3px solid rgba(212, 168, 67, 0.25);
@@ -300,6 +300,24 @@
   align-items: center;
   gap: 10px;
   position: relative;
+}
+
+/* Middle row: left opponent | play area | right opponent */
+.mp-middle-row {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+}
+
+.mp-side-zone {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+#play-area {
+  flex: 1;
+  text-align: center;
 }
 
 #mp-your-hand {
@@ -364,7 +382,7 @@
 }
 #mp-overlay.hidden { display: none; }
 
-/* ── Responsive ── */
+/* ── Responsive: Lobby ── */
 @media (max-width: 480px) {
   .player-slots {
     grid-template-columns: 1fr;
@@ -380,46 +398,117 @@
   }
 }
 
-/* Mobile game table */
+/* ── Responsive: Game Table (Mobile) ── */
 @media (max-width: 768px) {
-  #mp-table {
-    border-radius: 24px;
-    padding: 8px;
-    gap: 6px;
+  #mp-game {
+    padding-bottom: 4px;
   }
 
-  /* Smaller played cards on mobile */
-  #mp-played-cards .card {
-    width: 50px !important;
-    height: 72px !important;
-    font-size: 0.7rem !important;
-  }
-
-  /* Smaller hand cards on mobile */
-  #mp-your-hand .card {
-    width: 52px;
-    height: 74px;
-    font-size: 0.7rem;
-  }
-
-  #mp-your-hand {
-    gap: 2px;
-  }
-
-  /* Narrower side zones */
-  .player-zone[style*="width:110px"] {
+  #mp-game .game-logo {
     width: 60px !important;
+  }
+
+  #mp-game .subtitle {
+    font-size: 0.5rem;
+    margin-bottom: 4px;
+  }
+
+  #mp-scoreboard {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  #mp-scoreboard .score-chip {
+    font-size: 0.4rem;
+    padding: 3px 8px;
+  }
+
+  #mp-table {
+    border-radius: 20px;
+    padding: 8px;
+    gap: 4px;
+    width: 100vw;
+    border-width: 2px;
+  }
+
+  /* Side zones much narrower */
+  .mp-side-zone {
+    width: 50px;
+  }
+
+  .mp-middle-row {
+    gap: 4px;
   }
 
   /* Smaller opponent cards */
   .card-sm {
-    width: 18px !important;
-    height: 26px !important;
+    width: 16px !important;
+    height: 24px !important;
+    border-radius: 2px !important;
   }
 
-  /* Played cards always in a row */
+  /* Player labels smaller */
+  #mp-table .player-label {
+    font-size: 0.35rem !important;
+  }
+
+  /* Played cards smaller & always in a row */
   #mp-played-cards {
     flex-wrap: nowrap;
-    gap: 4px;
+    gap: 3px;
+    min-height: 60px;
+    margin: 4px 0;
+    overflow-x: auto;
+  }
+
+  #mp-played-cards .card {
+    width: 42px !important;
+    height: 60px !important;
+    font-size: 0.6rem !important;
+    flex-shrink: 0;
+  }
+
+  /* Your hand cards smaller */
+  #mp-your-hand {
+    gap: 2px;
+    min-height: 60px;
+  }
+
+  #mp-your-hand .card {
+    width: 44px !important;
+    height: 62px !important;
+    font-size: 0.6rem !important;
+  }
+
+  /* Play/Pass buttons smaller */
+  #your-hand-wrap .btn-row {
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  #your-hand-wrap .btn {
+    padding: 6px 20px;
+    font-size: 0.55rem;
+  }
+
+  /* Text elements smaller */
+  #mp-whose-play,
+  #mp-msg {
+    font-size: 0.45rem !important;
+  }
+
+  .label {
+    font-size: 0.35rem !important;
+  }
+
+  /* Top opponent zone compact */
+  #mp-table > .player-zone:first-child {
+    margin-bottom: 0;
+  }
+
+  /* Timer smaller */
+  .mp-timer-text {
+    font-size: 0.7rem;
   }
 }
+
