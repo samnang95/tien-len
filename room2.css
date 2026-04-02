@@ -597,14 +597,18 @@
     line-height: 1.6;
   }
   .boom-card {
-    width: 32px !important;
-    height: 46px !important;
+    width: 30px !important;
+    height: 44px !important;
+    margin-right: -4px !important;
   }
-  .boom-card .card-face { padding: 2px 2px !important; }
-  .boom-card .rank { font-size: 0.6rem !important; }
+  .boom-card .card-face { padding: 2px 3px !important; }
+  .boom-card .rank { font-size: 0.65rem !important; }
   .boom-card .suit { font-size: 0.5rem !important; }
-  .boom-card .center-suit { font-size: 0.7rem !important; }
-  .boom-hand .boom-card { margin-right: -16px !important; }
+  .boom-card .center-suit { display: none !important; }
+  .boom-card .bottom { display: none !important; }
+  .boom-player-name { font-size: 0.6rem; }
+  .boom-player-row { margin: 4px 0; }
+  .boom-hand { flex-wrap: wrap; justify-content: center; }
 }
 
 /* ── BOOM OVERLAY CARD STYLES ── */
