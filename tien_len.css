@@ -1058,3 +1058,126 @@ h1 {
 }
 #rules-panel.hidden { display: none; }
 #rules-panel strong { color: var(--gold); }
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .game-logo { width: 100px !important; margin-top: 6px; }
+  .subtitle { font-size: 0.6rem; margin-bottom: 4px; }
+
+  #moneyboard { gap: 6px; margin-bottom: 4px; }
+  .money-chip { padding: 2px 8px; font-size: 0.65rem; border-radius: 14px; }
+
+  #bet-bar { padding: 3px 10px; font-size: 0.7rem; margin-bottom: 4px; }
+
+  #scoreboard { gap: 6px; margin-bottom: 6px; }
+  .score-chip { padding: 2px 8px; font-size: 0.65rem; }
+
+  #table {
+    width: 100%;
+    border-radius: 24px;
+    padding: 8px;
+    gap: 6px;
+  }
+
+  /* Smaller cards for your hand */
+  :root {
+    --card-w: 48px;
+    --card-h: 70px;
+  }
+  .card-face .rank { font-size: 0.85rem; }
+  .card-face .suit { font-size: 0.7rem; }
+  .card-face .center-suit { font-size: 1.2rem; }
+
+  #your-hand { padding: 0 6px; }
+  #your-hand .card { margin-right: -26px; }
+
+  /* Smaller side zones */
+  .side-zone { width: 50px !important; }
+  .card-sm { width: 22px; height: 32px; margin-bottom: -20px; }
+  .hand-col .card-sm { margin-bottom: -20px; }
+
+  .player-label { font-size: 0.55rem; }
+  .side-zone .player-label { font-size: 0.45rem; padding: 1px 4px; }
+
+  /* Play area */
+  #play-area { min-height: 90px; padding: 6px; }
+  #played-cards .card { margin-right: -24px; }
+  #msg { font-size: 0.8rem; }
+  #whose-play { font-size: 0.65rem; }
+
+  /* Buttons */
+  .btn { padding: 6px 18px; font-size: 0.75rem; }
+  .btn-row { gap: 8px; }
+
+  /* Overlay */
+  .overlay-box { padding: 20px 24px; }
+  .overlay-box h2 { font-size: 1.4rem; }
+
+  /* Toolbar */
+  #game-toolbar { bottom: 8px; right: 8px; gap: 6px; }
+  #game-toolbar button { width: 30px; height: 30px; font-size: 0.85rem; }
+  #rules-panel { bottom: 46px; right: 8px; width: 260px; font-size: 0.68rem; }
+}
+
+@media (max-width: 480px) {
+  .game-logo { width: 70px !important; }
+
+  #moneyboard { gap: 4px; }
+  .money-chip { padding: 2px 6px; font-size: 0.58rem; }
+
+  #scoreboard { gap: 4px; }
+  .score-chip { padding: 2px 6px; font-size: 0.58rem; }
+
+  #table {
+    border-radius: 18px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  :root {
+    --card-w: 40px;
+    --card-h: 58px;
+  }
+  .card-face .rank { font-size: 0.75rem; }
+  .card-face .suit { font-size: 0.6rem; }
+  .card-face .center-suit { font-size: 1rem; }
+  .card-face { padding: 2px 3px; }
+
+  #your-hand .card { margin-right: -22px; }
+  .card:hover { transform: translateY(-6px); }
+  .card.selected { transform: translateY(-10px); }
+
+  .side-zone { width: 36px !important; }
+  .card-sm { width: 18px; height: 26px; border-radius: 3px; }
+  .hand-col .card-sm { margin-bottom: -16px; }
+  .side-zone .player-label { font-size: 0.4rem; padding: 1px 3px; }
+
+  #play-area { min-height: 75px; }
+  #played-cards .card {
+    width: 42px;
+    height: 60px;
+    margin-right: -20px;
+  }
+  #played-cards .card .card-face { padding: 2px 3px; }
+  #played-cards .card .rank { font-size: 0.75rem; }
+  #played-cards .card .suit { font-size: 0.6rem; }
+  #played-cards .card .center-suit { font-size: 1rem; }
+
+  #msg { font-size: 0.7rem; }
+  #whose-play { font-size: 0.6rem; }
+  #play-area .label { font-size: 0.55rem; }
+
+  .btn { padding: 5px 14px; font-size: 0.7rem; }
+
+  .overlay-box { padding: 18px 18px; }
+  .overlay-box h2 { font-size: 1.2rem; }
+  .overlay-box p { font-size: 0.75rem; }
+  #ov-loser-cards .loser-hand .card { width: 38px; height: 54px; }
+
+  .bet-box { padding: 20px 20px; min-width: unset; width: 90vw; }
+
+  #bet-bar { font-size: 0.65rem; padding: 3px 8px; }
+}
