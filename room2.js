@@ -155,6 +155,9 @@ function beats(combo, prevCards) {
     if (prev.type === 'pair' && prev.rank === 12) return true;
     if (prev.type === 'four') return true;
   }
+  // Pair sequence of 3+ pairs can chop a single 2
+  if (combo.type === 'dblrun' && combo.length >= 6 && prev.type === 'single' && prev.rank === 12)
+    return true;
   // Same type and length
   if (combo.type !== prev.type) return false;
   if ((combo.type === 'run' || combo.type === 'dblrun') && combo.length !== prev.length) return false;
@@ -367,6 +370,8 @@ function listenForPlayers() {
       listenForGame();
       showScreen('mp-game');
       document.getElementById('game-room-code').textContent = roomCode;
+      // Show reset button only for host
+      document.getElementById('mp-reset-btn').style.display = isHost ? 'flex' : 'none';
     }
   });
   listeners.push(() => roomRef.child('status').off('value', statusUnsub));
