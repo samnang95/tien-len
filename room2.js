@@ -518,13 +518,18 @@ function renderGame() {
   }
 
   // Enable/disable buttons
+  // If it's your turn (gs.current === mySeat), you can always play
+  // passedPlayers only prevents PASSING again, not playing when assigned your turn
   const passedList = gs.passedPlayers || [];
-  const isMyTurn = gs.current === mySeat && !gs.gameOver && !finishOrder.includes(mySeat) && !passedList.includes(mySeat);
+  const isMyTurn = gs.current === mySeat && !gs.gameOver && !finishOrder.includes(mySeat);
   document.getElementById('mp-btn-play').disabled = !isMyTurn;
-  document.getElementById('mp-btn-pass').disabled = !isMyTurn || (gs.lastPlayer === -1 || gs.lastPlayer === mySeat || (gs.lastPlayed && gs.lastPlayed.length === 0));
+  // Can't pass if: not your turn, free play, or already passed this round
+  const canPass = isMyTurn && gs.lastPlayed && gs.lastPlayed.length > 0 && gs.lastPlayer !== mySeat && !passedList.includes(mySeat);
+  document.getElementById('mp-btn-pass').disabled = !canPass;
 
-  // Grey out cards when you've passed this round
-  document.getElementById('mp-your-hand').style.opacity = (passedList.includes(mySeat) && !gs.gameOver) ? '0.5' : '1';
+  // Grey out cards when you've passed this round (but only if it's NOT your turn as free play)
+  const amPassed = passedList.includes(mySeat) && gs.current !== mySeat && !gs.gameOver;
+  document.getElementById('mp-your-hand').style.opacity = amPassed ? '0.5' : '1';
 }
 
 function renderOpponentHand(containerId, seat) {
@@ -578,8 +583,7 @@ function renderPlayedCards() {
 }
 
 function toggleSelect(idx) {
-  const passedList = gs.passedPlayers || [];
-  if (gs.current !== mySeat || gs.gameOver || passedList.includes(mySeat)) return;
+  if (gs.current !== mySeat || gs.gameOver) return;
   if (selected.has(idx)) selected.delete(idx);
   else selected.add(idx);
   SFX.play('play');
@@ -590,8 +594,7 @@ function toggleSelect(idx) {
 // PLAY CARDS / PASS
 // ═══════════════════════════════════════════════════════════════
 async function mpPlaySelected() {
-  const passedList = gs.passedPlayers || [];
-  if (gs.current !== mySeat || gs.gameOver || passedList.includes(mySeat)) return;
+  if (gs.current !== mySeat || gs.gameOver) return;
 
   const hand = gs.hands[mySeat];
   const cards = [...selected].map(i => hand[i]);
@@ -672,13 +675,17 @@ async function mpPlaySelected() {
     turnStartedAt: firebase.database.ServerValue.TIMESTAMP
   };
 
-  // If game over, calculate scores
+  // If game over, calculate scores based on player count
   if (gameOver) {
     const scores = [...(gs.scores || [0,0,0,0])];
-    scores[finishOrder[0]] += 3;
-    scores[finishOrder[1]] += 2;
-    scores[finishOrder[2]] += 1;
-    scores[finishOrder[3]] += 0;
+    const numPlayers = activeSeats.length;
+    // Dynamic scoring: winner gets most, loser gets 0
+    // 2 players: [1, 0]
+    // 3 players: [2, 1, 0]
+    // 4 players: [3, 2, 1, 0]
+    for (let i = 0; i < finishOrder.length; i++) {
+      scores[finishOrder[i]] += Math.max(numPlayers - 1 - i, 0);
+    }
     update.scores = scores;
   }
 
@@ -794,12 +801,21 @@ function showGameOver() {
   const names = gs.names || {};
   const activeSeats = gs.activeSeats || [0,1,2,3];
 
-  const myPos = finishOrder.indexOf(mySeat);
-  const titles = ['🥇 1st Place!', '🥈 2nd Place!', '🥉 3rd Place!', '4th Place'];
+  // Build titles based on player count
+  const numPlayers = activeSeats.length;
+  let titles;
+  if (numPlayers === 2) {
+    titles = ['🏆 Winner!', '💀 Loser'];
+  } else if (numPlayers === 3) {
+    titles = ['🥇 1st Place!', '🥈 2nd Place!', '💀 Last Place'];
+  } else {
+    titles = ['🥇 1st Place!', '🥈 2nd Place!', '🥉 3rd Place!', '💀 Last Place'];
+  }
 
+  const myPos = finishOrder.indexOf(mySeat);
   document.getElementById('mp-ov-title').textContent = myPos >= 0 ? titles[myPos] : 'Game Over';
   document.getElementById('mp-ov-msg').innerHTML = finishOrder.map((seat, i) =>
-    `<div>${titles[i]}: <strong>${names[seat] || 'Player'}</strong></div>`
+    `<div>${titles[i] || (i+1)+'th'}: <strong>${names[seat] || 'Player'}</strong></div>`
   ).join('');
 
   const scores = gs.scores || [0,0,0,0];
