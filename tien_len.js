@@ -235,50 +235,62 @@ function newGame(){
   setMsg('');
   SFX.deal();
 
-  // ── FOUR 2s INSTANT WIN CHECK ──
+  // ── INSTANT WIN CHECKS (four 2s or 6 pairs) ──
+  function countPairs(hand){
+    const groups = {};
+    hand.forEach(c => { groups[c.rank] = (groups[c.rank]||0) + 1; });
+    let pairs = 0;
+    Object.values(groups).forEach(cnt => { pairs += Math.floor(cnt / 2); });
+    return pairs;
+  }
+
+  let boomPlayer = -1;
+  let boomReason = '';
   for(let p=0; p<4; p++){
     const twos = hands[p].filter(c => c.rank === '2');
-    if(twos.length === 4){
-      // Instant win!
-      gameOver = true;
-      SFX.bomb();
-      setTimeout(() => SFX.win(), 500);
-      finishOrder = [p];
-      for(let q=0; q<4; q++){ if(q !== p) finishOrder.push(q); }
-      scores[p]++;
-      updateScores();
+    if(twos.length === 4){ boomPlayer = p; boomReason = 'FOUR 2s'; break; }
+    if(countPairs(hands[p]) >= 6){ boomPlayer = p; boomReason = 'SIX PAIRS'; break; }
+  }
 
-      render();
+  if(boomPlayer >= 0){
+    gameOver = true;
+    SFX.bomb();
+    setTimeout(() => SFX.win(), 500);
+    finishOrder = [boomPlayer];
+    for(let q=0; q<4; q++){ if(q !== boomPlayer) finishOrder.push(q); }
+    scores[boomPlayer]++;
+    updateScores();
 
-      const winnerName = p === 0 ? '🎉 You' : 'CPU ' + p;
-      const ov = document.getElementById('overlay');
-      ov.classList.remove('hidden');
-      document.getElementById('ov-title').textContent = '💣 FOUR 2s BOOM! 💣';
-      document.getElementById('ov-msg').textContent = winnerName + ' holds all four 2s — INSTANT WIN!';
-      document.getElementById('ov-money').textContent = '';
-      document.getElementById('ov-money').className = 'ov-money';
+    render();
 
-      document.getElementById('ov-wallets').textContent =
-        `You $${wallets[0]}  •  CPU1 $${wallets[1]}  •  CPU2 $${wallets[2]}  •  CPU3 $${wallets[3]}`;
-      document.getElementById('ov-score').textContent =
-        `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
+    const winnerName = boomPlayer === 0 ? '🎉 You' : 'CPU ' + boomPlayer;
+    const ov = document.getElementById('overlay');
+    ov.classList.remove('hidden');
+    document.getElementById('ov-title').textContent = '💣 ' + boomReason + ' BOOM! 💣';
+    document.getElementById('ov-msg').textContent = winnerName + ' has ' + boomReason.toLowerCase() + ' — INSTANT WIN!';
+    document.getElementById('ov-money').textContent = '';
+    document.getElementById('ov-money').className = 'ov-money';
 
-      // Show all other players' cards
-      const loserCardsEl = document.getElementById('ov-loser-cards');
-      let html = '';
-      for(let q=0; q<4; q++){
-        if(q === p) continue;
-        const name = q === 0 ? 'Your' : 'CPU ' + q + "'s";
-        html += `<div class="loser-label">🃏 ${name} cards:</div><div class="loser-hand" id="boom-hand-${q}"></div>`;
-      }
-      loserCardsEl.innerHTML = html;
-      for(let q=0; q<4; q++){
-        if(q === p) continue;
-        const handEl = document.getElementById('boom-hand-' + q);
-        hands[q].forEach(c => { handEl.appendChild(makeCardEl(c)); });
-      }
-      return;
+    document.getElementById('ov-wallets').textContent =
+      `You $${wallets[0]}  •  CPU1 $${wallets[1]}  •  CPU2 $${wallets[2]}  •  CPU3 $${wallets[3]}`;
+    document.getElementById('ov-score').textContent =
+      `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
+
+    // Show all other players' cards
+    const loserCardsEl = document.getElementById('ov-loser-cards');
+    let html = '';
+    for(let q=0; q<4; q++){
+      if(q === boomPlayer) continue;
+      const name = q === 0 ? 'Your' : 'CPU ' + q + "'s";
+      html += `<div class="loser-label">🃏 ${name} cards:</div><div class="loser-hand" id="boom-hand-${q}"></div>`;
     }
+    loserCardsEl.innerHTML = html;
+    for(let q=0; q<4; q++){
+      if(q === boomPlayer) continue;
+      const handEl = document.getElementById('boom-hand-' + q);
+      hands[q].forEach(c => { handEl.appendChild(makeCardEl(c)); });
+    }
+    return;
   }
 
   render();
@@ -300,8 +312,10 @@ function render(){
   for(let p=1;p<=3;p++){
     const el=document.getElementById('hand-cpu'+p);
     el.innerHTML='';
-    // Show cards face-up for 4th place player when game ends
-    const showCards = gameOver && hands[p].length > 0;
+    // Show cards face-up only for 4th place player at normal game end (not boom)
+    const isBoom = finishOrder.length === 4 && finishOrder[0] !== undefined && hands[finishOrder[0]].length === 13;
+    const is4thPlace = gameOver && !isBoom && finishOrder.indexOf(p) === 3;
+    const showCards = is4thPlace && hands[p].length > 0;
     hands[p].forEach(c=>{
       if(showCards){
         const cardEl=makeCardEl(c);

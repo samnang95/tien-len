@@ -421,17 +421,27 @@ async function startGame() {
     }
   }
 
-  // ── FOUR 2s INSTANT WIN CHECK ──
-  let fourTwosWinner = -1;
-  for (const seat of activeSeats) {
-    const twos = hands[seat].filter(c => c.rank === '2');
-    if (twos.length === 4) { fourTwosWinner = seat; break; }
+  // ── INSTANT WIN CHECKS (four 2s or 6 pairs) ──
+  function countPairs(hand){
+    const groups = {};
+    hand.forEach(c => { groups[c.rank] = (groups[c.rank]||0) + 1; });
+    let pairs = 0;
+    Object.values(groups).forEach(cnt => { pairs += Math.floor(cnt / 2); });
+    return pairs;
   }
 
-  if (fourTwosWinner >= 0) {
-    const fo = [fourTwosWinner, ...activeSeats.filter(s => s !== fourTwosWinner)];
+  let boomWinner = -1;
+  let boomReason = '';
+  for (const seat of activeSeats) {
+    const twos = hands[seat].filter(c => c.rank === '2');
+    if (twos.length === 4) { boomWinner = seat; boomReason = 'FOUR 2s'; break; }
+    if (countPairs(hands[seat]) >= 6) { boomWinner = seat; boomReason = 'SIX PAIRS'; break; }
+  }
+
+  if (boomWinner >= 0) {
+    const fo = [boomWinner, ...activeSeats.filter(s => s !== boomWinner)];
     const scores = [0, 0, 0, 0];
-    scores[fourTwosWinner] = 1;
+    scores[boomWinner] = 1;
     await roomRef.child('game').set({
       hands: hands,
       current: -1,
@@ -443,12 +453,13 @@ async function startGame() {
       wallets: [1000, 1000, 1000, 1000],
       betAmount: 100,
       gameOver: true,
-      message: '💣 ' + nameMap[fourTwosWinner] + ' has FOUR 2s — INSTANT WIN! 💣',
+      message: '💣 ' + nameMap[boomWinner] + ' has ' + boomReason + ' — INSTANT WIN! 💣',
       turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
       names: nameMap,
       activeSeats: activeSeats,
       passedPlayers: [],
-      fourTwosBoom: fourTwosWinner
+      fourTwosBoom: boomWinner,
+      boomReason: boomReason
     });
   } else {
     // Normal game start
@@ -867,7 +878,8 @@ function showGameOver() {
   if (isFourTwosBoom) {
     const boomPlayer = gs.fourTwosBoom;
     const boomName = names[boomPlayer] || 'Player';
-    document.getElementById('mp-ov-title').textContent = '💣 FOUR 2s BOOM! 💣';
+    const reason = gs.boomReason || 'FOUR 2s';
+    document.getElementById('mp-ov-title').textContent = '💣 ' + reason + ' BOOM! 💣';
     // Show all players' cards
     let cardsHtml = '';
     for (const seat of activeSeats) {
@@ -934,16 +946,26 @@ async function hostNewGame() {
 
   const scores = gs.scores || [0,0,0,0];
 
-  // ── FOUR 2s INSTANT WIN CHECK ──
-  let fourTwosWinner = -1;
-  for (const seat of activeSeats) {
-    const twos = hands[seat].filter(c => c.rank === '2');
-    if (twos.length === 4) { fourTwosWinner = seat; break; }
+  // ── INSTANT WIN CHECKS (four 2s or 6 pairs) ──
+  function countPairs(hand){
+    const groups = {};
+    hand.forEach(c => { groups[c.rank] = (groups[c.rank]||0) + 1; });
+    let pairs = 0;
+    Object.values(groups).forEach(cnt => { pairs += Math.floor(cnt / 2); });
+    return pairs;
   }
 
-  if (fourTwosWinner >= 0) {
-    const fo = [fourTwosWinner, ...activeSeats.filter(s => s !== fourTwosWinner)];
-    scores[fourTwosWinner]++;
+  let boomWinner = -1;
+  let boomReason = '';
+  for (const seat of activeSeats) {
+    const twos = hands[seat].filter(c => c.rank === '2');
+    if (twos.length === 4) { boomWinner = seat; boomReason = 'FOUR 2s'; break; }
+    if (countPairs(hands[seat]) >= 6) { boomWinner = seat; boomReason = 'SIX PAIRS'; break; }
+  }
+
+  if (boomWinner >= 0) {
+    const fo = [boomWinner, ...activeSeats.filter(s => s !== boomWinner)];
+    scores[boomWinner]++;
     await gameRef.set({
       hands: hands,
       current: -1,
@@ -955,12 +977,13 @@ async function hostNewGame() {
       wallets: gs.wallets || [1000,1000,1000,1000],
       betAmount: gs.betAmount || 100,
       gameOver: true,
-      message: '💣 ' + nameMap[fourTwosWinner] + ' has FOUR 2s — INSTANT WIN! 💣',
+      message: '💣 ' + nameMap[boomWinner] + ' has ' + boomReason + ' — INSTANT WIN! 💣',
       turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
       names: nameMap,
       activeSeats: activeSeats,
       passedPlayers: [],
-      fourTwosBoom: fourTwosWinner
+      fourTwosBoom: boomWinner,
+      boomReason: boomReason
     });
   } else {
     await gameRef.set({
