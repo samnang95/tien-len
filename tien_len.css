@@ -1180,4 +1180,54 @@ h1 {
   .bet-box { padding: 20px 20px; min-width: unset; width: 90vw; }
 
   #bet-bar { font-size: 0.65rem; padding: 3px 8px; }
+
+  .boom-card {
+    width: 32px !important;
+    height: 46px !important;
+    margin-right: -16px !important;
+  }
+  .boom-card .card-face { padding: 2px 2px !important; }
+  .boom-card .rank { font-size: 0.6rem !important; }
+  .boom-card .suit { font-size: 0.5rem !important; }
+  .boom-card .center-suit { font-size: 0.7rem !important; }
+  .boom-player-name { font-size: 0.6rem; }
 }
+
+/* ── BOOM OVERLAY CARD STYLES ── */
+.boom-player-row {
+  margin: 10px 0;
+  text-align: center;
+}
+.boom-player-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+.boom-hand {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0;
+}
+.boom-card {
+  width: 48px;
+  height: 68px;
+  flex-shrink: 0;
+  cursor: default !important;
+  margin-right: -18px;
+}
+.boom-card:last-child {
+  margin-right: 0;
+}
+.boom-card:hover {
+  transform: none !important;
+}
+.boom-card .card-face {
+  padding: 3px 4px;
+}
+.boom-card .rank { font-size: 0.8rem; }
+.boom-card .suit { font-size: 0.65rem; }
+.boom-card .center-suit { font-size: 1rem; }

@@ -276,19 +276,26 @@ function newGame(){
     document.getElementById('ov-score').textContent =
       `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
 
-    // Show all other players' cards
+    // Show all players' cards with full card visuals
     const loserCardsEl = document.getElementById('ov-loser-cards');
     let html = '';
     for(let q=0; q<4; q++){
-      if(q === boomPlayer) continue;
-      const name = q === 0 ? 'Your' : 'CPU ' + q + "'s";
-      html += `<div class="loser-label">🃏 ${name} cards:</div><div class="loser-hand" id="boom-hand-${q}"></div>`;
+      const pName = q === 0 ? 'You' : 'CPU ' + q;
+      const isBoomWinner = q === boomPlayer;
+      html += `<div class="boom-player-row">
+        <div class="boom-player-name">${pName}${isBoomWinner ? ' 👑' : ''}</div>
+        <div class="boom-hand" id="boom-hand-${q}"></div>
+      </div>`;
     }
     loserCardsEl.innerHTML = html;
     for(let q=0; q<4; q++){
-      if(q === boomPlayer) continue;
       const handEl = document.getElementById('boom-hand-' + q);
-      hands[q].forEach(c => { handEl.appendChild(makeCardEl(c)); });
+      hands[q].forEach(c => {
+        const el = makeCardEl(c);
+        el.classList.add('boom-card');
+        el.style.cursor = 'default';
+        handEl.appendChild(el);
+      });
     }
     return;
   }
