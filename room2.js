@@ -421,7 +421,8 @@ async function startGame() {
     message: nameMap[starter] + ' starts (has 3♠)',
     turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
     names: nameMap,
-    activeSeats: activeSeats
+    activeSeats: activeSeats,
+    passedPlayers: []
   });
 
   await roomRef.child('status').set('playing');
@@ -517,9 +518,13 @@ function renderGame() {
   }
 
   // Enable/disable buttons
-  const isMyTurn = gs.current === mySeat && !gs.gameOver && !finishOrder.includes(mySeat);
+  const passedList = gs.passedPlayers || [];
+  const isMyTurn = gs.current === mySeat && !gs.gameOver && !finishOrder.includes(mySeat) && !passedList.includes(mySeat);
   document.getElementById('mp-btn-play').disabled = !isMyTurn;
   document.getElementById('mp-btn-pass').disabled = !isMyTurn || (gs.lastPlayer === -1 || gs.lastPlayer === mySeat || (gs.lastPlayed && gs.lastPlayed.length === 0));
+
+  // Grey out cards when you've passed this round
+  document.getElementById('mp-your-hand').style.opacity = (passedList.includes(mySeat) && !gs.gameOver) ? '0.5' : '1';
 }
 
 function renderOpponentHand(containerId, seat) {
@@ -573,7 +578,8 @@ function renderPlayedCards() {
 }
 
 function toggleSelect(idx) {
-  if (gs.current !== mySeat || gs.gameOver) return;
+  const passedList = gs.passedPlayers || [];
+  if (gs.current !== mySeat || gs.gameOver || passedList.includes(mySeat)) return;
   if (selected.has(idx)) selected.delete(idx);
   else selected.add(idx);
   SFX.play('play');
@@ -584,7 +590,8 @@ function toggleSelect(idx) {
 // PLAY CARDS / PASS
 // ═══════════════════════════════════════════════════════════════
 async function mpPlaySelected() {
-  if (gs.current !== mySeat || gs.gameOver) return;
+  const passedList = gs.passedPlayers || [];
+  if (gs.current !== mySeat || gs.gameOver || passedList.includes(mySeat)) return;
 
   const hand = gs.hands[mySeat];
   const cards = [...selected].map(i => hand[i]);
@@ -621,9 +628,10 @@ async function mpPlaySelected() {
     finished = true;
   }
 
-  // Determine next player
+  // Determine next player (skip passed players too)
   const activeSeats = gs.activeSeats || [0,1,2,3];
-  let next = findNextPlayer(mySeat, finishOrder, activeSeats);
+  const currentPassedList = gs.passedPlayers || [];
+  let next = findNextPlayer(mySeat, finishOrder, activeSeats, currentPassedList);
 
   // Check game over (all but 1 active player finished)
   const gameOver = finishOrder.length >= activeSeats.length - 1;
@@ -666,44 +674,66 @@ async function mpPlaySelected() {
 }
 
 async function mpPass() {
-  if (gs.current !== mySeat || gs.gameOver) return;
+  const passedList = gs.passedPlayers || [];
+  if (gs.current !== mySeat || gs.gameOver || passedList.includes(mySeat)) return;
   SFX.play('pass');
 
   const finishOrder = gs.finishOrder || [];
   const names = gs.names || {};
   const activeSeats = gs.activeSeats || [0,1,2,3];
-  const passCount = (gs.passCount || 0) + 1;
+  const newPassedPlayers = [...passedList, mySeat]; // add me to passed list
 
-  // Count active players (not finished)
-  const activePlayers = activeSeats.length - finishOrder.length;
-  let next = findNextPlayer(mySeat, finishOrder, activeSeats);
+  // Count players who are alive, not finished, and haven't passed
+  const alivePlayers = activeSeats.filter(s => {
+    const hand = gs.hands[s] || [];
+    return hand.length > 0 && !finishOrder.includes(s);
+  });
+  const activePlayers = alivePlayers.filter(s => !newPassedPlayers.includes(s));
+
+  // If only 1 active player left → round ends, new round starts
+  if (activePlayers.length <= 1) {
+    const roundWinner = activePlayers[0] !== undefined ? activePlayers[0] : gs.lastPlayer;
+    const update = {
+      current: roundWinner,
+      lastPlayed: [],
+      lastPlayer: -1,
+      passCount: 0,
+      passedPlayers: [], // everyone unlocked for new round
+      message: (names[roundWinner] || 'Player') + "'s free turn",
+      turnStartedAt: firebase.database.ServerValue.TIMESTAMP
+    };
+    await gameRef.update(update);
+    return;
+  }
+
+  // Find next player (skip passed and finished)
+  let next = findNextPlayer(mySeat, finishOrder, activeSeats, newPassedPlayers);
 
   const update = {
     current: next,
-    passCount: passCount,
+    passCount: (gs.passCount || 0) + 1,
+    passedPlayers: newPassedPlayers,
     message: (names[mySeat] || 'Player') + ' passed',
     turnStartedAt: firebase.database.ServerValue.TIMESTAMP
   };
 
-  // If all other active players passed, free turn for lastPlayer
-  if (passCount >= activePlayers - 1) {
-    update.lastPlayed = [];
-    update.lastPlayer = -1;
-    update.passCount = 0;
-    update.message = (names[next] || 'Player') + "'s free turn";
-  }
-
   await gameRef.update(update);
 }
 
-function findNextPlayer(currentSeat, finishOrder, activeSeats) {
+function findNextPlayer(currentSeat, finishOrder, activeSeats, passedList) {
   const seats = activeSeats || [0,1,2,3];
+  const passed = passedList || [];
   const currentIdx = seats.indexOf(currentSeat);
+  for (let i = 1; i <= seats.length; i++) {
+    const nextSeat = seats[(currentIdx + i) % seats.length];
+    if (!finishOrder.includes(nextSeat) && !passed.includes(nextSeat)) return nextSeat;
+  }
+  // Fallback: skip only finished
   for (let i = 1; i <= seats.length; i++) {
     const nextSeat = seats[(currentIdx + i) % seats.length];
     if (!finishOrder.includes(nextSeat)) return nextSeat;
   }
-  return currentSeat; // shouldn't happen
+  return currentSeat;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -816,7 +846,8 @@ async function hostNewGame() {
     message: nameMap[starter] + ' starts (has 3♠)',
     turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
     names: nameMap,
-    activeSeats: activeSeats
+    activeSeats: activeSeats,
+    passedPlayers: []
   });
 }
 
