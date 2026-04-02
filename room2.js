@@ -442,6 +442,9 @@ function listenForGame() {
 
     if (gs.gameOver) {
       showGameOver();
+    } else {
+      // New game started — auto-hide the overlay
+      document.getElementById('mp-overlay').classList.add('hidden');
     }
   });
   listeners.push(() => gameRef.off('value', unsub));
@@ -822,8 +825,9 @@ function showGameOver() {
   document.getElementById('mp-ov-score').innerHTML = 'Scores: ' +
     activeSeats.map(i => `${names[i] || 'P'+(i+1)}: ${scores[i]}`).join(' | ');
 
-  // Show new game button for host
+  // Show new game button for host, waiting message for others
   document.getElementById('mp-btn-newgame').style.display = isHost ? 'inline-flex' : 'none';
+  document.getElementById('mp-ov-waiting').style.display = isHost ? 'none' : 'block';
 
   if (myPos === 0) SFX.play('win');
 }
