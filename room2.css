@@ -480,6 +480,23 @@
     font-size: 0.6rem !important;
   }
 
+  /* Scale down ALL card text/icons on mobile */
+  #mp-game .card .card-face {
+    padding: 2px 3px !important;
+  }
+
+  #mp-game .card .card-face .rank {
+    font-size: 0.6rem !important;
+  }
+
+  #mp-game .card .card-face .suit {
+    font-size: 0.5rem !important;
+  }
+
+  #mp-game .card .card-face .center-suit {
+    font-size: 0.85rem !important;
+  }
+
   /* Play/Pass buttons smaller */
   #your-hand-wrap .btn-row {
     gap: 8px;
