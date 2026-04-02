@@ -951,9 +951,16 @@ async function hostNewGame() {
   }
   for (const seat of activeSeats) hands[seat] = sortHand(hands[seat]);
 
-  let starter = activeSeats[0];
-  for (const seat of activeSeats) {
-    if (hands[seat].some(c => c.rank === '3' && c.suit === '♠')) { starter = seat; break; }
+  // Previous winner starts next game
+  const prevFinishOrder = gs.finishOrder || [];
+  let starter;
+  if (prevFinishOrder.length > 0 && activeSeats.includes(prevFinishOrder[0])) {
+    starter = prevFinishOrder[0];
+  } else {
+    starter = activeSeats[0];
+    for (const seat of activeSeats) {
+      if (hands[seat].some(c => c.rank === '3' && c.suit === '♠')) { starter = seat; break; }
+    }
   }
 
   const scores = gs.scores || [0,0,0,0];
@@ -1009,7 +1016,7 @@ async function hostNewGame() {
       wallets: gs.wallets || [1000,1000,1000,1000],
       betAmount: gs.betAmount || 100,
       gameOver: false,
-      message: nameMap[starter] + ' starts (has 3♠)',
+      message: nameMap[starter] + ' starts (winner goes first)',
       turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
       names: nameMap,
       activeSeats: activeSeats,

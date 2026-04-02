@@ -185,6 +185,7 @@ let gameOver=false;
 let betAmount=100;
 let wallets=[1000,1000,1000,1000]; // 0=you, 1-3=cpu
 let finishOrder=[]; // tracks order players empty their hands
+let lastWinner=-1; // winner of last game, -1 = first game
 const RANK_REWARDS=[30, 15, -15, -30]; // 1st, 2nd, 3rd, 4th
 
 // ── TIMER ─────────────────────────────────────────────────
@@ -228,9 +229,14 @@ function newGame(){
   for(let i=0;i<52;i++) hands[i%4].push(deck[i]);
   hands.forEach(h=>sortHand(h));
   lastPlayed=[]; lastPlayer=-1; passCount=0;
-  current=0;
-  for(let p=0;p<4;p++){
-    if(hands[p].some(c=>c.rank==='3'&&c.suit==='♠')){ current=p; break; }
+  // First game: 3♠ holder starts. Next games: previous winner starts
+  if(lastWinner >= 0){
+    current = lastWinner;
+  } else {
+    current=0;
+    for(let p=0;p<4;p++){
+      if(hands[p].some(c=>c.rank==='3'&&c.suit==='♠')){ current=p; break; }
+    }
   }
   setMsg('');
   SFX.deal();
@@ -254,6 +260,7 @@ function newGame(){
 
   if(boomPlayer >= 0){
     gameOver = true;
+    lastWinner = boomPlayer;
     SFX.bomb();
     setTimeout(() => SFX.win(), 500);
     finishOrder = [boomPlayer];
@@ -302,7 +309,11 @@ function newGame(){
 
   render();
   if(current!==0) scheduleAiTurn();
-  else { setMsg('Your turn — you have 3♠, lead freely!'); startTurnTimer(); }
+  else {
+    const startMsg = lastWinner >= 0 ? 'Your turn — winner goes first!' : 'Your turn — you have 3♠, lead freely!';
+    setMsg(startMsg);
+    startTurnTimer();
+  }
 }
 
 // ── RENDER ─────────────────────────────────────────────────
@@ -690,6 +701,7 @@ function endGame(){
   }
 
   const winner=finishOrder[0];
+  lastWinner = winner;
   if(winner===0) SFX.win(); else SFX.lose();
   scores[winner]++;
 
