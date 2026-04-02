@@ -886,10 +886,10 @@ function showGameOver() {
       const pName = names[seat] || 'Player ' + (seat+1);
       const hand = gs.hands?.[seat] || [];
       const isBoomWinner = seat === boomPlayer;
-      cardsHtml += `<div style="margin:8px 0;"><strong>${pName}${isBoomWinner ? ' 👑' : ''}:</strong> `;
+      cardsHtml += `<div style="margin:6px 0;"><strong style="font-size:0.7rem;">${pName}${isBoomWinner ? ' 👑' : ''}:</strong> `;
       cardsHtml += hand.map(c => {
         const isRed = c.suit === '♥' || c.suit === '♦';
-        return `<span style="color:${isRed ? '#c0392b' : '#1a1a2e'};background:#fdf6e3;padding:1px 4px;border-radius:3px;margin:1px;display:inline-block;font-size:0.8rem;">${c.rank}${c.suit}</span>`;
+        return `<span style="color:${isRed ? '#c0392b' : '#1a1a2e'};background:#fdf6e3;padding:1px 3px;border-radius:3px;margin:1px;display:inline-block;font-size:0.65rem;line-height:1.3;">${c.rank}${c.suit}</span>`;
       }).join('');
       cardsHtml += '</div>';
     }

@@ -552,5 +552,48 @@
   .mp-timer-text {
     font-size: 0.7rem;
   }
+
+  /* Overlay responsive */
+  #mp-overlay .overlay-box {
+    padding: 16px 14px;
+    width: 92vw;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  #mp-overlay .overlay-box h2 {
+    font-size: 1.1rem;
+  }
+  #mp-overlay .overlay-box p {
+    font-size: 0.7rem;
+  }
+  #mp-overlay .ov-score {
+    font-size: 0.6rem;
+  }
+  #mp-overlay .overlay-btn-row .btn {
+    padding: 6px 16px;
+    font-size: 0.6rem;
+  }
+  #mp-overlay .lobby-back-btn {
+    font-size: 0.4rem;
+  }
+  #mp-overlay .ov-waiting {
+    font-size: 0.4rem;
+  }
 }
 
+/* ── Boom cards on mobile ── */
+@media (max-width: 480px) {
+  #mp-overlay .overlay-box {
+    padding: 12px 10px;
+    width: 95vw;
+    max-height: 80vh;
+  }
+  #mp-overlay .overlay-box h2 {
+    font-size: 0.95rem;
+  }
+  #mp-overlay .overlay-box p {
+    font-size: 0.6rem;
+    line-height: 1.6;
+  }
+}
