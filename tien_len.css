@@ -706,7 +706,9 @@ h1 {
   padding: 10px;
 }
 #play-area .label { font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.3); }
-#played-cards { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+#played-cards { display: flex; flex-wrap: nowrap; justify-content: center; }
+#played-cards .card { margin-right: -30px; cursor: default; }
+#played-cards .card:last-child { margin-right: 0; }
 #whose-play { font-size: 0.8rem; color: var(--gold-light); font-style: italic; }
 #msg { font-size: 1rem; color: #f9ca24; font-family: 'Cinzel', serif; min-height: 1.3em; }
 
@@ -770,10 +772,16 @@ h1 {
 }
 #your-hand {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 4px;
   min-height: var(--card-h);
+  padding: 0 20px;
+}
+#your-hand .card {
+  margin-right: -30px;
+}
+#your-hand .card:last-child {
+  margin-right: 0;
 }
 
 /* ── BUTTONS ── */
