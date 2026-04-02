@@ -862,6 +862,9 @@ function showGameOver() {
   const activeSeats = gs.activeSeats || [0,1,2,3];
   const isFourTwosBoom = gs.fourTwosBoom !== undefined && gs.fourTwosBoom >= 0;
 
+  // Widen overlay for boom cards
+  overlay.classList.toggle('boom-active', isFourTwosBoom);
+
   // Build titles based on player count
   const numPlayers = activeSeats.length;
   let titles;
@@ -880,20 +883,29 @@ function showGameOver() {
     const boomName = names[boomPlayer] || 'Player';
     const reason = gs.boomReason || 'FOUR 2s';
     document.getElementById('mp-ov-title').textContent = '💣 ' + reason + ' BOOM! 💣';
-    // Show all players' cards
-    let cardsHtml = '';
+    // Show all players' cards as full card visuals
+    let cardsHtml = `<div style="text-align:center;margin-bottom:8px;">${boomName} — INSTANT WIN!</div>`;
     for (const seat of activeSeats) {
       const pName = names[seat] || 'Player ' + (seat+1);
       const hand = gs.hands?.[seat] || [];
       const isBoomWinner = seat === boomPlayer;
-      cardsHtml += `<div style="margin:6px 0;"><strong style="font-size:0.7rem;">${pName}${isBoomWinner ? ' 👑' : ''}:</strong> `;
+      cardsHtml += `<div class="boom-player-row">
+        <div class="boom-player-name">${pName}${isBoomWinner ? ' 👑' : ''}</div>
+        <div class="boom-hand">`;
       cardsHtml += hand.map(c => {
         const isRed = c.suit === '♥' || c.suit === '♦';
-        return `<span style="color:${isRed ? '#c0392b' : '#1a1a2e'};background:#fdf6e3;padding:1px 3px;border-radius:3px;margin:1px;display:inline-block;font-size:0.65rem;line-height:1.3;">${c.rank}${c.suit}</span>`;
+        const colorClass = isRed ? 'red' : 'black';
+        return `<div class="card boom-card">
+          <div class="card-face ${colorClass}">
+            <div><span class="rank">${c.rank}</span><span class="suit">${c.suit}</span></div>
+            <span class="center-suit">${c.suit}</span>
+            <div class="bottom"><span class="rank">${c.rank}</span><span class="suit">${c.suit}</span></div>
+          </div>
+        </div>`;
       }).join('');
-      cardsHtml += '</div>';
+      cardsHtml += `</div></div>`;
     }
-    document.getElementById('mp-ov-msg').innerHTML = boomName + ' holds all four 2s — INSTANT WIN!<br>' + cardsHtml;
+    document.getElementById('mp-ov-msg').innerHTML = cardsHtml;
   } else {
     document.getElementById('mp-ov-title').textContent = myPos >= 0 ? titles[myPos] : 'Game Over';
     document.getElementById('mp-ov-msg').innerHTML = finishOrder.map((seat, i) =>

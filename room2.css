@@ -596,4 +596,70 @@
     font-size: 0.6rem;
     line-height: 1.6;
   }
+  .boom-card {
+    width: 32px !important;
+    height: 46px !important;
+  }
+  .boom-card .card-face { padding: 2px 2px !important; }
+  .boom-card .rank { font-size: 0.6rem !important; }
+  .boom-card .suit { font-size: 0.5rem !important; }
+  .boom-card .center-suit { font-size: 0.7rem !important; }
+  .boom-hand .boom-card { margin-right: -16px !important; }
+}
+
+/* ── BOOM OVERLAY CARD STYLES ── */
+.boom-player-row {
+  margin: 10px 0;
+  text-align: center;
+}
+.boom-player-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold, #d4a843);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+.boom-hand {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0;
+}
+.boom-card {
+  width: 48px;
+  height: 68px;
+  flex-shrink: 0;
+  cursor: default;
+  margin-right: -18px;
+}
+.boom-card:last-child {
+  margin-right: 0;
+}
+.boom-card:hover {
+  transform: none;
+}
+.boom-card .card-face {
+  padding: 3px 4px;
+}
+.boom-card .rank { font-size: 0.8rem; }
+.boom-card .suit { font-size: 0.65rem; }
+.boom-card .center-suit { font-size: 1rem; }
+
+/* Boom overlay needs wider box to fit cards */
+#mp-overlay.boom-active .overlay-box {
+  max-width: 700px;
+  width: 94vw;
+}
+
+@media (max-width: 768px) {
+  .boom-card {
+    width: 38px;
+    height: 54px;
+    margin-right: -14px;
+  }
+  .boom-card .rank { font-size: 0.7rem; }
+  .boom-card .suit { font-size: 0.55rem; }
+  .boom-card .center-suit { font-size: 0.85rem; }
+  .boom-player-name { font-size: 0.65rem; }
 }
