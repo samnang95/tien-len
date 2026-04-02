@@ -1182,15 +1182,23 @@ h1 {
   #bet-bar { font-size: 0.65rem; padding: 3px 8px; }
 
   .boom-card {
-    width: 32px !important;
-    height: 46px !important;
-    margin-right: -16px !important;
+    width: 36px !important;
+    height: 52px !important;
+    margin-right: -10px !important;
   }
-  .boom-card .card-face { padding: 2px 2px !important; }
-  .boom-card .rank { font-size: 0.6rem !important; }
+  .boom-card .card-face { padding: 2px 3px !important; }
+  .boom-card .rank { font-size: 0.65rem !important; }
   .boom-card .suit { font-size: 0.5rem !important; }
-  .boom-card .center-suit { font-size: 0.7rem !important; }
+  .boom-card .center-suit { font-size: 0.8rem !important; }
   .boom-player-name { font-size: 0.6rem; }
+  .boom-player-row { margin: 6px 0; }
+  .boom-hand { flex-wrap: wrap; }
+
+  /* Make overlay scrollable for boom */
+  .overlay-box {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
 }
 
 /* ── BOOM OVERLAY CARD STYLES ── */
