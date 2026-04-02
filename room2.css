@@ -321,6 +321,16 @@
   color: #2ecc71 !important;
 }
 
+/* Played cards — display in a row */
+#mp-played-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  min-height: 90px;
+  margin: 8px 0;
+}
+
 /* ── Timer ── */
 #mp-turn-timer {
   display: flex;
@@ -367,5 +377,49 @@
 
   .start-btn-row .pixel-play-btn {
     width: 100%;
+  }
+}
+
+/* Mobile game table */
+@media (max-width: 768px) {
+  #mp-table {
+    border-radius: 24px;
+    padding: 8px;
+    gap: 6px;
+  }
+
+  /* Smaller played cards on mobile */
+  #mp-played-cards .card {
+    width: 50px !important;
+    height: 72px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Smaller hand cards on mobile */
+  #mp-your-hand .card {
+    width: 52px;
+    height: 74px;
+    font-size: 0.7rem;
+  }
+
+  #mp-your-hand {
+    gap: 2px;
+  }
+
+  /* Narrower side zones */
+  .player-zone[style*="width:110px"] {
+    width: 60px !important;
+  }
+
+  /* Smaller opponent cards */
+  .card-sm {
+    width: 18px !important;
+    height: 26px !important;
+  }
+
+  /* Played cards always in a row */
+  #mp-played-cards {
+    flex-wrap: nowrap;
+    gap: 4px;
   }
 }
