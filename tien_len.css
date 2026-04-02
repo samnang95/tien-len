@@ -631,12 +631,28 @@ h1 {
 .player-label.active-player { color: var(--gold); font-weight: 700; }
 .player-label.winner-tag { color: #f9ca24; }
 
-/* ── HAND (opponent, face-down) ── */
 .hand-row {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
   min-height: 32px;
+}
+
+/* Side zones: label centered in the card column */
+.side-zone {
+  position: relative;
+}
+.side-zone .player-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 0.55rem;
 }
 
 /* Vertical column layout for left/right opponents */
