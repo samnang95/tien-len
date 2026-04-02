@@ -421,24 +421,55 @@ async function startGame() {
     }
   }
 
-  // Write game state
-  await roomRef.child('game').set({
-    hands: hands,
-    current: starter,
-    lastPlayed: [],
-    lastPlayer: -1,
-    passCount: 0,
-    finishOrder: [],
-    scores: [0, 0, 0, 0],
-    wallets: [1000, 1000, 1000, 1000],
-    betAmount: 100,
-    gameOver: false,
-    message: nameMap[starter] + ' starts (has 3♠)',
-    turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
-    names: nameMap,
-    activeSeats: activeSeats,
-    passedPlayers: []
-  });
+  // ── FOUR 2s INSTANT WIN CHECK ──
+  let fourTwosWinner = -1;
+  for (const seat of activeSeats) {
+    const twos = hands[seat].filter(c => c.rank === '2');
+    if (twos.length === 4) { fourTwosWinner = seat; break; }
+  }
+
+  if (fourTwosWinner >= 0) {
+    const fo = [fourTwosWinner, ...activeSeats.filter(s => s !== fourTwosWinner)];
+    const scores = [0, 0, 0, 0];
+    scores[fourTwosWinner] = 1;
+    await roomRef.child('game').set({
+      hands: hands,
+      current: -1,
+      lastPlayed: [],
+      lastPlayer: -1,
+      passCount: 0,
+      finishOrder: fo,
+      scores: scores,
+      wallets: [1000, 1000, 1000, 1000],
+      betAmount: 100,
+      gameOver: true,
+      message: '💣 ' + nameMap[fourTwosWinner] + ' has FOUR 2s — INSTANT WIN! 💣',
+      turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
+      names: nameMap,
+      activeSeats: activeSeats,
+      passedPlayers: [],
+      fourTwosBoom: fourTwosWinner
+    });
+  } else {
+    // Normal game start
+    await roomRef.child('game').set({
+      hands: hands,
+      current: starter,
+      lastPlayed: [],
+      lastPlayer: -1,
+      passCount: 0,
+      finishOrder: [],
+      scores: [0, 0, 0, 0],
+      wallets: [1000, 1000, 1000, 1000],
+      betAmount: 100,
+      gameOver: false,
+      message: nameMap[starter] + ' starts (has 3♠)',
+      turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
+      names: nameMap,
+      activeSeats: activeSeats,
+      passedPlayers: []
+    });
+  }
 
   await roomRef.child('status').set('playing');
 }
@@ -818,6 +849,7 @@ function showGameOver() {
   const finishOrder = gs.finishOrder || [];
   const names = gs.names || {};
   const activeSeats = gs.activeSeats || [0,1,2,3];
+  const isFourTwosBoom = gs.fourTwosBoom !== undefined && gs.fourTwosBoom >= 0;
 
   // Build titles based on player count
   const numPlayers = activeSeats.length;
@@ -831,10 +863,31 @@ function showGameOver() {
   }
 
   const myPos = finishOrder.indexOf(mySeat);
-  document.getElementById('mp-ov-title').textContent = myPos >= 0 ? titles[myPos] : 'Game Over';
-  document.getElementById('mp-ov-msg').innerHTML = finishOrder.map((seat, i) =>
-    `<div>${titles[i] || (i+1)+'th'}: <strong>${names[seat] || 'Player'}</strong></div>`
-  ).join('');
+
+  if (isFourTwosBoom) {
+    const boomPlayer = gs.fourTwosBoom;
+    const boomName = names[boomPlayer] || 'Player';
+    document.getElementById('mp-ov-title').textContent = '💣 FOUR 2s BOOM! 💣';
+    // Show all players' cards
+    let cardsHtml = '';
+    for (const seat of activeSeats) {
+      const pName = names[seat] || 'Player ' + (seat+1);
+      const hand = gs.hands?.[seat] || [];
+      const isBoomWinner = seat === boomPlayer;
+      cardsHtml += `<div style="margin:8px 0;"><strong>${pName}${isBoomWinner ? ' 👑' : ''}:</strong> `;
+      cardsHtml += hand.map(c => {
+        const isRed = c.suit === '♥' || c.suit === '♦';
+        return `<span style="color:${isRed ? '#c0392b' : '#1a1a2e'};background:#fdf6e3;padding:1px 4px;border-radius:3px;margin:1px;display:inline-block;font-size:0.8rem;">${c.rank}${c.suit}</span>`;
+      }).join('');
+      cardsHtml += '</div>';
+    }
+    document.getElementById('mp-ov-msg').innerHTML = boomName + ' holds all four 2s — INSTANT WIN!<br>' + cardsHtml;
+  } else {
+    document.getElementById('mp-ov-title').textContent = myPos >= 0 ? titles[myPos] : 'Game Over';
+    document.getElementById('mp-ov-msg').innerHTML = finishOrder.map((seat, i) =>
+      `<div>${titles[i] || (i+1)+'th'}: <strong>${names[seat] || 'Player'}</strong></div>`
+    ).join('');
+  }
 
   const scores = gs.scores || [0,0,0,0];
   document.getElementById('mp-ov-score').innerHTML = 'Scores: ' +
@@ -844,7 +897,8 @@ function showGameOver() {
   document.getElementById('mp-btn-newgame').style.display = isHost ? 'inline-flex' : 'none';
   document.getElementById('mp-ov-waiting').style.display = isHost ? 'none' : 'block';
 
-  if (myPos === 0) SFX.play('win');
+  if (isFourTwosBoom && gs.fourTwosBoom === mySeat) SFX.play('win');
+  else if (myPos === 0) SFX.play('win');
 }
 
 async function hostNewGame() {
@@ -880,23 +934,53 @@ async function hostNewGame() {
 
   const scores = gs.scores || [0,0,0,0];
 
-  await gameRef.set({
-    hands: hands,
-    current: starter,
-    lastPlayed: [],
-    lastPlayer: -1,
-    passCount: 0,
-    finishOrder: [],
-    scores: scores,
-    wallets: gs.wallets || [1000,1000,1000,1000],
-    betAmount: gs.betAmount || 100,
-    gameOver: false,
-    message: nameMap[starter] + ' starts (has 3♠)',
-    turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
-    names: nameMap,
-    activeSeats: activeSeats,
-    passedPlayers: []
-  });
+  // ── FOUR 2s INSTANT WIN CHECK ──
+  let fourTwosWinner = -1;
+  for (const seat of activeSeats) {
+    const twos = hands[seat].filter(c => c.rank === '2');
+    if (twos.length === 4) { fourTwosWinner = seat; break; }
+  }
+
+  if (fourTwosWinner >= 0) {
+    const fo = [fourTwosWinner, ...activeSeats.filter(s => s !== fourTwosWinner)];
+    scores[fourTwosWinner]++;
+    await gameRef.set({
+      hands: hands,
+      current: -1,
+      lastPlayed: [],
+      lastPlayer: -1,
+      passCount: 0,
+      finishOrder: fo,
+      scores: scores,
+      wallets: gs.wallets || [1000,1000,1000,1000],
+      betAmount: gs.betAmount || 100,
+      gameOver: true,
+      message: '💣 ' + nameMap[fourTwosWinner] + ' has FOUR 2s — INSTANT WIN! 💣',
+      turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
+      names: nameMap,
+      activeSeats: activeSeats,
+      passedPlayers: [],
+      fourTwosBoom: fourTwosWinner
+    });
+  } else {
+    await gameRef.set({
+      hands: hands,
+      current: starter,
+      lastPlayed: [],
+      lastPlayer: -1,
+      passCount: 0,
+      finishOrder: [],
+      scores: scores,
+      wallets: gs.wallets || [1000,1000,1000,1000],
+      betAmount: gs.betAmount || 100,
+      gameOver: false,
+      message: nameMap[starter] + ' starts (has 3♠)',
+      turnStartedAt: firebase.database.ServerValue.TIMESTAMP,
+      names: nameMap,
+      activeSeats: activeSeats,
+      passedPlayers: []
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

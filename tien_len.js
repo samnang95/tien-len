@@ -234,6 +234,53 @@ function newGame(){
   }
   setMsg('');
   SFX.deal();
+
+  // ── FOUR 2s INSTANT WIN CHECK ──
+  for(let p=0; p<4; p++){
+    const twos = hands[p].filter(c => c.rank === '2');
+    if(twos.length === 4){
+      // Instant win!
+      gameOver = true;
+      SFX.bomb();
+      setTimeout(() => SFX.win(), 500);
+      finishOrder = [p];
+      for(let q=0; q<4; q++){ if(q !== p) finishOrder.push(q); }
+      scores[p]++;
+      updateScores();
+
+      render();
+
+      const winnerName = p === 0 ? '🎉 You' : 'CPU ' + p;
+      const ov = document.getElementById('overlay');
+      ov.classList.remove('hidden');
+      document.getElementById('ov-title').textContent = '💣 FOUR 2s BOOM! 💣';
+      document.getElementById('ov-msg').textContent = winnerName + ' holds all four 2s — INSTANT WIN!';
+      document.getElementById('ov-money').textContent = '';
+      document.getElementById('ov-money').className = 'ov-money';
+
+      document.getElementById('ov-wallets').textContent =
+        `You $${wallets[0]}  •  CPU1 $${wallets[1]}  •  CPU2 $${wallets[2]}  •  CPU3 $${wallets[3]}`;
+      document.getElementById('ov-score').textContent =
+        `Wins — You ${scores[0]}  •  CPU1 ${scores[1]}  •  CPU2 ${scores[2]}  •  CPU3 ${scores[3]}`;
+
+      // Show all other players' cards
+      const loserCardsEl = document.getElementById('ov-loser-cards');
+      let html = '';
+      for(let q=0; q<4; q++){
+        if(q === p) continue;
+        const name = q === 0 ? 'Your' : 'CPU ' + q + "'s";
+        html += `<div class="loser-label">🃏 ${name} cards:</div><div class="loser-hand" id="boom-hand-${q}"></div>`;
+      }
+      loserCardsEl.innerHTML = html;
+      for(let q=0; q<4; q++){
+        if(q === p) continue;
+        const handEl = document.getElementById('boom-hand-' + q);
+        hands[q].forEach(c => { handEl.appendChild(makeCardEl(c)); });
+      }
+      return;
+    }
+  }
+
   render();
   if(current!==0) scheduleAiTurn();
   else { setMsg('Your turn — you have 3♠, lead freely!'); startTurnTimer(); }
