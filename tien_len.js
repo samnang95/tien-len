@@ -187,53 +187,24 @@ let finishOrder=[]; // tracks order players empty their hands
 const RANK_REWARDS=[30, 15, -15, -30]; // 1st, 2nd, 3rd, 4th
 
 // ── TIMER ─────────────────────────────────────────────────
-const TURN_TIME = 10; // seconds per turn
+// Timer disabled for Room 1 — no time limit for human player
 let turnTimer = null;
 let turnTimeLeft = 0;
 let aiActionTimer = null;
 
-const RING_CIRCUMFERENCE = 2 * Math.PI * 11; // radius=11 for 28px SVG
-
 function startTurnTimer(){
-  clearTurnTimer();
-  turnTimeLeft = TURN_TIME;
-  updateTimerDisplay();
-  turnTimer = setInterval(()=>{
-    turnTimeLeft--;
-    updateTimerDisplay();
-    if(turnTimeLeft <= 0){
-      clearTurnTimer();
-      onTimerExpired();
-    }
-  }, 1000);
+  // No timer in Room 1 — just show whose turn it is
+  const el = document.getElementById('turn-timer');
+  if(current === 0){
+    el.innerHTML = `<span class="timer-label">YOUR TURN</span>`;
+  } else {
+    el.innerHTML = `<span class="timer-label">CPU ${current} THINKING</span>`;
+  }
 }
 
 function clearTurnTimer(){
   if(turnTimer){ clearInterval(turnTimer); turnTimer=null; }
   if(aiActionTimer){ clearTimeout(aiActionTimer); aiActionTimer=null; }
-}
-
-function updateTimerDisplay(){
-  const el = document.getElementById('turn-timer');
-  const fraction = turnTimeLeft / TURN_TIME;
-  const dashOffset = RING_CIRCUMFERENCE * (1 - fraction);
-
-  // Color class based on time left
-  el.className = turnTimeLeft <= 3 ? 'danger' : turnTimeLeft <= 5 ? 'warn' : '';
-
-  const who = current===0 ? 'YOUR TURN' : 'CPU '+current+' THINKING';
-  el.innerHTML = `
-    <div class="timer-ring">
-      <svg viewBox="0 0 28 28">
-        <circle class="ring-bg" cx="14" cy="14" r="11"/>
-        <circle class="ring-fg" cx="14" cy="14" r="11"
-          stroke-dasharray="${RING_CIRCUMFERENCE}"
-          stroke-dashoffset="${dashOffset}"/>
-      </svg>
-    </div>
-    <span class="timer-text">${turnTimeLeft}</span>
-    <span class="timer-label">${who}</span>
-  `;
 }
 
 function hideTimer(){
@@ -242,21 +213,7 @@ function hideTimer(){
 }
 
 function onTimerExpired(){
-  if(gameOver) return;
-  if(current === 0){
-    // Human auto-pass
-    if(lastPlayed.length > 0){
-      SFX.pass();
-      passCount++;
-      setMsg('Time\'s up! You auto-passed.');
-      advanceAfterPass();
-    } else {
-      // Must lead: play lowest card automatically
-      selected = [0];
-      playSelected();
-    }
-  }
-  // AI timer expiry is handled by aiTurn scheduling
+  // No timer expiry in Room 1
 }
 
 // ── INIT ───────────────────────────────────────────────────
