@@ -178,6 +178,7 @@ let current=0;
 let lastPlayed=[];
 let lastPlayer=-1;
 let passCount=0;
+let passedPlayers = new Set(); // players who passed — locked out until new round
 let selected=[];
 let scores=[0,0,0,0];
 let gameOver=false;
@@ -220,6 +221,7 @@ function onTimerExpired(){
 function newGame(){
   document.getElementById('overlay').classList.add('hidden');
   gameOver=false; selected=[]; finishOrder=[];
+  passedPlayers.clear();
   hideTimer();
   const deck=createDeck();
   hands=[[],[],[],[]];
@@ -288,9 +290,12 @@ function render(){
     wp.textContent='';
   }
 
-  const myTurn=current===0&&!gameOver;
+  const myTurn=current===0&&!gameOver&&!passedPlayers.has(0);
   document.getElementById('btn-play').disabled=!myTurn;
   document.getElementById('btn-pass').disabled=!myTurn||lastPlayed.length===0;
+
+  // Grey out cards when you've passed this round
+  document.getElementById('your-hand').style.opacity = (passedPlayers.has(0) && !gameOver) ? '0.5' : '1';
 }
 
 function makeCardEl(c, size=''){
@@ -308,7 +313,7 @@ function makeCardEl(c, size=''){
 
 // ── SELECT ─────────────────────────────────────────────────
 function toggleSelect(i){
-  if(current!==0||gameOver) return;
+  if(current!==0||gameOver||passedPlayers.has(0)) return;
   const idx=selected.indexOf(i);
   if(idx>=0){ selected.splice(idx,1); SFX.deselect(); }
   else { selected.push(i); SFX.click(); }
@@ -317,7 +322,7 @@ function toggleSelect(i){
 
 // ── PLAY ───────────────────────────────────────────────────
 function playSelected(){
-  if(current!==0||gameOver||selected.length===0) return;
+  if(current!==0||gameOver||selected.length===0||passedPlayers.has(0)) return;
   clearTurnTimer();
   const cards=selected.map(i=>hands[0][i]);
   const combo=classify(cards);
@@ -341,27 +346,43 @@ function playSelected(){
 }
 
 function pass(){
-  if(current!==0||lastPlayed.length===0||gameOver) return;
+  if(current!==0||lastPlayed.length===0||gameOver||passedPlayers.has(0)) return;
   clearTurnTimer();
   SFX.pass();
   passCount++;
-  setMsg('You passed.');
+  passedPlayers.add(0); // locked out until new round
+  setMsg('You passed — waiting for new round...');
   advanceAfterPass();
 }
 
 function nextAlive(from){
   let n=from%4;
-  while(hands[n].length===0) n=(n+1)%4;
+  let attempts=0;
+  while((hands[n].length===0 || passedPlayers.has(n)) && attempts<4){
+    n=(n+1)%4;
+    attempts++;
+  }
   return n;
 }
 
 function advanceAfterPass(){
-  const activePlayers=hands.filter(h=>h.length>0).length;
-  if(passCount>=activePlayers-1){
+  // Count players who are alive AND haven't passed
+  const alivePlayers = [0,1,2,3].filter(p => hands[p].length > 0);
+  const activePlayers = alivePlayers.filter(p => !passedPlayers.has(p));
+
+  // If only 1 active player left → they won the round, NEW ROUND starts
+  if(activePlayers.length <= 1){
+    const roundWinner = activePlayers[0] !== undefined ? activePlayers[0] : lastPlayer;
     passCount=0; lastPlayed=[]; lastPlayer=-1;
-    const winner=current===0?'Your':('CPU '+current);
-    setMsg(winner+' leads freely!');
+    passedPlayers.clear(); // ← ONLY here: everyone unlocked for new round
+    current = roundWinner;
+    const winner = roundWinner===0 ? 'Your' : ('CPU '+roundWinner);
+    render();
+    if(current!==0){ setMsg(winner+' leads freely!'); scheduleAiTurn(); }
+    else { setMsg('Your turn — lead freely!'); startTurnTimer(); }
+    return;
   }
+
   const next=nextAlive((current+1)%4);
   current=next;
   render();
@@ -407,6 +428,7 @@ function aiTurn(){
     SFX.pass();
     setMsg('CPU '+p+' passed.');
     passCount++;
+    passedPlayers.add(p); // CPU locked out until new round
     advanceAfterPass();
   }
 }
