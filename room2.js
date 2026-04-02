@@ -628,10 +628,22 @@ async function mpPlaySelected() {
     finished = true;
   }
 
-  // Determine next player (skip passed players too)
+  // Determine next player
   const activeSeats = gs.activeSeats || [0,1,2,3];
-  const currentPassedList = gs.passedPlayers || [];
+  // When someone plays a card, passedPlayers stays the same (round continues)
+  // BUT if the player finished, clear passes — it's a new situation
+  let currentPassedList = [...(gs.passedPlayers || [])];
+  if (finished) {
+    currentPassedList = []; // player finished, reset round
+  }
   let next = findNextPlayer(mySeat, finishOrder, activeSeats, currentPassedList);
+
+  // If next player is the lastPlayer (came full circle), clear passes — new round
+  if (next === mySeat && !finished) {
+    // Shouldn't happen, but safety
+    currentPassedList = [];
+    next = findNextPlayer(mySeat, finishOrder, activeSeats, currentPassedList);
+  }
 
   // Check game over (all but 1 active player finished)
   const gameOver = finishOrder.length >= activeSeats.length - 1;
@@ -653,6 +665,7 @@ async function mpPlaySelected() {
     lastPlayed: cards,
     lastPlayer: mySeat,
     passCount: 0,
+    passedPlayers: currentPassedList,
     finishOrder: finishOrder,
     gameOver: gameOver,
     message: message,
