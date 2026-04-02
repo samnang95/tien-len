@@ -164,6 +164,39 @@
     </div>
   </div>
 
+  <div id="game-toolbar">
+    <button id="mute-btn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
+    <button id="leave-btn" onclick="leaveRoom()" title="Leave Room">🚪</button>
+    <button id="rules-btn" onclick="toggleRules()" title="Rules">?</button>
+  </div>
+  <div id="rules-panel" class="hidden">
+    <strong>Tiến Lên – Official Rules</strong><br><br>
+    <strong>Card Order (low → high):</strong><br>
+    3 4 5 6 7 8 9 10 J Q K A 2<br><br>
+    <strong>Suit Order (low → high):</strong><br>
+    ♠ ♣ ♦ ♥<br><br>
+    <strong>Valid Plays:</strong><br>
+    • <strong>Single</strong> – any one card<br>
+    • <strong>Pair</strong> – two cards same rank<br>
+    • <strong>Triple</strong> – three same rank<br>
+    • <strong>Double Pair</strong> – two consecutive pairs (e.g. 3-3, 4-4), no 2s<br>
+    • <strong>Straight</strong> – 3+ consecutive ranks (no 2s)<br>
+    • <strong>Pair Sequence</strong> – 3+ consecutive pairs (e.g. 3-3, 4-4, 5-5)<br>
+    • <strong>Four of a Kind</strong> – bomb, beats anything<br><br>
+    <strong>Beating Rules:</strong><br>
+    • Must match the TYPE and SIZE of last play<br>
+    • Higher card value wins (rank first, then suit)<br>
+    • A 2 can only be beaten by: a pair sequence of 3+ (beats single 2), four of a kind (bomb)<br>
+    • Four of a kind beats everything including 2s<br><br>
+    <strong>Turn Flow:</strong><br>
+    • Player with 3♠ goes first<br>
+    • Must play or pass; cannot play if you can't beat<br>
+    • If all others pass → last player leads freely<br>
+    • First to empty hand wins!<br><br>
+    <strong>Penalty (not enforced here):</strong><br>
+    Holding only 2s at end = double penalty
+  </div>
+
   <!-- Win overlay -->
   <div id="mp-overlay" class="hidden">
     <div class="overlay-box">

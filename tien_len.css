@@ -1016,12 +1016,38 @@ h1 {
 .ov-money.win { color: #2ecc71; }
 .ov-money.lose { color: #e74c3c; }
 .ov-wallets { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-bottom: 18px; }
-#rules-btn {
-  position: fixed; bottom: 14px; right: 14px;
-  background: rgba(0,0,0,0.4); border: 1px solid rgba(212,168,67,0.3);
-  color: var(--gold); border-radius: 50%; width: 32px; height: 32px;
-  cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+/* ── GAME TOOLBAR (bottom-right floating buttons) ── */
+#game-toolbar {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
   z-index: 50;
+}
+#game-toolbar button {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(212,168,67,0.3);
+  color: var(--gold);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  backdrop-filter: blur(4px);
+}
+#game-toolbar button:hover {
+  background: rgba(0,0,0,0.7);
+  border-color: var(--gold);
+  transform: scale(1.1);
+}
+#mute-btn.muted {
+  color: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.15);
 }
 #rules-panel {
   position: fixed; bottom: 54px; right: 14px;

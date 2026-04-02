@@ -101,6 +101,16 @@ function classify(cards) {
   if (n === 3 && allSame(ranks)) return { type: 'triple', rank: sorted[0], high: Math.max(...cards.map(cardValue)) };
   if (n === 4 && allSame(ranks)) return { type: 'four', rank: sorted[0], high: Math.max(...cards.map(cardValue)) };
 
+  // Double pair: 2 consecutive pairs (4 cards), no 2s
+  if (n === 4 && !ranks.includes(12)) {
+    const sortedCards = [...cards].sort((a,b) => cardRankIdx(a) - cardRankIdx(b));
+    const r0 = cardRankIdx(sortedCards[0]), r1 = cardRankIdx(sortedCards[1]);
+    const r2 = cardRankIdx(sortedCards[2]), r3 = cardRankIdx(sortedCards[3]);
+    if (r0 === r1 && r2 === r3 && r2 - r0 === 1) {
+      return { type: 'doublepair', rank: r2, high: Math.max(...cards.map(cardValue)) };
+    }
+  }
+
   if (n >= 3 && isConsec(sorted)) {
     const uniqueRanks = [...new Set(ranks)];
     if (uniqueRanks.length === n) return { type: 'run', length: n, rank: Math.max(...sorted), high: Math.max(...cards.map(cardValue)) };
@@ -916,3 +926,25 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nickname-input').value = playerName;
   }
 });
+
+// ── MUTE TOGGLE ────────────────────────────────────────────
+let isMuted = false;
+let originalSFXPlay = SFX.play.bind(SFX);
+
+function toggleMute(){
+  isMuted = !isMuted;
+  const btn = document.getElementById('mute-btn');
+  if(isMuted){
+    SFX.play = () => {};
+    btn.textContent = '🔇';
+    btn.classList.add('muted');
+  } else {
+    SFX.play = originalSFXPlay;
+    btn.textContent = '🔊';
+    btn.classList.remove('muted');
+  }
+}
+
+function toggleRules(){
+  document.getElementById('rules-panel').classList.toggle('hidden');
+}

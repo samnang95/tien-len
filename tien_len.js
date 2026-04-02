@@ -530,6 +530,18 @@ function classify(cards){
   if(n===4&&uniqRanks.length===1)
     return {type:'quad', highVal, label:'BOMB (four '+ranks[0]+'s)'};
 
+  // Double pair: 2 consecutive pairs (4 cards), no 2s
+  if(n===4&&!rvals.includes(12)){
+    const rankGroups={};
+    sorted.forEach(c=>{ rankGroups[c.rank]=(rankGroups[c.rank]||[]).concat(c); });
+    const groupRanks=Object.keys(rankGroups);
+    if(groupRanks.length===2 && groupRanks.every(r=>rankGroups[r].length===2)){
+      const gRvals=groupRanks.map(r=>RANK_VAL[r]).sort((a,b)=>a-b);
+      if(gRvals[1]-gRvals[0]===1)
+        return {type:'doublepair', highVal, label:'double pair '+groupRanks.sort((a,b)=>RANK_VAL[a]-RANK_VAL[b]).join('-')};
+    }
+  }
+
   // Straight: 3+ consecutive ranks, no 2s
   if(n>=3&&n%2!==0||n>=3){
     if(!rvals.includes(12)){
@@ -813,3 +825,44 @@ function enterRoom2(){
 // Initialize start screen
 generatePixelStars();
 
+// ── MUTE / LEAVE ───────────────────────────────────────────
+let isMuted = false;
+const originalSFX = {};
+
+function toggleMute(){
+  isMuted = !isMuted;
+  const btn = document.getElementById('mute-btn');
+  if(isMuted){
+    // Store and silence all SFX
+    Object.keys(SFX).forEach(k => {
+      if(!originalSFX[k]) originalSFX[k] = SFX[k];
+      SFX[k] = () => {};
+    });
+    btn.textContent = '🔇';
+    btn.classList.add('muted');
+  } else {
+    // Restore all SFX
+    Object.keys(originalSFX).forEach(k => {
+      SFX[k] = originalSFX[k];
+    });
+    btn.textContent = '🔊';
+    btn.classList.remove('muted');
+  }
+}
+
+function leaveRoom(){
+  // Clean up game state
+  clearTurnTimer();
+  gameOver = true;
+
+  // Hide game room, show start screen
+  const gameRoom = document.getElementById('game-room');
+  const startScreen = document.getElementById('start-screen');
+
+  gameRoom.classList.add('game-room-hidden');
+  startScreen.style.display = '';
+  startScreen.classList.remove('fade-out');
+
+  // Reset overlay if visible
+  document.getElementById('overlay').classList.add('hidden');
+}

@@ -161,7 +161,11 @@
   </div>
 </div>
 
-<button id="rules-btn" onclick="toggleRules()">?</button>
+<div id="game-toolbar">
+  <button id="mute-btn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
+  <button id="leave-btn" onclick="leaveRoom()" title="Leave Room">🚪</button>
+  <button id="rules-btn" onclick="toggleRules()" title="Rules">?</button>
+</div>
 <div id="rules-panel" class="hidden">
   <strong>Tiến Lên – Official Rules</strong><br><br>
   <strong>Card Order (low → high):</strong><br>
@@ -172,6 +176,7 @@
   • <strong>Single</strong> – any one card<br>
   • <strong>Pair</strong> – two cards same rank<br>
   • <strong>Triple</strong> – three same rank<br>
+  • <strong>Double Pair</strong> – two consecutive pairs (e.g. 3-3, 4-4), no 2s<br>
   • <strong>Straight</strong> – 3+ consecutive ranks (no 2s)<br>
   • <strong>Pair Sequence</strong> – 3+ consecutive pairs (e.g. 3-3, 4-4, 5-5)<br>
   • <strong>Four of a Kind</strong> – bomb, beats anything<br><br>
