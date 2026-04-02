@@ -639,6 +639,19 @@ h1 {
   min-height: 32px;
 }
 
+/* Vertical column layout for left/right opponents */
+.hand-col {
+  flex-direction: column;
+  align-items: center;
+}
+.hand-col .card-sm {
+  margin-right: 0;
+  margin-bottom: -24px;
+}
+.hand-col .card-sm:last-child {
+  margin-bottom: 0;
+}
+
 /* ── CARD ── */
 .card {
   width: var(--card-w);
