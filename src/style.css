@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════════════════════
+   CUSTOM THEME — Tiến Lên Card Game
+   ════════════════════════════════════════════════════════════ */
+
+@theme {
+  --color-felt: #1a5c38;
+  --color-felt-dark: #0f3d25;
+  --color-felt-light: #237a4b;
+  --color-gold: #d4a843;
+  --color-gold-light: #f0c96e;
+  --color-card-red: #c0392b;
+  --color-card-black: #1a1a2e;
+  --color-cream: #fdf6e3;
+
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-cinzel: 'Cinzel', serif;
+  --font-body: 'Lato', sans-serif;
+}
+
+/* ── Base Resets ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-cream);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Card Sizing Variables ── */
+:root {
+  --card-w: 54px;
+  --card-h: 78px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ════════════════════════════════════════════════════════════ */
+
+@keyframes twinkle {
+  0%   { opacity: 0.2; transform: scale(0.8); }
+  50%  { opacity: 1;   transform: scale(1.2); }
+  100% { opacity: 0.4; transform: scale(1);   }
+}
+
+@keyframes floatCloud {
+  0%   { left: -150px; }
+  100% { left: calc(100vw + 50px); }
+}
+
+@keyframes ufoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes ufoDrift {
+  0%   { left: 5%; }
+  50%  { left: 85%; }
+  100% { left: 5%; }
+}
+
+@keyframes ufoLights {
+  0%   { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes beamPulse {
+  0%   { opacity: 0.3; width: 20px; }
+  100% { opacity: 0.7; width: 28px; }
+}
+
+@keyframes panelPulse {
+  0%   { box-shadow: 0 0 40px rgba(35, 122, 75, 0.3), 0 0 80px rgba(35, 122, 75, 0.1), inset 0 1px 0 rgba(255,255,255,0.2); }
+  100% { box-shadow: 0 0 60px rgba(35, 122, 75, 0.5), 0 0 120px rgba(35, 122, 75, 0.2), inset 0 1px 0 rgba(255,255,255,0.3); }
+}
+
+@keyframes glowBorder {
+  0%   { border-color: rgba(212, 168, 67, 0.3); }
+  100% { border-color: rgba(212, 168, 67, 0.7); }
+}
+
+@keyframes cardBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes logoFloat {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.02); }
+}
+
+@keyframes titleGlow {
+  0%   { text-shadow: 0 0 10px rgba(212, 168, 67, 0.6), 0 0 30px rgba(212, 168, 67, 0.3), 0 4px 0 #0a2a16, 0 5px 0 #061a0e; }
+  100% { text-shadow: 0 0 20px rgba(212, 168, 67, 1), 0 0 50px rgba(212, 168, 67, 0.5), 0 4px 0 #0a2a16, 0 5px 0 #061a0e; }
+}
+
+@keyframes playPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+@keyframes btnBorderGlow {
+  0%   { border-color: rgba(255, 200, 100, 0.3); }
+  100% { border-color: rgba(255, 200, 100, 0.8); }
+}
+
+@keyframes hintBlink {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+
+@keyframes gameRoomFadeIn {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   PLAYING CARD STYLES
+   ════════════════════════════════════════════════════════════ */
+
+.card {
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+}
+.card:hover { transform: translateY(-10px); }
+.card.selected {
+  transform: translateY(-16px);
+  box-shadow: 0 0 0 3px var(--color-gold), 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.card-face {
+  width: 100%; height: 100%;
+  background: var(--color-cream);
+  border-radius: 7px;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 5px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.card-face .rank { font-size: 0.92rem; font-weight: 900; line-height: 1; }
+.card-face .suit { font-size: 0.75rem; line-height: 1; }
+.card-face .center-suit { font-size: 1.35rem; position: absolute; top:50%; left:50%; transform:translate(-50%,-55%); }
+.card-face .bottom { transform: rotate(180deg); }
+.card-face.red .rank, .card-face.red .suit, .card-face.red .center-suit { color: var(--color-card-red); }
+.card-face.black .rank, .card-face.black .suit, .card-face.black .center-suit { color: var(--color-card-black); }
+
+/* Small card back for opponents */
+.card-sm {
+  width: 28px;
+  height: 40px;
+  border-radius: 4px;
+  background: url('/images/card_back.png') center/cover;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  margin-right: -16px;
+}
+.card-sm:last-child { margin-right: 0; }
+
+/* ════════════════════════════════════════════════════════════
+   BUTTONS
+   ════════════════════════════════════════════════════════════ */
+
+.btn {
+  padding: 8px 26px;
+  border-radius: 30px;
+  border: none;
+  font-family: var(--font-cinzel);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn:active { transform: scale(0.95); }
+.btn-play {
+  background: linear-gradient(135deg, #f9ca24, #d4a843);
+  color: #1a1a2e;
+  box-shadow: 0 4px 12px rgba(212,168,67,0.5);
+}
+.btn-pass {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-pass:hover { background: rgba(255,255,255,0.18); }
+.btn-new {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(39,174,96,0.4);
+  margin-top: 8px;
+}
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.btn-reset {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 8px 22px;
+  border-radius: 30px;
+  font-family: var(--font-cinzel);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn-reset:hover { background: rgba(220,50,50,0.2); color: #ff8a80; border-color: #ff6b6b; }
+
+/* ════════════════════════════════════════════════════════════
+   OVERLAY STYLES
+   ════════════════════════════════════════════════════════════ */
+
+.overlay-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.overlay-box {
+  background: linear-gradient(135deg, #1e6e42, #0f3d25);
+  border: 2px solid var(--color-gold);
+  border-radius: 18px;
+  padding: 36px 48px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+.overlay-box h2 { font-family: var(--font-cinzel); color: var(--color-gold); font-size: 2rem; margin-bottom: 10px; }
+.overlay-box p { color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+
+/* ════════════════════════════════════════════════════════════
+   BOOM CARD STYLES
+   ════════════════════════════════════════════════════════════ */
+
+.boom-player-row { margin: 10px 0; text-align: center; }
+.boom-player-name {
+  font-family: var(--font-cinzel);
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--color-gold);
+  margin-bottom: 6px; letter-spacing: 0.05em;
+}
+.boom-hand { display: flex; flex-wrap: nowrap; justify-content: center; gap: 0; }
+.boom-card {
+  width: 48px; height: 68px; flex-shrink: 0;
+  cursor: default !important; margin-right: -18px;
+}
+.boom-card:last-child { margin-right: 0; }
+.boom-card:hover { transform: none !important; }
+.boom-card .card-face { padding: 3px 4px; }
+.boom-card .rank { font-size: 0.8rem; }
+.boom-card .suit { font-size: 0.65rem; }
+.boom-card .center-suit { font-size: 1rem; }
+
+/* ════════════════════════════════════════════════════════════
+   UTILITY CLASSES NOT IN TAILWIND
+   ════════════════════════════════════════════════════════════ */
+
+.hidden-vis { display: none !important; }
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  :root {
+    --card-w: 48px;
+    --card-h: 70px;
+  }
+  .card-face .rank { font-size: 0.85rem; }
+  .card-face .suit { font-size: 0.7rem; }
+  .card-face .center-suit { font-size: 1.2rem; }
+  .card-sm { width: 22px; height: 32px; margin-bottom: -20px; }
+  .btn { padding: 6px 18px; font-size: 0.75rem; }
+  .overlay-box { padding: 20px 24px; }
+  .overlay-box h2 { font-size: 1.4rem; }
+  .boom-card { width: 38px; height: 54px; margin-right: -14px; }
+  .boom-card .rank { font-size: 0.7rem; }
+  .boom-card .suit { font-size: 0.55rem; }
+  .boom-card .center-suit { font-size: 0.85rem; }
+  .boom-player-name { font-size: 0.65rem; }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --card-w: 36px;
+    --card-h: 52px;
+  }
+  .card-face .rank { font-size: 0.7rem; }
+  .card-face .suit { font-size: 0.55rem; }
+  .card-face .center-suit { font-size: 0.9rem; }
+  .card-face { padding: 2px 3px; }
+  .card:hover { transform: translateY(-6px); }
+  .card.selected { transform: translateY(-10px); }
+  .card-sm { width: 18px; height: 26px; border-radius: 3px; }
+  .btn { padding: 5px 14px; font-size: 0.7rem; }
+  .overlay-box { padding: 18px 18px; max-height: 85vh; overflow-y: auto; }
+  .overlay-box h2 { font-size: 1.2rem; }
+  .overlay-box p { font-size: 0.75rem; }
+  .boom-card { width: 30px !important; height: 50px !important; margin-right: -4px !important; }
+  .boom-card .card-face { padding: 2px 2px !important; }
+  .boom-card .rank { font-size: 0.55rem !important; }
+  .boom-card .suit { font-size: 0.4rem !important; }
+  .boom-card .center-suit { font-size: 0.6rem !important; }
+  .boom-card .bottom { transform: scale(0.8); }
+  .boom-player-name { font-size: 0.6rem; }
+  .boom-player-row { margin: 4px 0; }
+  .boom-hand { flex-wrap: wrap; justify-content: center; }
+}
+
+/* Extra small phones (iPhone SE, etc.) */
+@media (max-width: 400px) {
+  :root {
+    --card-w: 30px;
+    --card-h: 44px;
+  }
+  .card-face .rank { font-size: 0.6rem; }
+  .card-face .suit { font-size: 0.45rem; }
+  .card-face .center-suit { font-size: 0.75rem; }
+  .card-face { padding: 1px 2px; }
+  .card { border-radius: 5px; }
+  .card-face { border-radius: 5px; }
+  .card:hover { transform: translateY(-4px); }
+  .card.selected { transform: translateY(-8px); }
+  .btn { padding: 4px 12px; font-size: 0.65rem; }
+}
