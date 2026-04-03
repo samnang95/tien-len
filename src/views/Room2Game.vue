@@ -120,9 +120,6 @@
     <div class="r2-table-wrapper">
       <!-- Rope border decoration -->
       <div class="r2-rope-border"></div>
-      <!-- Diagonal rope decorations -->
-      <div class="r2-rope-diagonal r2-rope-diagonal-1"></div>
-      <div class="r2-rope-diagonal r2-rope-diagonal-2"></div>
       <!-- Inner table surface -->
       <div class="r2-table-surface">
 
