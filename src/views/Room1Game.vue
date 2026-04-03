@@ -32,9 +32,6 @@
     <div class="table-wrapper">
       <!-- Rope border decoration -->
       <div class="rope-border"></div>
-      <!-- Diagonal rope decorations -->
-      <div class="rope-diagonal rope-diagonal-1"></div>
-      <div class="rope-diagonal rope-diagonal-2"></div>
       <!-- Inner table surface -->
       <div class="table-surface">
 
@@ -712,9 +709,9 @@ newGame()
    ═══════════════════════════════════════════════════ */
 .table-wrapper {
   position: relative;
-  width: min(920px, 94vw);
+  width: min(780px, 94vw);
   z-index: 1;
-  padding: 8px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
 }
@@ -723,8 +720,8 @@ newGame()
 .rope-border {
   position: absolute;
   inset: 0;
-  border-radius: 48px;
-  border: 4px solid transparent;
+  border-radius: 36px;
+  border: 3px solid transparent;
   background:
     transparent padding-box,
     linear-gradient(135deg, rgba(200,170,90,0.5), rgba(160,130,70,0.3), rgba(200,170,90,0.5)) border-box;
@@ -736,7 +733,7 @@ newGame()
   content: '';
   position: absolute;
   inset: -2px;
-  border-radius: 50px;
+  border-radius: 38px;
   border: 2px solid rgba(180,150,90,0.2);
   pointer-events: none;
 }
@@ -745,7 +742,7 @@ newGame()
   content: '';
   position: absolute;
   inset: 2px;
-  border-radius: 46px;
+  border-radius: 34px;
   border: 2px solid rgba(180,150,90,0.15);
   pointer-events: none;
 }
@@ -797,12 +794,12 @@ newGame()
 
 /* Inner table surface */
 .table-surface {
-  border-radius: 44px;
-  padding: 12px;
+  border-radius: 32px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   z-index: 1;
   overflow: hidden;
