@@ -970,12 +970,7 @@ onUnmounted(() => {
   position: relative;
   z-index: 1;
   overflow: hidden;
-  /* #145230 is rgb(20, 82, 48). The 0.75 is opacity. Lower it (e.g. 0.6) to make it lighter, raise it (e.g. 0.9) to make it darker! */
-  background: linear-gradient(rgba(20, 82, 48, 0.75), rgba(20, 82, 48, 0.75)), url('/images/felt_background.png') center/cover;
-  box-shadow:
-    0 0 60px rgba(0,0,0,0.7),
-    inset 0 0 40px rgba(0,0,0,0.3),
-    inset 0 0 100px rgba(0,0,0,0.15);
+  background: linear-gradient(rgba(15, 61, 37, 0.6), rgba(15, 61, 37, 0.6)), url('/images/felt_background.png') center/cover;
 }
 
 /* ── Seats & Labels ── */
