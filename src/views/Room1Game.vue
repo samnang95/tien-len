@@ -803,7 +803,7 @@ newGame()
   position: relative;
   z-index: 1;
   overflow: hidden;
-  background: linear-gradient(rgba(15, 61, 37, 0.6), rgba(15, 61, 37, 0.6)), url('/images/felt_background.png') center/cover;
+  background: #145230 url('/images/felt_background.png') center/cover;
 }
 
 /* ═══════════════════════════════════════════════════
