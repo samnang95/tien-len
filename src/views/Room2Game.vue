@@ -970,7 +970,7 @@ onUnmounted(() => {
   position: relative;
   z-index: 1;
   overflow: hidden;
-  background: #1a5c38 url('/images/felt_background.png') center/cover;
+  background: #145230 url('/images/felt_background.png') center/cover;
   box-shadow:
     0 0 60px rgba(0,0,0,0.7),
     inset 0 0 40px rgba(0,0,0,0.3),
