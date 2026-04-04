@@ -1,7 +1,7 @@
 <template>
   <div>
   <!-- LOBBY SCREEN -->
-  <div v-if="screen === 'lobby'" class="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+  <div v-if="screen === 'lobby'" class="fixed inset-0 z-9999 flex items-center justify-center overflow-hidden"
     style="background: linear-gradient(180deg, #061a0e 0%, #0a2a16 25%, #0f3d25 45%, #1a5c38 60%, #237a4b 75%, #1a5c38 90%, #0a2a16 100%);">
     <PixelStars />
     <PixelClouds />
@@ -60,7 +60,7 @@
   </div>
 
   <!-- WAITING ROOM -->
-  <div v-if="screen === 'waiting'" class="fixed inset-0 z-[9998] flex items-center justify-center overflow-hidden"
+  <div v-if="screen === 'waiting'" class="fixed inset-0 z-9998 flex items-center justify-center overflow-hidden"
     style="background: linear-gradient(180deg, #061a0e 0%, #0a2a16 25%, #0f3d25 45%, #1a5c38 60%, #237a4b 75%, #1a5c38 90%, #0a2a16 100%);">
     <PixelStars />
 
@@ -145,7 +145,7 @@
           <div class="r2-play-area">
             <div class="r2-play-area-label">LAST PLAYED</div>
             <div class="r2-played-cards-row">
-              <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="j" :card="c" class="!cursor-default played-card" />
+              <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="j" :card="c" class="cursor-default! played-card" />
             </div>
             <div class="r2-play-area-who">{{ whosePlayText }}</div>
             <div class="r2-play-area-msg">{{ gs?.message || '' }}</div>
@@ -184,7 +184,7 @@
 
     <!-- Win Overlay -->
     <div v-if="showGameOverlay" class="overlay-backdrop">
-      <div class="overlay-box max-md:p-4 max-md:w-[92vw] max-md:max-w-[400px] max-md:max-h-[85vh] max-md:overflow-y-auto" :class="{ '!max-w-[700px] !w-[94vw]': isBoom }">
+      <div class="overlay-box max-md:p-4 max-md:w-[92vw] max-md:max-w-[400px] max-md:max-h-[85vh] max-md:overflow-y-auto" :class="{ 'max-w-[700px]! w-[94vw]!': isBoom }">
         <h2>{{ gameOverTitle }}</h2>
         <div v-html="gameOverMsg" class="mb-3"></div>
         <div class="text-xs text-white/40 mb-3">{{ gameOverScores }}</div>
@@ -194,7 +194,7 @@
           <div v-for="(bh, i) in boomHands" :key="i" class="boom-player-row">
             <div class="boom-player-name">{{ bh.name }}{{ bh.winner ? ' 👑' : '' }}</div>
             <div class="boom-hand">
-              <PlayingCard v-for="(c, j) in bh.cards" :key="j" :card="c" class="boom-card !cursor-default hover:!transform-none" />
+              <PlayingCard v-for="(c, j) in bh.cards" :key="j" :card="c" class="boom-card cursor-default! hover:transform-none!" />
             </div>
           </div>
         </div>

@@ -42,7 +42,7 @@
           </div>
           <div class="cpu-hand-h">
             <template v-if="showCpuCards(3)">
-              <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="!w-[50px] !h-[72px] !text-[0.75rem] !cursor-default" />
+              <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="w-[50px]! h-[72px]! text-[0.75rem]! cursor-default!" />
             </template>
             <template v-else>
               <div v-for="j in hands[3].length" :key="j" class="card-sm"></div>
@@ -59,7 +59,7 @@
             </div>
             <div class="cpu-hand-v">
               <template v-if="showCpuCards(1)">
-                <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="!w-[50px] !h-[72px] !text-[0.75rem] !cursor-default side-card-reveal" />
+                <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="w-[50px]! h-[72px]! text-[0.75rem]! cursor-default! side-card-reveal" />
               </template>
               <template v-else>
                 <div v-for="j in hands[1].length" :key="j" class="card-sm-v"></div>
@@ -71,7 +71,7 @@
           <div class="play-area">
             <div class="play-area-label">LAST PLAYED</div>
             <div class="played-cards-row">
-              <PlayingCard v-for="(c, j) in lastPlayed" :key="j" :card="c" class="!cursor-default played-card" />
+              <PlayingCard v-for="(c, j) in lastPlayed" :key="j" :card="c" class="cursor-default! played-card" />
             </div>
             <div class="play-area-who">{{ whosePlayText }}</div>
             <div class="play-area-msg">{{ msg }}</div>
@@ -89,7 +89,7 @@
             </div>
             <div class="cpu-hand-v">
               <template v-if="showCpuCards(2)">
-                <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="!w-[50px] !h-[72px] !text-[0.75rem] !cursor-default side-card-reveal" />
+                <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="w-[50px]! h-[72px]! text-[0.75rem]! cursor-default! side-card-reveal" />
               </template>
               <template v-else>
                 <div v-for="j in hands[2].length" :key="j" class="card-sm-v"></div>
@@ -131,10 +131,10 @@
 
         <!-- Loser cards -->
         <div v-if="loserCards.length > 0" class="mb-4">
-          <div class="text-xs text-white/50 tracking-[0.1em] mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
+          <div class="text-xs text-white/50 tracking-widest mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
           <div class="flex gap-1 justify-center flex-wrap">
             <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c"
-              class="!w-[46px] !h-[66px] !text-[0.7rem] !cursor-default hover:!transform-none max-sm:!w-[38px] max-sm:!h-[54px]" />
+              class="w-[46px]! h-[66px]! text-[0.7rem]! cursor-default! hover:transform-none! max-sm:w-[38px]! max-sm:h-[54px]!" />
           </div>
           <div v-if="loserPenaltyText" class="mt-2 text-sm text-[#e74c3c] font-bold tracking-[0.03em]">{{ loserPenaltyText }}</div>
         </div>
@@ -144,7 +144,7 @@
           <div v-for="(bh, i) in boomHands" :key="i" class="boom-player-row">
             <div class="boom-player-name">{{ bh.name }}{{ bh.winner ? ' 👑' : '' }}</div>
             <div class="boom-hand">
-              <PlayingCard v-for="(c, j) in bh.cards" :key="j" :card="c" class="boom-card !cursor-default hover:!transform-none" />
+              <PlayingCard v-for="(c, j) in bh.cards" :key="j" :card="c" class="boom-card cursor-default! hover:transform-none!" />
             </div>
           </div>
         </div>
@@ -157,25 +157,25 @@
     </div>
 
     <!-- Bet Modal -->
-    <div v-if="betModalOpen" class="fixed inset-0 z-[200] flex items-center justify-center" style="background: rgba(0,0,0,0.7);">
-      <div class="rounded-2xl border-2 border-gold p-[30px] px-9 text-center min-w-[300px] max-sm:p-5 max-sm:min-w-0 max-sm:w-[90vw]"
-        style="background: linear-gradient(135deg, #1a5c38, #0f3d25); box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
-        <h3 class="mb-4.5 text-xl text-gold" style="font-family: var(--font-cinzel);">💵 Set Bet Amount</h3>
-        <label class="block text-sm text-white/60 mb-1.5 text-left">Quick select:</label>
-        <div class="flex gap-2 mb-3.5 flex-wrap justify-center">
+    <div v-if="betModalOpen" class="fixed inset-0 z-200 flex items-center justify-center" style="background: rgba(0,0,0,0.7);">
+      <div class="rounded-2xl border-2 border-gold text-center"
+        style="background: linear-gradient(135deg, #1a5c38, #0f3d25); box-shadow: 0 20px 50px rgba(0,0,0,0.7); padding: 40px 48px; min-width: 340px;">
+        <h3 class="text-xl text-gold" style="font-family: var(--font-cinzel); margin-bottom: 28px;">💵 Set Bet Amount</h3>
+        <label style="display: block; font-size: 0.875rem; color: rgba(255,255,255,0.6); margin-bottom: 12px; text-align: left;">Quick select:</label>
+        <div style="display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; justify-content: center;">
           <button v-for="p in [50,100,200,500,1000]" :key="p"
             @click="betAmount = p; betInput = p"
             class="bet-preset" :class="{ 'bg-gold/30 text-white': betAmount === p }">
             ${{ p }}
           </button>
         </div>
-        <label class="block text-sm text-white/60 mb-1.5 text-left">Custom amount:</label>
-        <div class="flex gap-2 items-center mb-4.5">
+        <label style="display: block; font-size: 0.875rem; color: rgba(255,255,255,0.6); margin-bottom: 12px; text-align: left;">Custom amount:</label>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 32px;">
           <input v-model.number="betInput" type="number" min="1" placeholder="e.g. 250"
-            class="flex-1 rounded-lg border border-white/20 py-1.5 px-3 text-white text-sm outline-none focus:border-gold"
-            style="background: rgba(0,0,0,0.3); font-family: var(--font-body);" />
+            class="flex-1 rounded-lg border border-white/20 text-white text-sm outline-none focus:border-gold"
+            style="background: rgba(0,0,0,0.3); font-family: var(--font-body); padding: 10px 16px;" />
         </div>
-        <div class="flex gap-2.5 justify-center">
+        <div style="display: flex; gap: 16px; justify-content: center;">
           <button class="btn btn-play" @click="confirmBet()">Confirm</button>
           <button class="btn btn-pass" @click="betModalOpen = false">Cancel</button>
         </div>
@@ -724,7 +724,7 @@ newGame()
   border: 3px solid transparent;
   background:
     transparent padding-box,
-    linear-gradient(135deg, rgba(200,170,90,0.5), rgba(160,130,70,0.3), rgba(200,170,90,0.5)) border-box;
+    linear-gradient(135deg, rgba(200,170,90,0.3), rgba(160,130,70,0.15), rgba(200,170,90,0.3)) border-box;
   pointer-events: none;
   z-index: 2;
 }
@@ -734,7 +734,7 @@ newGame()
   position: absolute;
   inset: -2px;
   border-radius: 38px;
-  border: 2px solid rgba(180,150,90,0.2);
+  border: 2px solid rgba(180,150,90,0.12);
   pointer-events: none;
 }
 
@@ -743,7 +743,7 @@ newGame()
   position: absolute;
   inset: 2px;
   border-radius: 34px;
-  border: 2px solid rgba(180,150,90,0.15);
+  border: 2px solid rgba(180,150,90,0.08);
   pointer-events: none;
 }
 
@@ -803,11 +803,11 @@ newGame()
   position: relative;
   z-index: 1;
   overflow: hidden;
-  background: #1a5c38 url('/images/felt_background.png') center/cover;
+  background: #145230 url('/images/felt_background.png') center/cover;
   box-shadow:
     0 0 60px rgba(0,0,0,0.7),
-    inset 0 0 40px rgba(0,0,0,0.3),
-    inset 0 0 100px rgba(0,0,0,0.15);
+    inset 0 0 50px rgba(0,0,0,0.4),
+    inset 0 0 120px rgba(0,0,0,0.2);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -933,8 +933,8 @@ newGame()
   gap: 4px;
   padding: 8px;
   background:
-    radial-gradient(ellipse at center, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.25) 100%);
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    radial-gradient(ellipse at center, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.35) 100%);
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
 }
 
 .play-area-label {

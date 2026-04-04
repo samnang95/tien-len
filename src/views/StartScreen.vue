@@ -95,7 +95,7 @@
         <h1
           style="
             margin-bottom: 20px;
-            font-family: &quot;Press Start 2P&quot;, monospace;
+            font-family: 'Press Start 2P', monospace;
             font-size: clamp(1.5rem, 5vw, 2.8rem);
             color: #d4a843;
             text-shadow:
@@ -112,7 +112,7 @@
 
         <p
           style="
-            font-family: &quot;Press Start 2P&quot;, monospace;
+            font-family: 'Press Start 2P', monospace;
             font-size: clamp(0.45rem, 1.5vw, 0.65rem);
             color: rgba(240, 201, 110, 0.7);
             letter-spacing: 0.15em;
@@ -158,7 +158,7 @@
 
         <p
           style="
-            font-family: &quot;Press Start 2P&quot;, monospace;
+            font-family: 'Press Start 2P', monospace;
             font-size: clamp(0.35rem, 1vw, 0.5rem);
             color: rgba(240, 201, 110, 0.35);
             margin-top: 32px;

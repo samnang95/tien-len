@@ -282,7 +282,7 @@ body {
   }
   .card-face .rank { font-size: 0.85rem; }
   .card-face .suit { font-size: 0.7rem; }
-  .card-face .center-suit { font-size: 1.2rem; }
+  .card-face .center-suit { font-size: 0.95rem; }
   .card-sm { width: 22px; height: 32px; margin-bottom: -20px; }
   .btn { padding: 6px 18px; font-size: 0.75rem; }
   .overlay-box { padding: 20px 24px; }
@@ -296,12 +296,12 @@ body {
 
 @media (max-width: 480px) {
   :root {
-    --card-w: 36px;
-    --card-h: 52px;
+    --card-w: 42px;
+    --card-h: 60px;
   }
-  .card-face .rank { font-size: 0.7rem; }
-  .card-face .suit { font-size: 0.55rem; }
-  .card-face .center-suit { font-size: 0.9rem; }
+  .card-face .rank { font-size: 0.65rem; }
+  .card-face .suit { font-size: 0.48rem; }
+  .card-face .center-suit { font-size: 0.75rem; }
   .card-face { padding: 2px 3px; }
   .card:hover { transform: translateY(-6px); }
   .card.selected { transform: translateY(-10px); }
@@ -324,12 +324,12 @@ body {
 /* Extra small phones (iPhone SE, etc.) */
 @media (max-width: 400px) {
   :root {
-    --card-w: 30px;
-    --card-h: 44px;
+    --card-w: 36px;
+    --card-h: 52px;
   }
-  .card-face .rank { font-size: 0.6rem; }
-  .card-face .suit { font-size: 0.45rem; }
-  .card-face .center-suit { font-size: 0.75rem; }
+  .card-face .rank { font-size: 0.55rem; }
+  .card-face .suit { font-size: 0.4rem; }
+  .card-face .center-suit { font-size: 0.6rem; }
   .card-face { padding: 1px 2px; }
   .card { border-radius: 5px; }
   .card-face { border-radius: 5px; }
@@ -337,3 +337,4 @@ body {
   .card.selected { transform: translateY(-8px); }
   .btn { padding: 4px 12px; font-size: 0.65rem; }
 }
+
