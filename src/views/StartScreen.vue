@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden transition-all duration-800"
+    class="fixed inset-0 z-9999 flex items-center justify-center overflow-hidden transition-all duration-800"
     :class="fadingOut ? 'opacity-0 scale-110 pointer-events-none' : ''"
     style="
       background: linear-gradient(
