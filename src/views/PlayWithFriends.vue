@@ -170,7 +170,9 @@
             <template v-else>
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.4rem] max-[480px]:text-[0.35rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.3rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-md:min-h-[60px] max-md:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
-                <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="j" :card="c" class="cursor-default! played-card" />
+                <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="c.rank + c.suit" :card="c"
+                  class="cursor-default! played-card" :class="playAnimClass"
+                  :style="{ animationDelay: j * 50 + 'ms' }" />
               </div>
               <div class="text-[0.82rem] italic text-gold-light max-md:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
               <div class="text-[0.95rem] min-h-[1.3em] text-[#f9ca24] max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]"
@@ -245,6 +247,7 @@
 
 <script setup>
 import { usePlayWithFriends } from '../composables/usePlayWithFriends.js'
+import { computed } from 'vue'
 import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
 import PixelStars from '../components/PixelStars.vue'
@@ -264,6 +267,17 @@ const {
   toggleSelect, mpPlaySelected, mpPass,
   doStartGame, doHostNewGame, doLeaveRoom,
 } = usePlayWithFriends()
+
+const playAnimClass = computed(() => {
+  if (!gs.value) return ''
+  const p = gs.value.lastPlayer
+  if (p === undefined || p < 0 || (gs.value.lastPlayed || []).length === 0) return ''
+  if (p === mySeat.value) return 'play-from-bottom'
+  if (p === topSeat.value) return 'play-from-top'
+  if (p === leftSeat.value) return 'play-from-left'
+  if (p === rightSeat.value) return 'play-from-right'
+  return ''
+})
 </script>
 
 
@@ -326,6 +340,37 @@ const {
 .your-card:last-child { margin-right: 0; }
 .played-card { margin-right: -30px; cursor: default; }
 .played-card:last-child { margin-right: 0; }
+
+/* ── Play Card Animations ───────────────────────────────────────────────── */
+.play-from-bottom {
+  animation: playFromBottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-top {
+  animation: playFromTop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-left {
+  animation: playFromLeft 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-right {
+  animation: playFromRight 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes playFromBottom {
+  from { opacity: 0; transform: translateY(60px) scale(0.7) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromTop {
+  from { opacity: 0; transform: translateY(-60px) scale(0.7) rotate(-3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromLeft {
+  from { opacity: 0; transform: translateX(-80px) scale(0.7) rotate(-3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromRight {
+  from { opacity: 0; transform: translateX(80px) scale(0.7) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
 
 @media (max-width: 768px) {
   .r2-rope-border { border-radius: 20px; border-width: 3px; }

@@ -94,7 +94,9 @@
             <template v-else>
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center">
-                <PlayingCard v-for="(c, j) in lastPlayed" :key="j" :card="c" class="cursor-default! played-card" />
+                <PlayingCard v-for="(c, j) in lastPlayed" :key="c.rank + c.suit" :card="c"
+                  class="cursor-default! played-card" :class="playAnimClass"
+                  :style="{ animationDelay: j * 50 + 'ms' }" />
               </div>
               <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
               <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
@@ -214,6 +216,7 @@
 
 <script setup>
 import { useVsComputer, playerNames } from '../composables/useVsComputer.js'
+import { computed } from 'vue'
 import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
 
@@ -231,6 +234,12 @@ const {
 } = useVsComputer()
 
 newGame()
+
+const playAnimClass = computed(() => {
+  const p = lastPlayer.value
+  if (p < 0 || lastPlayed.value.length === 0) return ''
+  return ['play-from-bottom', 'play-from-left', 'play-from-right', 'play-from-top'][p] || ''
+})
 </script>
 
 
@@ -272,6 +281,37 @@ newGame()
 .your-card:last-child { margin-right: 0; }
 .played-card { margin-right: -24px; cursor: default; }
 .played-card:last-child { margin-right: 0; }
+
+/* ── Play Card Animations ───────────────────────────────────────────────── */
+.play-from-bottom {
+  animation: playFromBottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-top {
+  animation: playFromTop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-left {
+  animation: playFromLeft 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.play-from-right {
+  animation: playFromRight 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes playFromBottom {
+  from { opacity: 0; transform: translateY(60px) scale(0.7) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromTop {
+  from { opacity: 0; transform: translateY(-60px) scale(0.7) rotate(-3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromLeft {
+  from { opacity: 0; transform: translateX(-80px) scale(0.7) rotate(-3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes playFromRight {
+  from { opacity: 0; transform: translateX(80px) scale(0.7) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
 
 .turn-text { font-size: 0.72rem; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; font-weight: 700; }
 .pulse-glow { color: var(--color-gold); text-shadow: 0 0 10px rgba(212,168,67,0.5); animation: turnPulse 1.5s ease-in-out infinite; }
