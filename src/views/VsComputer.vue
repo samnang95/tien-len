@@ -227,7 +227,8 @@ newGame()
   border-radius: 32px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
   position: relative; z-index: 1; overflow: hidden;
   background: #0f3d25 url('/images/felt_background.png') center/cover;
-  box-shadow: 0 0 60px rgba(0,0,0,0.7), inset 0 0 50px rgba(0,0,0,0.4), inset 0 0 120px rgba(0,0,0,0.2);
+  /* background-blend-mode: multiply; */
+  /* box-shadow: 0 0 60px rgba(0,0,0,0.7), inset 0 0 50px rgba(0,0,0,0.4), inset 0 0 120px rgba(0,0,0,0.2); */
 }
 
 .player-label { font-size: 0.72rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
