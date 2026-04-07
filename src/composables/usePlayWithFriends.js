@@ -32,9 +32,11 @@ export function usePlayWithFriends() {
   const gameOverScores = ref('')
   const boomHands      = ref([])
   const isBoom         = ref(false)
+  const isDealing      = ref(false)
 
   let listeners  = []
   let turnTimer  = null
+  let dealTimer  = null
 
   const playerId = fb.getPlayerId()
 
@@ -46,12 +48,12 @@ export function usePlayWithFriends() {
   const myHand        = computed(() => gs.value?.hands?.[mySeat.value] || [])
 
   const mpIsMyTurn = computed(() => {
-    if (!gs.value || gs.value.gameOver) return false
+    if (!gs.value || gs.value.gameOver || isDealing.value) return false
     return gs.value.current === mySeat.value && !(gs.value.finishOrder || []).includes(mySeat.value)
   })
 
   const canPass = computed(() => {
-    if (!mpIsMyTurn.value) return false
+    if (!mpIsMyTurn.value || isDealing.value) return false
     const lp = gs.value?.lastPlayed || []
     if (lp.length === 0) return false
     if (gs.value?.lastPlayer === mySeat.value) return false
@@ -186,15 +188,34 @@ export function usePlayWithFriends() {
   }
 
   function setupGameListener() {
+    let prevGameOver = true  // start true so first game triggers deal
     const unsub = fb.listenGame(roomCode.value, (gameState) => {
-      gs.value = gameState
+      const wasGameOver  = prevGameOver
+      prevGameOver       = gameState?.gameOver ?? true
+      gs.value           = gameState
       if (!gameState) return
-      selectedSet.value = new Set()
+      selectedSet.value  = new Set()
+
+      // Detect new game start: transition from gameOver to not gameOver
+      if (wasGameOver && !gameState.gameOver) {
+        triggerDealAnimation()
+      }
+
       startTurnCountdown()
       if (gameState.gameOver) showGameOver()
       else showGameOverlay.value = false
     })
     listeners.push(unsub)
+  }
+
+  function triggerDealAnimation() {
+    if (dealTimer) { clearTimeout(dealTimer); dealTimer = null }
+    isDealing.value = true
+    SFX.deal()
+    dealTimer = setTimeout(() => {
+      isDealing.value = false
+      dealTimer = null
+    }, 2800)
   }
 
   // ── Game Start ─────────────────────────────────────────────────────────────
@@ -508,6 +529,7 @@ export function usePlayWithFriends() {
 
   onUnmounted(() => {
     clearInterval(turnTimer)
+    if (dealTimer) { clearTimeout(dealTimer); dealTimer = null }
     listeners.forEach(fn => fn())
     listeners = []
   })
@@ -517,7 +539,7 @@ export function usePlayWithFriends() {
     // state
     screen, lobbyView, lobbyError, nickname, roomCodeInput, roomCode,
     isHost, mySeat, playerCount, copied, slots, gs,
-    selectedSet, turnTimeLeft, showGameOverlay,
+    selectedSet, turnTimeLeft, showGameOverlay, isDealing,
     gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
     // computed
     activeSeats, topSeat, leftSeat, rightSeat, myHand,

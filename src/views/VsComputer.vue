@@ -53,7 +53,9 @@
               <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default!" />
             </template>
             <template v-else>
-              <div v-for="j in hands[3].length" :key="j" class="card-sm"></div>
+              <div v-for="j in hands[3].length" :key="j" class="card-sm"
+                :class="{ 'deal-to-top': isDealing }"
+                :style="isDealing ? { animationDelay: ((j-1) * 4 + 3) * 45 + 'ms' } : {}"></div>
             </template>
           </div>
         </div>
@@ -68,7 +70,9 @@
                 <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default! side-card-reveal" />
               </template>
               <template v-else>
-                <div v-for="j in hands[1].length" :key="j" class="card-sm-v"></div>
+                <div v-for="j in hands[1].length" :key="j" class="card-sm-v"
+                  :class="{ 'deal-to-left': isDealing }"
+                  :style="isDealing ? { animationDelay: ((j-1) * 4 + 1) * 45 + 'ms' } : {}"></div>
               </template>
             </div>
           </div>
@@ -76,17 +80,30 @@
           <!-- Play Area -->
           <div class="flex-1 min-h-[320px] rounded-[14px] border border-white/6 flex flex-col items-center justify-center gap-1 p-2 max-md:min-h-[100px] max-md:p-1.5 max-md:gap-[3px] max-[480px]:min-h-[70px] max-[480px]:p-1 max-[480px]:gap-0.5 max-[480px]:rounded-[10px] max-[400px]:min-h-[55px] max-[400px]:p-[3px]"
             style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.35) 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.3);">
-            <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
-            <div class="flex flex-nowrap justify-center">
-              <PlayingCard v-for="(c, j) in lastPlayed" :key="j" :card="c" class="cursor-default! played-card" />
-            </div>
-            <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
-            <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
-              style="font-family: var(--font-cinzel);">{{ msg }}</div>
-            <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-md:min-h-5 max-md:mt-0.5 max-[480px]:min-h-4 max-[480px]:mt-px">
-              <span v-if="!gameOver && current === 0" class="turn-text pulse-glow">YOUR TURN</span>
-              <span v-else-if="!gameOver && current > 0" class="turn-text">CPU {{ current }} THINKING</span>
-            </div>
+            <!-- Dealing visual -->
+            <template v-if="isDealing">
+              <div class="deal-center">
+                <div class="deal-deck-pile">
+                  <div v-for="i in 6" :key="i" class="deal-deck-card"
+                    :style="{ transform: `translateX(${(i-3)*0.8}px) translateY(${-i*1.5}px)`, opacity: 1 - i * 0.06 }"></div>
+                </div>
+                <div class="deal-label">DEALING<span class="deal-ellipsis"></span></div>
+              </div>
+            </template>
+            <!-- Normal play area -->
+            <template v-else>
+              <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
+              <div class="flex flex-nowrap justify-center">
+                <PlayingCard v-for="(c, j) in lastPlayed" :key="j" :card="c" class="cursor-default! played-card" />
+              </div>
+              <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
+              <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
+                style="font-family: var(--font-cinzel);">{{ msg }}</div>
+              <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-md:min-h-5 max-md:mt-0.5 max-[480px]:min-h-4 max-[480px]:mt-px">
+                <span v-if="!gameOver && current === 0" class="turn-text pulse-glow">YOUR TURN</span>
+                <span v-else-if="!gameOver && current > 0" class="turn-text">CPU {{ current }} THINKING</span>
+              </div>
+            </template>
           </div>
 
           <!-- CPU 2 right -->
@@ -96,7 +113,9 @@
                 <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default! side-card-reveal" />
               </template>
               <template v-else>
-                <div v-for="j in hands[2].length" :key="j" class="card-sm-v"></div>
+                <div v-for="j in hands[2].length" :key="j" class="card-sm-v"
+                  :class="{ 'deal-to-right': isDealing }"
+                  :style="isDealing ? { animationDelay: ((j-1) * 4 + 2) * 45 + 'ms' } : {}"></div>
               </template>
             </div>
             <div class="player-label-side rotate-90" :class="{ 'active-player': current === 2 }">{{ cpuLabel(2) }}</div>
@@ -112,7 +131,10 @@
             :style="{ opacity: passedPlayers.has(0) && !gameOver ? 0.5 : 1, minHeight: 'var(--card-h)' }">
             <PlayingCard v-for="(c, j) in hands[0]" :key="j"
               :card="c" :selected="selected.includes(j)"
-              class="your-card" @click="toggleSelect(j)" />
+              class="your-card"
+              :class="{ 'deal-to-bottom': isDealing }"
+              :style="isDealing ? { animationDelay: (j * 4) * 45 + 'ms', pointerEvents: 'none' } : {}"
+              @click="toggleSelect(j)" />
           </div>
           <div class="flex gap-2.5 mt-1 max-md:gap-2 max-md:mt-0.5 max-[480px]:gap-1.5">
             <button class="btn btn-play" :disabled="!isMyTurn || selected.length === 0" @click="playSelected">Play</button>
@@ -197,7 +219,7 @@ import GameToolbar from '../components/GameToolbar.vue'
 
 const {
   hands, current, lastPlayed, lastPlayer, passedPlayers,
-  selected, scores, gameOver, betAmount, betInput, betModalOpen,
+  selected, scores, gameOver, isDealing, betAmount, betInput, betModalOpen,
   wallets, finishOrder, msg, showOverlay,
   overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,
   overlayWallets, overlayScore, loserCards, loserName, loserPenaltyText, boomHands,
@@ -295,5 +317,138 @@ newGame()
   .card-sm-v { width: 22px; height: 16px; margin-bottom: -12px; border-radius: 2px; }
   .your-card { margin-right: -17px; }
   .played-card { margin-right: -16px; }
+}
+
+/* ── Deal Animations ────────────────────────────────────────────────────── */
+.deal-to-top {
+  animation: dealToTop 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-bottom {
+  animation: dealToBottom 0.45s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-left {
+  animation: dealToLeft 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-right {
+  animation: dealToRight 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+@keyframes dealToTop {
+  from {
+    opacity: 0;
+    transform: translateY(160px) scale(0.25) rotate(-8deg);
+  }
+  40% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+@keyframes dealToBottom {
+  from {
+    opacity: 0;
+    transform: translateY(-160px) scale(0.25) rotate(8deg);
+  }
+  40% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+@keyframes dealToLeft {
+  from {
+    opacity: 0;
+    transform: translateX(200px) scale(0.25) rotate(8deg);
+  }
+  40% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotate(0deg);
+  }
+}
+@keyframes dealToRight {
+  from {
+    opacity: 0;
+    transform: translateX(-200px) scale(0.25) rotate(-8deg);
+  }
+  40% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotate(0deg);
+  }
+}
+
+/* Deal center deck visual */
+.deal-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  animation: dealCenterPulse 1.5s ease-in-out infinite;
+}
+@keyframes dealCenterPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.deal-deck-pile {
+  position: relative;
+  width: 56px;
+  height: 78px;
+}
+.deal-deck-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: url('/images/card_back.png') center/cover;
+  border: 2px solid rgba(255,255,255,0.18);
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.5), 0 0 20px rgba(212,168,67,0.15);
+}
+.deal-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: var(--color-gold);
+  text-shadow: 0 0 12px rgba(212,168,67,0.5);
+  font-weight: 700;
+  font-family: var(--font-cinzel);
+}
+.deal-ellipsis::after {
+  content: '';
+  animation: dealDots 1.5s steps(4, end) infinite;
+}
+@keyframes dealDots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+@media (max-width: 768px) {
+  .deal-to-top { animation-name: dealToTopMd; }
+  .deal-to-bottom { animation-name: dealToBottomMd; }
+  .deal-to-left { animation-name: dealToLeftMd; }
+  .deal-to-right { animation-name: dealToRightMd; }
+  @keyframes dealToTopMd {
+    from { opacity: 0; transform: translateY(100px) scale(0.3) rotate(-6deg); }
+    40% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToBottomMd {
+    from { opacity: 0; transform: translateY(-100px) scale(0.3) rotate(6deg); }
+    40% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToLeftMd {
+    from { opacity: 0; transform: translateX(120px) scale(0.3) rotate(6deg); }
+    40% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToRightMd {
+    from { opacity: 0; transform: translateX(-120px) scale(0.3) rotate(-6deg); }
+    40% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+  }
+  .deal-deck-pile { width: 42px; height: 60px; }
+  .deal-label { font-size: 0.55rem; }
 }
 </style>

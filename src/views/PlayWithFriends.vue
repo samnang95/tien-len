@@ -134,7 +134,9 @@
         <div v-if="activeSeats.includes(topSeat)" class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
           <div class="player-label" :class="labelClass(topSeat)">{{ labelText(topSeat) }}</div>
           <div class="flex flex-nowrap justify-center min-h-[50px] max-[480px]:min-h-8 max-[400px]:min-h-6">
-            <div v-for="j in opponentCardCount(topSeat)" :key="j" class="r2-card-sm-h"></div>
+            <div v-for="j in opponentCardCount(topSeat)" :key="j" class="r2-card-sm-h"
+              :class="{ 'deal-to-top': isDealing }"
+              :style="isDealing ? { animationDelay: ((j-1) * 4 + 2) * 45 + 'ms' } : {}"></div>
           </div>
         </div>
 
@@ -145,32 +147,49 @@
             class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
             <div class="player-label-side -rotate-90" :class="labelClass(leftSeat)">{{ labelText(leftSeat) }}</div>
             <div class="flex flex-col items-center">
-              <div v-for="j in opponentCardCount(leftSeat)" :key="j" class="r2-card-sm-v"></div>
+              <div v-for="j in opponentCardCount(leftSeat)" :key="j" class="r2-card-sm-v"
+                :class="{ 'deal-to-left': isDealing }"
+                :style="isDealing ? { animationDelay: ((j-1) * 4 + 1) * 45 + 'ms' } : {}"></div>
             </div>
           </div>
 
           <!-- Play Area -->
           <div class="flex-1 min-h-[120px] rounded-2xl border border-white/6 flex flex-col items-center justify-center gap-1.5 p-3 max-md:min-h-[70px] max-md:p-1.5 max-md:gap-[3px] max-[480px]:min-h-[55px] max-[480px]:p-1 max-[480px]:gap-0.5 max-[480px]:rounded-[10px] max-[400px]:min-h-[45px] max-[400px]:p-[3px]"
             style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.25) 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
-            <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.4rem] max-[480px]:text-[0.35rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.3rem]">LAST PLAYED</div>
-            <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-md:min-h-[60px] max-md:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
-              <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="j" :card="c" class="cursor-default! played-card" />
-            </div>
-            <div class="text-[0.82rem] italic text-gold-light max-md:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
-            <div class="text-[0.95rem] min-h-[1.3em] text-[#f9ca24] max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]"
-              style="font-family: var(--font-cinzel);">{{ gs?.message || '' }}</div>
-            <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-md:min-h-5 max-md:mt-px max-[480px]:min-h-4">
-              <span v-if="turnTimeLeft > 0 && !gs?.gameOver" class="font-bold transition-colors duration-500"
-                :class="turnTimeLeft <= 5 ? 'text-[#e74c3c]' : turnTimeLeft <= 15 ? 'text-[#f39c12]' : 'text-[#2ecc71]'"
-                style="font-family: var(--font-cinzel); font-size: 0.9rem;">{{ turnTimeLeft }}s</span>
-            </div>
+            <!-- Dealing visual -->
+            <template v-if="isDealing">
+              <div class="deal-center">
+                <div class="deal-deck-pile">
+                  <div v-for="i in 6" :key="i" class="deal-deck-card"
+                    :style="{ transform: `translateX(${(i-3)*0.8}px) translateY(${-i*1.5}px)`, opacity: 1 - i * 0.06 }"></div>
+                </div>
+                <div class="deal-label">DEALING<span class="deal-ellipsis"></span></div>
+              </div>
+            </template>
+            <!-- Normal play area -->
+            <template v-else>
+              <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.4rem] max-[480px]:text-[0.35rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.3rem]">LAST PLAYED</div>
+              <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-md:min-h-[60px] max-md:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
+                <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="j" :card="c" class="cursor-default! played-card" />
+              </div>
+              <div class="text-[0.82rem] italic text-gold-light max-md:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
+              <div class="text-[0.95rem] min-h-[1.3em] text-[#f9ca24] max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]"
+                style="font-family: var(--font-cinzel);">{{ gs?.message || '' }}</div>
+              <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-md:min-h-5 max-md:mt-px max-[480px]:min-h-4">
+                <span v-if="turnTimeLeft > 0 && !gs?.gameOver" class="font-bold transition-colors duration-500"
+                  :class="turnTimeLeft <= 5 ? 'text-[#e74c3c]' : turnTimeLeft <= 15 ? 'text-[#f39c12]' : 'text-[#2ecc71]'"
+                  style="font-family: var(--font-cinzel); font-size: 0.9rem;">{{ turnTimeLeft }}s</span>
+              </div>
+            </template>
           </div>
 
           <!-- Right -->
           <div v-if="activeSeats.includes(rightSeat)"
             class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
             <div class="flex flex-col items-center">
-              <div v-for="j in opponentCardCount(rightSeat)" :key="j" class="r2-card-sm-v"></div>
+              <div v-for="j in opponentCardCount(rightSeat)" :key="j" class="r2-card-sm-v"
+                :class="{ 'deal-to-right': isDealing }"
+                :style="isDealing ? { animationDelay: ((j-1) * 4 + 3) * 45 + 'ms' } : {}"></div>
             </div>
             <div class="player-label-side rotate-90" :class="labelClass(rightSeat)">{{ labelText(rightSeat) }}</div>
           </div>
@@ -182,7 +201,10 @@
           <div class="flex flex-nowrap justify-center px-5 transition-opacity duration-300 max-md:px-1 max-[480px]:px-0.5"
             :style="{ opacity: amPassed ? 0.5 : 1, minHeight: 'var(--card-h)' }">
             <PlayingCard v-for="(c, j) in myHand" :key="j" :card="c"
-              :selected="selectedSet.has(j)" class="your-card" @click="toggleSelect(j)" />
+              :selected="selectedSet.has(j)" class="your-card"
+              :class="{ 'deal-to-bottom': isDealing }"
+              :style="isDealing ? { animationDelay: (j * 4) * 45 + 'ms', pointerEvents: 'none' } : {}"
+              @click="toggleSelect(j)" />
           </div>
           <div class="flex gap-2.5 mt-1 max-md:gap-2 max-md:mt-px max-[480px]:gap-1.5">
             <button class="btn btn-play" :disabled="!mpIsMyTurn" @click="mpPlaySelected">Play</button>
@@ -231,7 +253,7 @@ import PixelClouds from '../components/PixelClouds.vue'
 const {
   screen, lobbyView, lobbyError, nickname, roomCodeInput, roomCode,
   isHost, mySeat, playerCount, copied, slots, gs,
-  selectedSet, turnTimeLeft, showGameOverlay,
+  selectedSet, turnTimeLeft, showGameOverlay, isDealing,
   gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
   activeSeats, topSeat, leftSeat, rightSeat, myHand,
   mpIsMyTurn, canPass, amPassed, whosePlayText,
@@ -336,5 +358,85 @@ const {
   .r2-card-sm-v { width: 22px; height: 16px; margin-bottom: -12px; border-radius: 2px; }
   .your-card { margin-right: -17px; }
   .played-card { margin-right: -16px; }
+}
+
+/* ── Deal Animations ────────────────────────────────────────────────────── */
+.deal-to-top {
+  animation: dealToTop 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-bottom {
+  animation: dealToBottom 0.45s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-left {
+  animation: dealToLeft 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+.deal-to-right {
+  animation: dealToRight 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+@keyframes dealToTop {
+  from { opacity: 0; transform: translateY(160px) scale(0.25) rotate(-8deg); }
+  40% { opacity: 1; }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+@keyframes dealToBottom {
+  from { opacity: 0; transform: translateY(-160px) scale(0.25) rotate(8deg); }
+  40% { opacity: 1; }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+@keyframes dealToLeft {
+  from { opacity: 0; transform: translateX(200px) scale(0.25) rotate(8deg); }
+  40% { opacity: 1; }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+}
+@keyframes dealToRight {
+  from { opacity: 0; transform: translateX(-200px) scale(0.25) rotate(-8deg); }
+  40% { opacity: 1; }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+}
+
+.deal-center {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  animation: dealCenterPulse 1.5s ease-in-out infinite;
+}
+@keyframes dealCenterPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.deal-deck-pile { position: relative; width: 56px; height: 78px; }
+.deal-deck-card {
+  position: absolute; inset: 0; border-radius: 6px;
+  background: url('/images/card_back.png') center/cover;
+  border: 2px solid rgba(255,255,255,0.18);
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.5), 0 0 20px rgba(212,168,67,0.15);
+}
+.deal-label {
+  font-size: 0.7rem; letter-spacing: 0.3em; color: var(--color-gold);
+  text-shadow: 0 0 12px rgba(212,168,67,0.5); font-weight: 700; font-family: var(--font-cinzel);
+}
+.deal-ellipsis::after { content: ''; animation: dealDots 1.5s steps(4, end) infinite; }
+@keyframes dealDots {
+  0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
+}
+
+@media (max-width: 768px) {
+  .deal-to-top { animation-name: dealToTopMd; }
+  .deal-to-bottom { animation-name: dealToBottomMd; }
+  .deal-to-left { animation-name: dealToLeftMd; }
+  .deal-to-right { animation-name: dealToRightMd; }
+  @keyframes dealToTopMd {
+    from { opacity: 0; transform: translateY(100px) scale(0.3) rotate(-6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToBottomMd {
+    from { opacity: 0; transform: translateY(-100px) scale(0.3) rotate(6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToLeftMd {
+    from { opacity: 0; transform: translateX(120px) scale(0.3) rotate(6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
+  }
+  @keyframes dealToRightMd {
+    from { opacity: 0; transform: translateX(-120px) scale(0.3) rotate(-6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
+  }
+  .deal-deck-pile { width: 42px; height: 60px; }
+  .deal-label { font-size: 0.55rem; }
 }
 </style>

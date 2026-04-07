@@ -43,12 +43,14 @@ export function useVsComputer() {
   const loserName      = ref('')
   const loserPenaltyText = ref('')
   const boomHands      = ref([])
+  const isDealing      = ref(false)
 
   let aiActionTimer = null
+  let dealTimer = null
 
   // ── Computed ───────────────────────────────────────────────────────────────
   const isMyTurn = computed(() =>
-    current.value === 0 && !gameOver.value && !passedPlayers.value.has(0)
+    current.value === 0 && !gameOver.value && !passedPlayers.value.has(0) && !isDealing.value
   )
 
   const whosePlayText = computed(() => {
@@ -115,6 +117,7 @@ export function useVsComputer() {
     loserCards.value     = []
     loserPenaltyText.value = ''
     clearAiTimer()
+    clearDealTimer()
 
     const deck = createDeck()
     const h = [[], [], [], []]
@@ -125,55 +128,61 @@ export function useVsComputer() {
     lastPlayed.value  = []
     lastPlayer.value  = -1
     passCount.value   = 0
-
-    if (lastWinner.value >= 0) {
-      current.value = lastWinner.value
-    } else {
-      current.value = 0
-      for (let p = 0; p < 4; p++) {
-        if (h[p].some(c => c.rank === '3' && c.suit === '♠')) { current.value = p; break }
-      }
-    }
-
+    current.value     = -1
     setMsg('')
+    isDealing.value = true
     SFX.deal()
 
-    // Check instant win
-    for (let p = 0; p < 4; p++) {
-      const reason = checkInstantWin(h[p])
-      if (reason) {
-        gameOver.value    = true
-        lastWinner.value  = p
-        SFX.bomb()
-        setTimeout(() => SFX.win(), 500)
-        finishOrder.value = [p]
-        for (let q = 0; q < 4; q++) { if (q !== p) finishOrder.value.push(q) }
-        scores.value[p]++
+    // After dealing animation completes, start the game
+    dealTimer = setTimeout(() => {
+      isDealing.value = false
 
-        showOverlay.value  = true
-        overlayTitle.value = '💣 ' + reason + ' BOOM! 💣'
-        const winnerName   = p === 0 ? '🎉 You' : 'CPU ' + p
-        overlayMsg.value   = winnerName + ' has ' + reason.toLowerCase() + ' — INSTANT WIN!'
-        overlayMoney.value = ''
-        overlayMoneyWin.value = true
-        overlayWallets.value = `You $${wallets.value[0]}  •  CPU1 $${wallets.value[1]}  •  CPU2 $${wallets.value[2]}  •  CPU3 $${wallets.value[3]}`
-        overlayScore.value   = `Wins — You ${scores.value[0]}  •  CPU1 ${scores.value[1]}  •  CPU2 ${scores.value[2]}  •  CPU3 ${scores.value[3]}`
-        boomHands.value = [0, 1, 2, 3].map(q => ({
-          name: q === 0 ? 'You' : 'CPU ' + q,
-          winner: q === p,
-          cards: h[q],
-        }))
-        return
+      if (lastWinner.value >= 0) {
+        current.value = lastWinner.value
+      } else {
+        current.value = 0
+        for (let p = 0; p < 4; p++) {
+          if (h[p].some(c => c.rank === '3' && c.suit === '♠')) { current.value = p; break }
+        }
       }
-    }
 
-    if (current.value !== 0) scheduleAiTurn()
-    else {
-      const startMsg = lastWinner.value >= 0
-        ? 'Your turn — winner goes first!'
-        : 'Your turn — you have 3♠, lead freely!'
-      setMsg(startMsg)
-    }
+      // Check instant win
+      for (let p = 0; p < 4; p++) {
+        const reason = checkInstantWin(h[p])
+        if (reason) {
+          gameOver.value    = true
+          lastWinner.value  = p
+          SFX.bomb()
+          setTimeout(() => SFX.win(), 500)
+          finishOrder.value = [p]
+          for (let q = 0; q < 4; q++) { if (q !== p) finishOrder.value.push(q) }
+          scores.value[p]++
+
+          showOverlay.value  = true
+          overlayTitle.value = '💣 ' + reason + ' BOOM! 💣'
+          const winnerName   = p === 0 ? '🎉 You' : 'CPU ' + p
+          overlayMsg.value   = winnerName + ' has ' + reason.toLowerCase() + ' — INSTANT WIN!'
+          overlayMoney.value = ''
+          overlayMoneyWin.value = true
+          overlayWallets.value = `You $${wallets.value[0]}  •  CPU1 $${wallets.value[1]}  •  CPU2 $${wallets.value[2]}  •  CPU3 $${wallets.value[3]}`
+          overlayScore.value   = `Wins — You ${scores.value[0]}  •  CPU1 ${scores.value[1]}  •  CPU2 ${scores.value[2]}  •  CPU3 ${scores.value[3]}`
+          boomHands.value = [0, 1, 2, 3].map(q => ({
+            name: q === 0 ? 'You' : 'CPU ' + q,
+            winner: q === p,
+            cards: h[q],
+          }))
+          return
+        }
+      }
+
+      if (current.value !== 0) scheduleAiTurn()
+      else {
+        const startMsg = lastWinner.value >= 0
+          ? 'Your turn — winner goes first!'
+          : 'Your turn — you have 3♠, lead freely!'
+        setMsg(startMsg)
+      }
+    }, 2800)
   }
 
   function endGame() {
@@ -326,6 +335,10 @@ export function useVsComputer() {
     if (aiActionTimer) { clearTimeout(aiActionTimer); aiActionTimer = null }
   }
 
+  function clearDealTimer() {
+    if (dealTimer) { clearTimeout(dealTimer); dealTimer = null }
+  }
+
   function scheduleAiTurn() {
     const delay = 2000 + Math.floor(Math.random() * 3000)
     aiActionTimer = setTimeout(aiTurn, delay)
@@ -388,17 +401,18 @@ export function useVsComputer() {
 
   function leaveRoom() {
     clearAiTimer()
+    clearDealTimer()
     gameOver.value = true
     router.push({ name: 'home' })
   }
 
-  onUnmounted(() => { clearAiTimer() })
+  onUnmounted(() => { clearAiTimer(); clearDealTimer() })
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
     // state
     hands, current, lastPlayed, lastPlayer, passCount, passedPlayers,
-    selected, scores, gameOver, betAmount, betInput, betModalOpen,
+    selected, scores, gameOver, isDealing, betAmount, betInput, betModalOpen,
     wallets, finishOrder, lastWinner, msg, showOverlay,
     overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,
     overlayWallets, overlayScore, loserCards, loserName, loserPenaltyText, boomHands,
