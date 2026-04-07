@@ -191,7 +191,7 @@
 </template>
 
 <script setup>
-import { useRoom1Game, playerNames } from '../composables/useRoom1Game.js'
+import { useVsComputer, playerNames } from '../composables/useVsComputer.js'
 import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
 
@@ -206,7 +206,7 @@ const {
   walletClass, cpuLabel, showCpuCards,
   newGame, toggleSelect, playSelected, pass,
   resetScore, confirmBet, leaveRoom,
-} = useRoom1Game()
+} = useVsComputer()
 
 newGame()
 </script>

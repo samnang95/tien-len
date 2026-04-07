@@ -11,7 +11,7 @@ const RANK_REWARDS = [30, 15, -15, -30]
 export const playerNames = ['You', 'CPU 1', 'CPU 2', 'CPU 3']
 
 // ─── Composable ───────────────────────────────────────────────────────────────
-export function useRoom1Game() {
+export function useVsComputer() {
   const router = useRouter()
   const { SFX, isMuted, toggleMute } = useSound()
 

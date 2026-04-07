@@ -5,7 +5,7 @@ import { useFirebase } from './useFirebase.js'
 import { createDeck, sortHand, classify, beats, checkInstantWin } from './useCardLogic.js'
 
 // ─── Composable ───────────────────────────────────────────────────────────────
-export function useRoom2Game() {
+export function usePlayWithFriends() {
   const router = useRouter()
   const { SFX, isMuted, toggleMute } = useSound()
   const fb = useFirebase()

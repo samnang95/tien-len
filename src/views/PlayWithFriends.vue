@@ -15,7 +15,7 @@
           style="display: block; margin: 0 auto 32px auto; width: min(140px, 40vw); filter: drop-shadow(0 0 20px rgba(212,168,67,0.4)); animation: logoFloat 3s ease-in-out infinite alternate;" />
 
         <h1 style="margin-bottom: 16px; font-family: 'Press Start 2P', monospace; font-size: clamp(1.2rem, 4vw, 2rem); color: #d4a843; text-shadow: 0 0 10px rgba(212,168,67,0.8), 0 0 30px rgba(212,168,67,0.4), 0 4px 0 #0a2a16; animation: titleGlow 2s ease-in-out infinite alternate;">
-          MULTIPLAYER
+          PLAY WITH FRIENDS
         </h1>
         <p style="font-family: 'Press Start 2P', monospace; font-size: clamp(0.45rem, 1.5vw, 0.65rem); color: rgba(240,201,110,0.7); letter-spacing: 0.15em; margin-bottom: 36px; text-transform: uppercase;">
           Play with friends online
@@ -96,7 +96,7 @@
           ▶ START GAME
         </button>
 
-        <button @click="doLeaveRoom" class="lobby-back-btn" style="margin-top: 20px;">← Leave Room</button>
+        <button @click="doLeaveRoom" class="lobby-back-btn" style="margin-top: 20px;">← Leave Game</button>
       </div>
     </div>
   </div>
@@ -113,7 +113,7 @@
       class="mt-1 rounded-xl w-[100px] relative z-1 max-md:w-[60px] max-md:mt-px max-[480px]:w-[50px] max-[400px]:w-[40px]"
       style="filter: drop-shadow(0 4px 20px rgba(212,168,67,0.4));" />
     <p class="text-[0.7rem] text-white/35 tracking-[0.2em] mb-2 relative z-1 max-md:text-[0.5rem] max-md:mb-px max-[480px]:text-[0.42rem] max-[400px]:hidden">
-      Multiplayer — Room {{ roomCode }}
+      Play with Friends — Room {{ roomCode }}
     </p>
 
     <!-- Scoreboard -->
@@ -212,7 +212,7 @@
         <p v-if="!isHost" style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: rgba(240,201,110,0.7); margin-top: 12px; animation: hintBlink 2s ease-in-out infinite;">
           ⏳ Waiting for host to start next game...
         </p>
-        <button @click="doLeaveRoom" class="lobby-back-btn mt-3">← Leave Room</button>
+        <button @click="doLeaveRoom" class="lobby-back-btn mt-3">← Leave Game</button>
       </div>
     </div>
 
@@ -222,7 +222,7 @@
 </template>
 
 <script setup>
-import { useRoom2Game } from '../composables/useRoom2Game.js'
+import { usePlayWithFriends } from '../composables/usePlayWithFriends.js'
 import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
 import PixelStars from '../components/PixelStars.vue'
@@ -241,7 +241,7 @@ const {
   showCreate, showJoin, doCreateRoom, doJoinRoom, copyCode,
   toggleSelect, mpPlaySelected, mpPass,
   doStartGame, doHostNewGame, doLeaveRoom,
-} = useRoom2Game()
+} = usePlayWithFriends()
 </script>
 
 

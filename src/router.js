@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import StartScreen from './views/StartScreen.vue'
-import Room1Game from './views/Room1Game.vue'
-import Room2Game from './views/Room2Game.vue'
+import VsComputer from './views/VsComputer.vue'
+import PlayWithFriends from './views/PlayWithFriends.vue'
 
 const routes = [
   { path: '/', name: 'home', component: StartScreen },
-  { path: '/room1', name: 'room1', component: Room1Game },
-  { path: '/room2', name: 'room2', component: Room2Game },
+  { path: '/room1', name: 'room1', component: VsComputer },
+  { path: '/room2', name: 'room2', component: PlayWithFriends },
 ]
 
 const router = createRouter({

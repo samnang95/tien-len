@@ -7,7 +7,7 @@
       {{ muted ? '🔇' : '🔊' }}
     </button>
     <button v-if="showReset" @click="emit('newGame')" class="toolbar-btn" title="New Game">🔄</button>
-    <button @click="emit('leave')" class="toolbar-btn" title="Leave Room">🚪</button>
+    <button @click="emit('leave')" class="toolbar-btn" title="Leave Game">🚪</button>
     <button @click="rulesOpen = !rulesOpen" class="toolbar-btn" title="Rules">?</button>
   </div>
 

@@ -66,11 +66,11 @@
         <div class="flex gap-5 justify-center flex-wrap relative z-2">
           <button @click="enterRoom('room1')" class="pixel-play-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
-            <span>ROOM 1</span>
+            <span>VS COMPUTER</span>
           </button>
           <button @click="enterRoom('room2')" class="pixel-play-btn room-2-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
-            <span>ROOM 2</span>
+            <span>PLAY WITH FRIENDS</span>
           </button>
         </div>
 
@@ -78,7 +78,7 @@
           class="tracking-widest text-[rgba(240,201,110,0.35)]"
           style="font-family: 'Press Start 2P', monospace; font-size: clamp(0.35rem, 1vw, 0.5rem); animation: hintBlink 2s ease-in-out infinite;"
         >
-          Select a room to start playing
+          vs Computer · Play with Friends
         </p>
       </div>
 
