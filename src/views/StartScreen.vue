@@ -64,11 +64,11 @@
 
         <!-- Buttons -->
         <div class="flex gap-5 justify-center flex-wrap relative z-2">
-          <button @click="enterRoom('room1')" class="pixel-play-btn">
+          <button @click="enterRoom('vs-computer')" class="pixel-play-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
             <span>VS COMPUTER</span>
           </button>
-          <button @click="enterRoom('room2')" class="pixel-play-btn room-2-btn">
+          <button @click="enterRoom('play-with-friends')" class="pixel-play-btn room-2-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
             <span>PLAY WITH FRIENDS</span>
           </button>

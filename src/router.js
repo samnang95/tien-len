@@ -5,8 +5,8 @@ import PlayWithFriends from './views/PlayWithFriends.vue'
 
 const routes = [
   { path: '/', name: 'home', component: StartScreen },
-  { path: '/room1', name: 'room1', component: VsComputer },
-  { path: '/room2', name: 'room2', component: PlayWithFriends },
+  { path: '/vs-computer', name: 'vs-computer', component: VsComputer },
+  { path: '/play-with-friends', name: 'play-with-friends', component: PlayWithFriends },
 ]
 
 const router = createRouter({

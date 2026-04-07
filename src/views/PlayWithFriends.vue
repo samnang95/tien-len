@@ -216,7 +216,7 @@
       </div>
     </div>
 
-    <GameToolbar :muted="isMuted" :show-reset="isHost" @toggle-mute="toggleMute" @new-game="doHostNewGame" @leave="doLeaveRoom" />
+    <GameToolbar :muted="isMuted" :show-reset="false" @toggle-mute="toggleMute" @new-game="doHostNewGame" @leave="doLeaveRoom" />
   </div>
   </div>
 </template>
