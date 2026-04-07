@@ -6,13 +6,13 @@ import { initializeApp } from 'firebase/app'
 import { getDatabase, ref as dbRef, set, get, update, remove, onValue, off, serverTimestamp, child } from 'firebase/database'
 
 const firebaseConfig = {
-  apiKey: "AIzaSy8hgWb4INKU1418pGaxdqUhtrtQV8BC8is",
-  authDomain: "tien-len-ac1a2.firebaseapp.com",
-  databaseURL: "https://tien-len-ac1a2-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tien-len-ac1a2",
-  storageBucket: "tien-len-ac1a2.firebasestorage.app",
-  messagingSenderId: "554951223890",
-  appId: "1:554951223890:web:2ef967c27a96f453d1cd8b"
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL:       import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
 const app = initializeApp(firebaseConfig)

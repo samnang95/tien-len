@@ -232,7 +232,7 @@ body {
   z-index: 100;
 }
 .overlay-box {
-  background: linear-gradient(135deg, #1e6e42, #0f3d25);
+  background: linear-gradient(135deg, var(--color-felt-light), var(--color-felt-dark));
   border: 2px solid var(--color-gold);
   border-radius: 18px;
   padding: 36px 48px;
