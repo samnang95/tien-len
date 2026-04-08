@@ -278,7 +278,7 @@ export function useVsComputer() {
       if (!finishOrder.value.includes(0)) finishOrder.value.push(0)
       if (finishOrder.value.length >= 3) { endGame(); return }
     }
-    current.value = nextAlive(1)
+    current.value = nextAlive(NEXT_TURN[0])
     if (current.value !== 0) scheduleAiTurn()
     else setMsg('Your turn!')
   }
@@ -294,11 +294,14 @@ export function useVsComputer() {
   }
 
   // ── Round Helpers ──────────────────────────────────────────────────────────
+  // Counter-Clockwise order: CPU 1(1) -> Me(0) -> CPU 2(2) -> CPU 3(3)
+  const NEXT_TURN = { 0: 2, 2: 3, 3: 1, 1: 0 }
+
   function nextAlive(from) {
-    let n = from % 4
+    let n = from
     let attempts = 0
     while ((hands.value[n].length === 0 || passedPlayers.value.has(n)) && attempts < 4) {
-      n = (n + 1) % 4
+      n = NEXT_TURN[n]
       attempts++
     }
     return n
@@ -306,10 +309,22 @@ export function useVsComputer() {
 
   function advanceAfterPass() {
     const alivePlayers  = [0, 1, 2, 3].filter(p => hands.value[p].length > 0)
-    const activePlayers = alivePlayers.filter(p => !passedPlayers.value.has(p))
+    
+    const isLastPlayerAlive = alivePlayers.includes(lastPlayer.value)
+    const requiredPasses = isLastPlayerAlive ? alivePlayers.length - 1 : alivePlayers.length
 
-    if (activePlayers.length <= 1) {
-      const roundWinner       = activePlayers[0] !== undefined ? activePlayers[0] : lastPlayer.value
+    if (passedPlayers.value.size >= requiredPasses) {
+      let roundWinner = lastPlayer.value
+
+      // CRITICAL FIX: If round winner has no cards, pass lead to next player who does (ignoring pass status)
+      if (hands.value[roundWinner].length === 0) {
+        let n = NEXT_TURN[roundWinner]
+        while (hands.value[n].length === 0 && n !== roundWinner) {
+          n = NEXT_TURN[n]
+        }
+        roundWinner = n
+      }
+
       passCount.value         = 0
       lastPlayed.value        = []
       lastPlayer.value        = -1
@@ -321,7 +336,7 @@ export function useVsComputer() {
       return
     }
 
-    const next = nextAlive((current.value + 1) % 4)
+    const next = nextAlive(NEXT_TURN[current.value])
     current.value = next
     if (current.value !== 0) scheduleAiTurn()
     else {
@@ -348,7 +363,7 @@ export function useVsComputer() {
     if (gameOver.value) return
     const p = current.value
     if (hands.value[p].length === 0) {
-      current.value = nextAlive((p + 1) % 4)
+      current.value = nextAlive(NEXT_TURN[p])
       if (current.value !== 0) scheduleAiTurn()
       return
     }
@@ -373,7 +388,7 @@ export function useVsComputer() {
         if (!finishOrder.value.includes(p)) finishOrder.value.push(p)
         if (finishOrder.value.length >= 3) { endGame(); return }
       }
-      current.value = nextAlive((p + 1) % 4)
+      current.value = nextAlive(NEXT_TURN[p])
       if (current.value !== 0) scheduleAiTurn()
       else setMsg('Your turn!')
     } else {

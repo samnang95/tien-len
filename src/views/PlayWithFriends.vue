@@ -282,7 +282,7 @@ const playAnimClass = computed(() => {
 
 
 
-<style scoped>
+<style>
 .lobby-panel {
   position: relative; z-index: 10;
   width: min(520px, 92vw); padding: 4px; border-radius: 12px;
@@ -339,38 +339,6 @@ const playAnimClass = computed(() => {
 .your-card { margin-right: -30px; }
 .your-card:last-child { margin-right: 0; }
 .played-card { margin-right: -30px; cursor: default; }
-.played-card:last-child { margin-right: 0; }
-
-/* ── Play Card Animations ───────────────────────────────────────────────── */
-.play-from-bottom {
-  animation: playFromBottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-.play-from-top {
-  animation: playFromTop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-.play-from-left {
-  animation: playFromLeft 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-.play-from-right {
-  animation: playFromRight 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-
-@keyframes playFromBottom {
-  from { opacity: 0; transform: translateY(60px) scale(0.7) rotate(3deg); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes playFromTop {
-  from { opacity: 0; transform: translateY(-60px) scale(0.7) rotate(-3deg); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes playFromLeft {
-  from { opacity: 0; transform: translateX(-80px) scale(0.7) rotate(-3deg); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes playFromRight {
-  from { opacity: 0; transform: translateX(80px) scale(0.7) rotate(3deg); }
-  to { opacity: 1; transform: none; }
-}
 
 @media (max-width: 768px) {
   .r2-rope-border { border-radius: 20px; border-width: 3px; }
@@ -403,85 +371,5 @@ const playAnimClass = computed(() => {
   .r2-card-sm-v { width: 22px; height: 16px; margin-bottom: -12px; border-radius: 2px; }
   .your-card { margin-right: -17px; }
   .played-card { margin-right: -16px; }
-}
-
-/* ── Deal Animations ────────────────────────────────────────────────────── */
-.deal-to-top {
-  animation: dealToTop 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
-}
-.deal-to-bottom {
-  animation: dealToBottom 0.45s cubic-bezier(0.23, 1, 0.32, 1) backwards;
-}
-.deal-to-left {
-  animation: dealToLeft 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
-}
-.deal-to-right {
-  animation: dealToRight 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
-}
-
-@keyframes dealToTop {
-  from { opacity: 0; transform: translateY(160px) scale(0.25) rotate(-8deg); }
-  40% { opacity: 1; }
-  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-}
-@keyframes dealToBottom {
-  from { opacity: 0; transform: translateY(-160px) scale(0.25) rotate(8deg); }
-  40% { opacity: 1; }
-  to { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-}
-@keyframes dealToLeft {
-  from { opacity: 0; transform: translateX(200px) scale(0.25) rotate(8deg); }
-  40% { opacity: 1; }
-  to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
-}
-@keyframes dealToRight {
-  from { opacity: 0; transform: translateX(-200px) scale(0.25) rotate(-8deg); }
-  40% { opacity: 1; }
-  to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
-}
-
-.deal-center {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-  animation: dealCenterPulse 1.5s ease-in-out infinite;
-}
-@keyframes dealCenterPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-}
-.deal-deck-pile { position: relative; width: 56px; height: 78px; }
-.deal-deck-card {
-  position: absolute; inset: 0; border-radius: 6px;
-  background: url('/images/card_back.png') center/cover;
-  border: 2px solid rgba(255,255,255,0.18);
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.5), 0 0 20px rgba(212,168,67,0.15);
-}
-.deal-label {
-  font-size: 0.7rem; letter-spacing: 0.3em; color: var(--color-gold);
-  text-shadow: 0 0 12px rgba(212,168,67,0.5); font-weight: 700; font-family: var(--font-cinzel);
-}
-.deal-ellipsis::after { content: ''; animation: dealDots 1.5s steps(4, end) infinite; }
-@keyframes dealDots {
-  0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
-}
-
-@media (max-width: 768px) {
-  .deal-to-top { animation-name: dealToTopMd; }
-  .deal-to-bottom { animation-name: dealToBottomMd; }
-  .deal-to-left { animation-name: dealToLeftMd; }
-  .deal-to-right { animation-name: dealToRightMd; }
-  @keyframes dealToTopMd {
-    from { opacity: 0; transform: translateY(100px) scale(0.3) rotate(-6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
-  }
-  @keyframes dealToBottomMd {
-    from { opacity: 0; transform: translateY(-100px) scale(0.3) rotate(6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
-  }
-  @keyframes dealToLeftMd {
-    from { opacity: 0; transform: translateX(120px) scale(0.3) rotate(6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
-  }
-  @keyframes dealToRightMd {
-    from { opacity: 0; transform: translateX(-120px) scale(0.3) rotate(-6deg); } 40% { opacity: 1; } to { opacity: 1; transform: none; }
-  }
-  .deal-deck-pile { width: 42px; height: 60px; }
-  .deal-label { font-size: 0.55rem; }
 }
 </style>

@@ -358,8 +358,18 @@ export function usePlayWithFriends() {
     })
     const activePlayers = alivePlayers.filter(s => !newPassedPlayers.includes(s))
 
-    if (activePlayers.length <= 1) {
-      const roundWinner = activePlayers[0] !== undefined ? activePlayers[0] : gs.value.lastPlayer
+    const isLastPlayerAlive = alivePlayers.includes(gs.value.lastPlayer)
+    const requiredPasses = isLastPlayerAlive ? alivePlayers.length - 1 : alivePlayers.length
+
+    if (newPassedPlayers.length >= requiredPasses) {
+      let roundWinner = gs.value.lastPlayer
+
+      // CRITICAL FIX: If round winner has no cards, pass lead to next player who does
+      const winnerHand = gs.value.hands[roundWinner] || []
+      if (winnerHand.length === 0 || finishOrder.includes(roundWinner)) {
+        roundWinner = findNextPlayer(roundWinner, finishOrder, activeSts, [])
+      }
+
       await fb.updateGameState(roomCode.value, {
         current: roundWinner, lastPlayed: [], lastPlayer: -1,
         passCount: 0, passedPlayers: [],
