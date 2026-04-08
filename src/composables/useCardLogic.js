@@ -60,8 +60,10 @@ export function classify(cards) {
       const uniqRV = [...new Set(rvals)].sort((a, b) => a - b)
       if (uniqRV.length === n) {
         const consecutive = uniqRV.every((v, i) => i === 0 || v === uniqRV[i - 1] + 1)
-        if (consecutive)
-          return { type: 'straight', len: n, highVal, label: n + '-card straight' }
+        if (consecutive) {
+          const suited = sorted.every(c => c.suit === sorted[0].suit)
+          return { type: 'straight', len: n, highVal, suited, label: (suited ? 'suited ' : '') + n + '-card straight' }
+        }
       }
     }
   }
@@ -89,10 +91,18 @@ export function beats(combo, prevCards) {
   const prev = classify(prevCards)
   if (!prev) return true
 
-  // Quad (bomb) beats everything except a higher quad
+  // Quad (bomb) beats everything except a higher quad, but DOES NOT beat a 5+ suited straight
   if (combo.type === 'quad') {
     if (prev.type === 'quad') return combo.highVal > prev.highVal
+    if (prev.type === 'straight' && prev.len >= 5 && prev.suited) return false
     return true
+  }
+
+  // 5+ card suited straight is a SUPER BOMB. It chops: single 2, 3-pair seq, 4-pair seq, and Quad!
+  if (combo.type === 'straight' && combo.len >= 5 && combo.suited) {
+    if (prev.type === 'single' && prevCards[0].rank === '2') return true
+    if (prev.type === 'pairseq' && prev.len >= 3) return true
+    if (prev.type === 'quad') return true
   }
 
   // Pair sequence of 3+ pairs can chop a single 2
@@ -102,6 +112,13 @@ export function beats(combo, prevCards) {
   if (combo.type !== prev.type) return false
   if (combo.type === 'straight' && combo.len !== prev.len) return false
   if (combo.type === 'pairseq' && combo.len !== prev.len) return false
+
+  // Same-length straight: suited beats mixed; suited vs suited / mixed vs mixed use highVal
+  if (combo.type === 'straight' && combo.len === prev.len) {
+    if (combo.suited && !prev.suited) return true   // suited always beats mixed
+    if (!combo.suited && prev.suited) return false  // mixed never beats suited
+    return combo.highVal > prev.highVal              // same type → higher card wins
+  }
 
   return combo.highVal > prev.highVal
 }
@@ -151,8 +168,12 @@ export function aiLead(p, hands) {
     if (c.type === 'pair') s += 5
     if (c.type === 'triple') s += 8
     if (c.type === 'pairseq') s += c.len * 6
-    if (c.type === 'straight') s += c.len * 4
+    if (c.type === 'straight') {
+      s += c.len * 4
+      if (c.len >= 5 && c.suited) s -= 60 // Save super bombs!
+    }
     if (c.type === 'quad') s -= 40
+    if (c.type === 'pairseq' && c.len >= 3) s -= 30 // Save standard bombs
     return s
   }
   all.sort((a, b) => scoreCombo(b) - scoreCombo(a))
@@ -168,8 +189,16 @@ export function aiRespond(p, lp, hands, lastPlayer) {
   const lastHandSize = lastPlayer >= 0 ? hands[lastPlayer].length : 99
   const urgent = lastHandSize <= 3
 
-  const bombs = beaters.filter(c => classify(c)?.type === 'quad')
-  const normal = beaters.filter(c => classify(c)?.type !== 'quad')
+  const isBomb = (cCombo) => {
+    if (!cCombo) return false;
+    if (cCombo.type === 'quad') return true;
+    if (cCombo.type === 'pairseq' && cCombo.len >= 3) return true;
+    if (cCombo.type === 'straight' && cCombo.len >= 5 && cCombo.suited) return true;
+    return false;
+  }
+
+  const bombs = beaters.filter(c => isBomb(classify(c)))
+  const normal = beaters.filter(c => !isBomb(classify(c)))
 
   function scoreBeater(cards) {
     const c = classify(cards)
@@ -178,6 +207,7 @@ export function aiRespond(p, lp, hands, lastPlayer) {
     s += cards.length * 2
     if (cards.some(x => x.rank === '2')) s -= 15
     if (urgent) s += c.highVal * 0.4
+    if (c.type === 'straight' && c.suited && c.len >= 5) s -= 30 // prioritize using cheaper bombs first if multiple
     return s
   }
 

@@ -279,8 +279,9 @@ export function useVsComputer() {
     if (lastPlayed.value.length > 0) applyCutTwoPenalty(0, lastPlayed.value, lastPlayer.value)
     if (combo.type === 'quad') SFX.bomb(); else SFX.play()
     selected.value.sort((a, b) => b - a).forEach(i => hands.value[0].splice(i, 1))
+    hands.value[0] = sortHand(hands.value[0])
     selected.value  = []
-    lastPlayed.value = cards
+    lastPlayed.value = sortHand(cards)
     lastPlayer.value = 0
     passCount.value  = 0
     setMsg('')
@@ -392,7 +393,7 @@ export function useVsComputer() {
         const idx = hands.value[p].findIndex(x => x === pc)
         if (idx >= 0) hands.value[p].splice(idx, 1)
       })
-      lastPlayed.value = played
+      lastPlayed.value = sortHand(played)
       lastPlayer.value = p
       passCount.value  = 0
       setMsg('')

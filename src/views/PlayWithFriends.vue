@@ -180,7 +180,7 @@
               <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-md:min-h-[60px] max-md:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
                 <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="c.rank + c.suit" :card="c"
                   class="cursor-default! played-card played-card-glow" :class="playAnimClass"
-                  :style="{ animationDelay: j * 50 + 'ms' }" />
+                  :style="{ animationDelay: j * 80 + 'ms' }" />
               </div>
               <div class="text-[0.82rem] italic text-gold-light max-md:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
               <div class="text-[0.95rem] min-h-[1.3em] text-[#f9ca24] max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]"

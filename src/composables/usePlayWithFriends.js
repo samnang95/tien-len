@@ -307,7 +307,7 @@ export function usePlayWithFriends() {
 
     SFX.play()
 
-    const newHand     = hand.filter((_, i) => !selectedSet.value.has(i))
+    const newHand     = sortHand(hand.filter((_, i) => !selectedSet.value.has(i)))
     const finishOrder = [...(gs.value.finishOrder || [])]
     const names       = gs.value.names || {}
     let finished      = false
@@ -333,7 +333,7 @@ export function usePlayWithFriends() {
     const update = {
       ['hands/' + mySeat.value]: newHand,
       current: isGameOver ? -1 : next,
-      lastPlayed: cards, lastPlayer: mySeat.value,
+      lastPlayed: sortHand(cards), lastPlayer: mySeat.value,
       passCount: 0, passedPlayers: currentPassedList,
       finishOrder, gameOver: isGameOver, message,
     }

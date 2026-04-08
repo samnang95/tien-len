@@ -104,7 +104,7 @@
               <div class="flex flex-nowrap justify-center">
                 <PlayingCard v-for="(c, j) in lastPlayed" :key="c.rank + c.suit" :card="c"
                   class="cursor-default! played-card played-card-glow" :class="playAnimClass"
-                  :style="{ animationDelay: j * 50 + 'ms' }" />
+                  :style="{ animationDelay: j * 80 + 'ms' }" />
               </div>
               <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
               <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
