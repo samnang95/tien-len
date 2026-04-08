@@ -37,8 +37,8 @@ body {
 
 /* ── Card Sizing Variables ── */
 :root {
-  --card-w: 54px;
-  --card-h: 78px;
+  --card-w: 80px;
+  --card-h: 115px;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -139,7 +139,7 @@ body {
 .card:hover { transform: translateY(-10px); }
 .card.selected {
   transform: translateY(-16px);
-  box-shadow: 0 0 0 3px var(--color-gold), 0 8px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 3px var(--color-gold), 0 0 18px 6px rgba(212,168,67,0.6), 0 8px 20px rgba(0,0,0,0.4);
 }
 
 .card-face {
@@ -153,24 +153,13 @@ body {
   padding: 4px 5px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
-.card-face .rank { font-size: 0.92rem; font-weight: 900; line-height: 1; }
-.card-face .suit { font-size: 0.75rem; line-height: 1; }
-.card-face .center-suit { font-size: 1.35rem; position: absolute; top:50%; left:50%; transform:translate(-50%,-55%); }
+.card-face .rank { font-size: 1.15rem; font-weight: 900; line-height: 1; }
+.card-face .suit { font-size: 0.95rem; line-height: 1; }
+.card-face .center-suit { font-size: 1.75rem; position: absolute; top:50%; left:50%; transform:translate(-50%,-55%); }
 .card-face .bottom { transform: rotate(180deg); }
 .card-face.red .rank, .card-face.red .suit, .card-face.red .center-suit { color: var(--color-card-red); }
 .card-face.black .rank, .card-face.black .suit, .card-face.black .center-suit { color: var(--color-card-black); }
 
-/* Small card back for opponents */
-.card-sm {
-  width: 28px;
-  height: 40px;
-  border-radius: 4px;
-  background: url('/images/card_back.png') center/cover;
-  border: 1.5px solid rgba(255,255,255,0.2);
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-  margin-right: -16px;
-}
-.card-sm:last-child { margin-right: 0; }
 
 /* ════════════════════════════════════════════════════════════
    BUTTONS
@@ -283,7 +272,6 @@ body {
   .card-face .rank { font-size: 0.85rem; }
   .card-face .suit { font-size: 0.7rem; }
   .card-face .center-suit { font-size: 0.95rem; }
-  .card-sm { width: 22px; height: 32px; margin-bottom: -20px; }
   .btn { padding: 6px 18px; font-size: 0.75rem; }
   .overlay-box { padding: 20px 24px; }
   .overlay-box h2 { font-size: 1.4rem; }
@@ -305,7 +293,6 @@ body {
   .card-face { padding: 2px 3px; }
   .card:hover { transform: translateY(-6px); }
   .card.selected { transform: translateY(-10px); }
-  .card-sm { width: 18px; height: 26px; border-radius: 3px; }
   .btn { padding: 5px 14px; font-size: 0.7rem; }
   .overlay-box { padding: 18px 18px; max-height: 85vh; overflow-y: auto; }
   .overlay-box h2 { font-size: 1.2rem; }

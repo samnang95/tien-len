@@ -44,9 +44,11 @@ export function useVsComputer() {
   const loserPenaltyText = ref('')
   const boomHands      = ref([])
   const isDealing      = ref(false)
+  const playerAction   = ref({ player: -1, text: '', id: 0 })
 
   let aiActionTimer = null
   let dealTimer = null
+  let actionTimer = null
 
   // ── Computed ───────────────────────────────────────────────────────────────
   const isMyTurn = computed(() =>
@@ -84,6 +86,14 @@ export function useVsComputer() {
   }
 
   function setMsg(t) { msg.value = t }
+
+  function showPlayerAction(player, text) {
+    if (actionTimer) clearTimeout(actionTimer)
+    playerAction.value = { player, text, id: Date.now() }
+    actionTimer = setTimeout(() => {
+      playerAction.value = { player: -1, text: '', id: 0 }
+    }, 1400)
+  }
 
   // ── Penalty ────────────────────────────────────────────────────────────────
   function applyCutTwoPenalty(cuttingPlayer, cutCards, cutPlayer) {
@@ -274,6 +284,7 @@ export function useVsComputer() {
     lastPlayer.value = 0
     passCount.value  = 0
     setMsg('')
+    showPlayerAction(0, combo.label)
     if (hands.value[0].length === 0) {
       if (!finishOrder.value.includes(0)) finishOrder.value.push(0)
       if (finishOrder.value.length >= 3) { endGame(); return }
@@ -290,6 +301,7 @@ export function useVsComputer() {
     passCount.value++
     passedPlayers.value.add(0)
     setMsg('You passed — waiting for new round...')
+    showPlayerAction(0, 'PASS')
     advanceAfterPass()
   }
 
@@ -384,6 +396,7 @@ export function useVsComputer() {
       lastPlayer.value = p
       passCount.value  = 0
       setMsg('')
+      showPlayerAction(p, aiCombo ? aiCombo.label : 'Played')
       if (hands.value[p].length === 0) {
         if (!finishOrder.value.includes(p)) finishOrder.value.push(p)
         if (finishOrder.value.length >= 3) { endGame(); return }
@@ -394,6 +407,7 @@ export function useVsComputer() {
     } else {
       SFX.pass()
       setMsg('CPU ' + p + ' passed.')
+      showPlayerAction(p, 'PASS')
       passCount.value++
       passedPlayers.value.add(p)
       advanceAfterPass()
@@ -421,12 +435,12 @@ export function useVsComputer() {
     router.push({ name: 'home' })
   }
 
-  onUnmounted(() => { clearAiTimer(); clearDealTimer() })
+  onUnmounted(() => { clearAiTimer(); clearDealTimer(); if (actionTimer) clearTimeout(actionTimer) })
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
     // state
-    hands, current, lastPlayed, lastPlayer, passCount, passedPlayers,
+    hands, current, lastPlayed, lastPlayer, passCount, passedPlayers, playerAction,
     selected, scores, gameOver, isDealing, betAmount, betInput, betModalOpen,
     wallets, finishOrder, lastWinner, msg, showOverlay,
     overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,

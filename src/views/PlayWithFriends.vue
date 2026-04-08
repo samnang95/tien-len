@@ -126,13 +126,17 @@
     </div>
 
     <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-2 flex flex-col w-[min(1000px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-[2px]">
+    <div class="relative z-1 p-2 flex flex-col w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-[2px]">
       <div class="r2-rope-border"></div>
-      <div class="r2-table-surface" style="min-height: 500px;">
+      <div class="r2-table-surface" style="min-height: 800px;">
 
         <!-- Opponent top -->
         <div v-if="activeSeats.includes(topSeat)" class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
-          <div class="player-label" :class="labelClass(topSeat)">{{ labelText(topSeat) }}</div>
+          <div class="relative">
+            <div class="player-label-side" :class="labelClass(topSeat)">{{ labelText(topSeat) }}</div>
+            <div v-if="playerAction.player === topSeat" :key="playerAction.id" class="player-action-bubble"
+              :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+          </div>
           <div class="flex flex-nowrap justify-center min-h-[50px] max-[480px]:min-h-8 max-[400px]:min-h-6">
             <div v-for="j in opponentCardCount(topSeat)" :key="j" class="r2-card-sm-h"
               :class="{ 'deal-to-top': isDealing }"
@@ -145,7 +149,11 @@
           <!-- Left -->
           <div v-if="activeSeats.includes(leftSeat)"
             class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
-            <div class="player-label-side -rotate-90" :class="labelClass(leftSeat)">{{ labelText(leftSeat) }}</div>
+            <div class="relative">
+              <div class="player-label-side -rotate-90" :class="labelClass(leftSeat)">{{ labelText(leftSeat) }}</div>
+              <div v-if="playerAction.player === leftSeat" :key="playerAction.id" class="player-action-bubble"
+                :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+            </div>
             <div class="flex flex-col items-center">
               <div v-for="j in opponentCardCount(leftSeat)" :key="j" class="r2-card-sm-v"
                 :class="{ 'deal-to-left': isDealing }"
@@ -171,7 +179,7 @@
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.4rem] max-[480px]:text-[0.35rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.3rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-md:min-h-[60px] max-md:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
                 <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="c.rank + c.suit" :card="c"
-                  class="cursor-default! played-card" :class="playAnimClass"
+                  class="cursor-default! played-card played-card-glow" :class="playAnimClass"
                   :style="{ animationDelay: j * 50 + 'ms' }" />
               </div>
               <div class="text-[0.82rem] italic text-gold-light max-md:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
@@ -193,13 +201,21 @@
                 :class="{ 'deal-to-right': isDealing }"
                 :style="isDealing ? { animationDelay: ((j-1) * 4 + 3) * 45 + 'ms' } : {}"></div>
             </div>
-            <div class="player-label-side rotate-90" :class="labelClass(rightSeat)">{{ labelText(rightSeat) }}</div>
+            <div class="relative">
+              <div class="player-label-side rotate-90" :class="labelClass(rightSeat)">{{ labelText(rightSeat) }}</div>
+              <div v-if="playerAction.player === rightSeat" :key="playerAction.id" class="player-action-bubble"
+                :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+            </div>
           </div>
         </div>
 
         <!-- YOUR HAND -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
-          <div class="player-label" :class="labelClass(mySeat)">{{ labelText(mySeat) }} (You)</div>
+          <div class="relative inline-flex flex-col items-center">
+            <div class="player-label-side" :class="labelClass(mySeat)">{{ labelText(mySeat) }} (You)</div>
+            <div v-if="playerAction.player === mySeat" :key="playerAction.id" class="player-action-bubble"
+              :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+          </div>
           <div class="flex flex-nowrap justify-center px-5 transition-opacity duration-300 max-md:px-1 max-[480px]:px-0.5"
             :style="{ opacity: amPassed ? 0.5 : 1, minHeight: 'var(--card-h)' }">
             <PlayingCard v-for="(c, j) in myHand" :key="j" :card="c"
@@ -256,7 +272,7 @@ import PixelClouds from '../components/PixelClouds.vue'
 const {
   screen, lobbyView, lobbyError, nickname, roomCodeInput, roomCode,
   isHost, mySeat, playerCount, copied, slots, gs,
-  selectedSet, turnTimeLeft, showGameOverlay, isDealing,
+  selectedSet, turnTimeLeft, showGameOverlay, isDealing, playerAction,
   gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
   activeSeats, topSeat, leftSeat, rightSeat, myHand,
   mpIsMyTurn, canPass, amPassed, whosePlayText,
@@ -321,7 +337,7 @@ const playAnimClass = computed(() => {
 .r2-table-surface {
   border-radius: 44px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
   position: relative; z-index: 1; overflow: hidden;
-  background: #0f3d25 url('/images/felt_background.png') center/cover;
+  background: #0f3d25 url('/images/felt_background.png') center/cover !important;
 }
 
 .player-label { font-size: 0.72rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
@@ -331,14 +347,14 @@ const playAnimClass = computed(() => {
 .player-label-side { background: rgba(0,0,0,0.65); padding: 3px 10px; border-radius: 6px; white-space: nowrap; font-size: 0.58rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.5); text-transform: uppercase; backdrop-filter: blur(4px); border: 1px solid rgba(212,168,67,0.15); flex-shrink: 0; }
 .player-label-side.active-player { color: var(--color-gold); font-weight: 700; border-color: rgba(212,168,67,0.4); box-shadow: 0 0 10px rgba(212,168,67,0.2); }
 
-.r2-card-sm-h { width: 28px; height: 40px; border-radius: 4px; background: url('/images/card_back.png') center/cover; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-right: -16px; flex-shrink: 0; }
+.r2-card-sm-h { width: 44px; height: 62px; border-radius: 6px; background: url('/images/card_back.png') center/cover !important; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-right: -26px; flex-shrink: 0; }
 .r2-card-sm-h:last-child { margin-right: 0; }
-.r2-card-sm-v { width: 48px; height: 32px; border-radius: 4px; background: url('/images/card_back.png') center/cover; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-bottom: -24px; flex-shrink: 0; }
+.r2-card-sm-v { width: 72px; height: 48px; border-radius: 6px; background: url('/images/card_back.png') center/cover !important; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-bottom: -36px; flex-shrink: 0; }
 .r2-card-sm-v:last-child { margin-bottom: 0; }
 
-.your-card { margin-right: -30px; }
+.your-card { margin-right: -36px; }
 .your-card:last-child { margin-right: 0; }
-.played-card { margin-right: -30px; cursor: default; }
+.played-card { margin-right: -36px; cursor: default; }
 
 @media (max-width: 768px) {
   .r2-rope-border { border-radius: 20px; border-width: 3px; }

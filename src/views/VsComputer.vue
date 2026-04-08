@@ -41,13 +41,17 @@
     </div>
 
     <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-1.5 flex flex-col w-[min(1000px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5">
+    <div class="relative z-1 p-1.5 flex flex-col w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5">
       <div class="rope-border"></div>
-      <div class="table-surface" style="min-height: 500px;">
+      <div class="table-surface" style="min-height: 800px;">
 
         <!-- CPU 3 (top) -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
-          <div class="player-label" :class="{ 'active-player': current === 3 }">{{ cpuLabel(3) }}</div>
+          <div class="relative">
+            <div class="player-label" :class="{ 'active-player': current === 3 }">{{ cpuLabel(3) }}</div>
+            <div v-if="playerAction.player === 3" :key="playerAction.id" class="player-action-bubble"
+              :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+          </div>
           <div class="flex flex-nowrap justify-center min-h-[72px] max-[480px]:min-h-[50px] max-[400px]:min-h-[40px]">
             <template v-if="showCpuCards(3)">
               <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default!" />
@@ -64,7 +68,11 @@
         <div class="flex-1 flex w-full gap-2.5 items-stretch max-md:gap-[3px] max-[480px]:gap-0.5">
           <!-- CPU 1 left -->
           <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
-            <div class="player-label-side -rotate-90" :class="{ 'active-player': current === 1 }">{{ cpuLabel(1) }}</div>
+            <div class="relative">
+              <div class="player-label-side -rotate-90" :class="{ 'active-player': current === 1 }">{{ cpuLabel(1) }}</div>
+              <div v-if="playerAction.player === 1" :key="playerAction.id" class="player-action-bubble"
+                :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+            </div>
             <div class="flex flex-col items-center">
               <template v-if="showCpuCards(1)">
                 <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default! side-card-reveal" />
@@ -95,7 +103,7 @@
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center">
                 <PlayingCard v-for="(c, j) in lastPlayed" :key="c.rank + c.suit" :card="c"
-                  class="cursor-default! played-card" :class="playAnimClass"
+                  class="cursor-default! played-card played-card-glow" :class="playAnimClass"
                   :style="{ animationDelay: j * 50 + 'ms' }" />
               </div>
               <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
@@ -120,14 +128,22 @@
                   :style="isDealing ? { animationDelay: ((j-1) * 4 + 2) * 45 + 'ms' } : {}"></div>
               </template>
             </div>
-            <div class="player-label-side rotate-90" :class="{ 'active-player': current === 2 }">{{ cpuLabel(2) }}</div>
+            <div class="relative">
+              <div class="player-label-side rotate-90" :class="{ 'active-player': current === 2 }">{{ cpuLabel(2) }}</div>
+              <div v-if="playerAction.player === 2" :key="playerAction.id" class="player-action-bubble"
+                :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
+            </div>
           </div>
         </div>
 
         <!-- YOUR HAND -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
-          <div class="player-label" :class="{ 'active-player': current === 0 }">
-            {{ hands[0].length === 0 ? 'YOU ✓' : 'YOU' }}
+          <div class="relative inline-flex flex-col items-center">
+            <div class="player-label" :class="{ 'active-player': current === 0 }">
+              {{ hands[0].length === 0 ? 'YOU ✓' : 'YOU' }}
+            </div>
+            <div v-if="playerAction.player === 0" :key="playerAction.id" class="player-action-bubble"
+              :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
           </div>
           <div class="flex flex-nowrap justify-center px-5 transition-opacity duration-300 max-md:px-1 max-[480px]:px-0.5"
             :style="{ opacity: passedPlayers.has(0) && !gameOver ? 0.5 : 1, minHeight: 'var(--card-h)' }">
@@ -221,7 +237,7 @@ import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
 
 const {
-  hands, current, lastPlayed, lastPlayer, passedPlayers,
+  hands, current, lastPlayed, lastPlayer, passedPlayers, playerAction,
   selected, scores, gameOver, isDealing, betAmount, betInput, betModalOpen,
   wallets, finishOrder, msg, showOverlay,
   overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,
@@ -257,9 +273,7 @@ const playAnimClass = computed(() => {
 .table-surface {
   border-radius: 32px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
   position: relative; z-index: 1; overflow: hidden;
-  background: #0f3d25 url('/images/felt_background.png') center/cover;
-  /* background-blend-mode: multiply; */
-  /* box-shadow: 0 0 60px rgba(0,0,0,0.7), inset 0 0 50px rgba(0,0,0,0.4), inset 0 0 120px rgba(0,0,0,0.2); */
+  background: #0f163d url('/images/felt_background.png') center/cover !important;
 }
 
 .player-label { font-size: 0.72rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.5); text-transform: uppercase; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
@@ -268,18 +282,18 @@ const playAnimClass = computed(() => {
 .player-label-side { background: rgba(0,0,0,0.65); padding: 3px 10px; border-radius: 6px; white-space: nowrap; font-size: 0.58rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.5); text-transform: uppercase; backdrop-filter: blur(4px); border: 1px solid rgba(212,168,67,0.15); flex-shrink: 0; }
 .player-label-side.active-player { color: var(--color-gold); font-weight: 700; border-color: rgba(212,168,67,0.4); box-shadow: 0 0 10px rgba(212,168,67,0.2); }
 
-.card-sm { width: 28px; height: 40px; border-radius: 4px; background: url('/images/card_back.png') center/cover; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-right: -16px; flex-shrink: 0; }
+.card-sm { width: 44px; height: 62px; border-radius: 6px; background: url('/images/card_back.png') center/cover !important; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-right: -26px; flex-shrink: 0; }
 .card-sm:last-child { margin-right: 0; }
 
-.card-sm-v { width: 48px; height: 32px; border-radius: 4px; background: url('/images/card_back.png') center/cover; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-bottom: -24px; flex-shrink: 0; }
+.card-sm-v { width: 72px; height: 48px; border-radius: 6px; background: url('/images/card_back.png') center/cover !important; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-bottom: -36px; flex-shrink: 0; }
 .card-sm-v:last-child { margin-bottom: 0; }
 
-.side-card-reveal { margin-bottom: -58px; }
+.side-card-reveal { margin-bottom: -86px; }
 .side-card-reveal:last-child { margin-bottom: 0; }
 
-.your-card { margin-right: -24px; }
+.your-card { margin-right: -36px; }
 .your-card:last-child { margin-right: 0; }
-.played-card { margin-right: -24px; cursor: default; }
+.played-card { margin-right: -36px; cursor: default; }
 .played-card:last-child { margin-right: 0; }
 
 .bet-change-btn { background: rgba(212,168,67,0.15); border: 1px solid rgba(212,168,67,0.4); color: var(--color-gold); border-radius: 14px; padding: 3px 12px; font-size: 0.75rem; cursor: pointer; font-family: var(--font-body); transition: background 0.15s; }

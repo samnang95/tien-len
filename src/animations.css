@@ -119,3 +119,67 @@
   .deal-deck-pile { width: 42px; height: 60px; }
   .deal-label { font-size: 0.55rem; }
 }
+
+/* ── Player Action Bubble (float-up near player zone) ───────────────────── */
+.player-action-bubble {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(39,174,96,0.9), rgba(30,132,73,0.9));
+  color: #fff;
+  font-family: var(--font-cinzel);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 80;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 12px rgba(39,174,96,0.3);
+  animation: actionBubbleUp 1.4s ease-out forwards;
+}
+.player-action-bubble.pass-action {
+  background: linear-gradient(135deg, rgba(231,76,60,0.9), rgba(192,57,43,0.9));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 12px rgba(231,76,60,0.3);
+}
+
+@keyframes actionBubbleUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1.1);
+  }
+  30% {
+    transform: translateX(-50%) translateY(-2px) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-22px) scale(0.85);
+  }
+}
+
+@media (max-width: 768px) {
+  .player-action-bubble { font-size: 0.55rem; padding: 3px 10px; }
+}
+@media (max-width: 480px) {
+  .player-action-bubble { font-size: 0.45rem; padding: 2px 8px; }
+}
+
+/* ── Played Card Glow (last played cards in center) ─────────────────────── */
+.played-card-glow {
+  box-shadow: 0 0 16px 6px rgba(212, 168, 67, 0.6), 0 4px 15px rgba(0,0,0,0.5) !important;
+  animation: playedGlowPulse 1.6s ease-in-out infinite;
+}
+@keyframes playedGlowPulse {
+  0%, 100% { box-shadow: 0 0 12px 4px rgba(212, 168, 67, 0.45), 0 4px 15px rgba(0,0,0,0.5); }
+  50%       { box-shadow: 0 0 24px 10px rgba(212, 168, 67, 0.75), 0 4px 15px rgba(0,0,0,0.5); }
+}

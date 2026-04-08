@@ -33,10 +33,12 @@ export function usePlayWithFriends() {
   const boomHands      = ref([])
   const isBoom         = ref(false)
   const isDealing      = ref(false)
+  const playerAction   = ref({ player: -1, text: '', id: 0 })
 
   let listeners  = []
   let turnTimer  = null
   let dealTimer  = null
+  let actionTimer = null
 
   const playerId = fb.getPlayerId()
 
@@ -86,6 +88,14 @@ export function usePlayWithFriends() {
   }
 
   function seatName(seat) { return slots.value[seat]?.name || 'Empty' }
+
+  function showPlayerAction(seat, text) {
+    if (actionTimer) clearTimeout(actionTimer)
+    playerAction.value = { player: seat, text, id: Date.now() }
+    actionTimer = setTimeout(() => {
+      playerAction.value = { player: -1, text: '', id: 0 }
+    }, 1400)
+  }
 
   function labelClass(seat) {
     if (!gs.value) return {}
@@ -338,6 +348,7 @@ export function usePlayWithFriends() {
     }
 
     selectedSet.value = new Set()
+    showPlayerAction(mySeat.value, combo.label)
     await fb.updateGameState(roomCode.value, update)
   }
 
@@ -346,6 +357,7 @@ export function usePlayWithFriends() {
     const passedList = gs.value.passedPlayers || []
     if (gs.value.current !== mySeat.value || gs.value.gameOver || passedList.includes(mySeat.value)) return
     SFX.pass()
+    showPlayerAction(mySeat.value, 'PASS')
 
     const finishOrder       = gs.value.finishOrder || []
     const names             = gs.value.names || {}
@@ -540,6 +552,7 @@ export function usePlayWithFriends() {
   onUnmounted(() => {
     clearInterval(turnTimer)
     if (dealTimer) { clearTimeout(dealTimer); dealTimer = null }
+    if (actionTimer) { clearTimeout(actionTimer); actionTimer = null }
     listeners.forEach(fn => fn())
     listeners = []
   })
@@ -549,7 +562,7 @@ export function usePlayWithFriends() {
     // state
     screen, lobbyView, lobbyError, nickname, roomCodeInput, roomCode,
     isHost, mySeat, playerCount, copied, slots, gs,
-    selectedSet, turnTimeLeft, showGameOverlay, isDealing,
+    selectedSet, turnTimeLeft, showGameOverlay, isDealing, playerAction,
     gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
     // computed
     activeSeats, topSeat, leftSeat, rightSeat, myHand,
