@@ -139,7 +139,7 @@
           </div>
           <div class="flex flex-nowrap justify-center min-h-[50px] max-[480px]:min-h-8 max-[400px]:min-h-6">
             <div v-for="j in opponentCardCount(topSeat)" :key="j" class="r2-card-sm-h"
-              :class="{ 'deal-to-top': isDealing }"
+              :class="{ 'deal-to-top': isDealing, 'turn-card-glow': gs?.current === topSeat && !gs?.gameOver }"
               :style="isDealing ? { animationDelay: ((j-1) * 4 + 2) * 45 + 'ms' } : {}"></div>
           </div>
         </div>
@@ -156,7 +156,7 @@
             </div>
             <div class="flex flex-col items-center">
               <div v-for="j in opponentCardCount(leftSeat)" :key="j" class="r2-card-sm-v"
-                :class="{ 'deal-to-left': isDealing }"
+                :class="{ 'deal-to-left': isDealing, 'turn-card-glow': gs?.current === leftSeat && !gs?.gameOver }"
                 :style="isDealing ? { animationDelay: ((j-1) * 4 + 1) * 45 + 'ms' } : {}"></div>
             </div>
           </div>
@@ -198,7 +198,7 @@
             class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
             <div class="flex flex-col items-center">
               <div v-for="j in opponentCardCount(rightSeat)" :key="j" class="r2-card-sm-v"
-                :class="{ 'deal-to-right': isDealing }"
+                :class="{ 'deal-to-right': isDealing, 'turn-card-glow': gs?.current === rightSeat && !gs?.gameOver }"
                 :style="isDealing ? { animationDelay: ((j-1) * 4 + 3) * 45 + 'ms' } : {}"></div>
             </div>
             <div class="relative">

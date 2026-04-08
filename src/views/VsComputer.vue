@@ -58,7 +58,7 @@
             </template>
             <template v-else>
               <div v-for="j in hands[3].length" :key="j" class="card-sm"
-                :class="{ 'deal-to-top': isDealing }"
+                :class="{ 'deal-to-top': isDealing, 'turn-card-glow': current === 3 && !gameOver }"
                 :style="isDealing ? { animationDelay: ((j-1) * 4 + 3) * 45 + 'ms' } : {}"></div>
             </template>
           </div>
@@ -79,7 +79,7 @@
               </template>
               <template v-else>
                 <div v-for="j in hands[1].length" :key="j" class="card-sm-v"
-                  :class="{ 'deal-to-left': isDealing }"
+                  :class="{ 'deal-to-left': isDealing, 'turn-card-glow': current === 1 && !gameOver }"
                   :style="isDealing ? { animationDelay: ((j-1) * 4 + 1) * 45 + 'ms' } : {}"></div>
               </template>
             </div>
@@ -124,7 +124,7 @@
               </template>
               <template v-else>
                 <div v-for="j in hands[2].length" :key="j" class="card-sm-v"
-                  :class="{ 'deal-to-right': isDealing }"
+                  :class="{ 'deal-to-right': isDealing, 'turn-card-glow': current === 2 && !gameOver }"
                   :style="isDealing ? { animationDelay: ((j-1) * 4 + 2) * 45 + 'ms' } : {}"></div>
               </template>
             </div>

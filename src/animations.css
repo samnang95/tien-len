@@ -183,3 +183,13 @@
   0%, 100% { box-shadow: 0 0 12px 4px rgba(212, 168, 67, 0.45), 0 4px 15px rgba(0,0,0,0.5); }
   50%       { box-shadow: 0 0 24px 10px rgba(212, 168, 67, 0.75), 0 4px 15px rgba(0,0,0,0.5); }
 }
+
+/* ── Turn Card Glow (CPU card backs when it's their turn) ───────────────── */
+.turn-card-glow {
+  box-shadow: 0 0 14px 5px rgba(212, 168, 67, 0.55), 2px 2px 5px rgba(0,0,0,0.4) !important;
+  animation: turnCardPulse 1.4s ease-in-out infinite;
+}
+@keyframes turnCardPulse {
+  0%, 100% { box-shadow: 0 0 10px 3px rgba(212, 168, 67, 0.4), 2px 2px 5px rgba(0,0,0,0.4); }
+  50%       { box-shadow: 0 0 22px 9px rgba(212, 168, 67, 0.7), 2px 2px 5px rgba(0,0,0,0.4); }
+}
