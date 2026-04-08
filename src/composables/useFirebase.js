@@ -55,15 +55,16 @@ export function useFirebase() {
       code = generateRoomCode()
       ref = roomRef(code)
     }
+    const seat = Math.floor(Math.random() * 4)
     await set(ref, {
       host: playerId,
       status: 'waiting',
       createdAt: serverTimestamp(),
       players: {
-        [playerId]: { name: playerName, seat: 0, connected: true }
+        [playerId]: { name: playerName, seat, connected: true }
       }
     })
-    return { code, seat: 0 }
+    return { code, seat }
   }
 
   async function joinRoom(code, playerName) {
@@ -76,7 +77,8 @@ export function useFirebase() {
     const playerCount = Object.keys(players).length
     if (playerCount >= 4) throw new Error('Room is full (4/4)')
     const takenSeats = Object.values(players).map(p => p.seat)
-    const seat = [0, 1, 2, 3].find(s => !takenSeats.includes(s))
+    const available = [0, 1, 2, 3].filter(s => !takenSeats.includes(s))
+    const seat = available[Math.floor(Math.random() * available.length)]
     await set(child(playersRef(code), playerId), {
       name: playerName, seat, connected: true
     })
