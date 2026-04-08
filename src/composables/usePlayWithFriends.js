@@ -2,7 +2,7 @@ import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSound } from './useSound.js'
 import { useFirebase } from './useFirebase.js'
-import { createDeck, sortHand, classify, beats, checkInstantWin } from './useCardLogic.js'
+import { createDeck, sortHand, classify, beats, checkInstantWin, aiLead, aiRespond } from './useCardLogic.js'
 
 // ─── Composable ───────────────────────────────────────────────────────────────
 export function usePlayWithFriends() {
@@ -39,6 +39,7 @@ export function usePlayWithFriends() {
   let turnTimer  = null
   let dealTimer  = null
   let actionTimer = null
+  let cpuTimer   = null
 
   const playerId = fb.getPlayerId()
 
@@ -206,7 +207,7 @@ export function usePlayWithFriends() {
       if (!gameState) return
       selectedSet.value  = new Set()
 
-      // Detect new game start: transition from gameOver to not gameOver
+    // Detect new game start: transition from gameOver to not gameOver
       if (wasGameOver && !gameState.gameOver) {
         triggerDealAnimation()
       }
@@ -214,6 +215,8 @@ export function usePlayWithFriends() {
       startTurnCountdown()
       if (gameState.gameOver) showGameOver()
       else showGameOverlay.value = false
+
+      if (!isDealing.value) handleCpuTurn(gameState)
     })
     listeners.push(unsub)
   }
@@ -225,7 +228,132 @@ export function usePlayWithFriends() {
     dealTimer = setTimeout(() => {
       isDealing.value = false
       dealTimer = null
+      if (gs.value) handleCpuTurn(gs.value)
     }, 2800)
+  }
+
+  // ── CPU Multiplayer Logic ──────────────────────────────────────────────────
+  function handleCpuTurn(gameState) {
+    if (!isHost.value || gameState.gameOver || isDealing.value) return;
+    const p = gameState.current;
+    if (!gameState.cpuSeats?.includes(p)) return;
+    if ((gameState.finishOrder || []).includes(p)) return;
+
+    if (cpuTimer) clearTimeout(cpuTimer);
+    cpuTimer = setTimeout(() => {
+      executeCpuMove(gameState, p)
+    }, 2000 + Math.floor(Math.random() * 2000));
+  }
+
+  async function executeCpuMove(gameState, p) {
+    if (!isHost.value || gameState.gameOver || gameState.current !== p) return;
+    
+    const hand = gameState.hands[p] || []
+    if (hand.length === 0) return mpPassForCpu(gameState, p)
+
+    const lastPlayed = gameState.lastPlayed || []
+    const isFree = lastPlayed.length === 0 || gameState.lastPlayer === p
+    
+    let playedCards = isFree
+       ? aiLead(p, gameState.hands)
+       : aiRespond(p, lastPlayed, gameState.hands, gameState.lastPlayer)
+
+    if (playedCards && playedCards.length > 0) {
+       SFX.play()
+       const combo = classify(playedCards)
+       const newHand = [...hand]
+       playedCards.forEach(c => {
+         const idx = newHand.findIndex(x => x.rank === c.rank && x.suit === c.suit)
+         if (idx >= 0) newHand.splice(idx, 1)
+       })
+       
+       let finished = newHand.length === 0
+       const finishOrder = [...(gameState.finishOrder || [])]
+       const names = gameState.names || {}
+       if (finished) finishOrder.push(p)
+
+       const activeSts = gameState.activeSeats || [0, 1, 2, 3]
+       let currentPassedList = [...(gameState.passedPlayers || [])]
+       if (finished) currentPassedList = []
+       
+       let next = findNextPlayer(p, finishOrder, activeSts, currentPassedList)
+       if (next === p && !finished) {
+         currentPassedList = []
+         next = findNextPlayer(p, finishOrder, activeSts, currentPassedList)
+       }
+
+       const isGameOver = finishOrder.length >= activeSts.length - 1
+       if (isGameOver) {
+         for (const s of activeSts) { if (!finishOrder.includes(s)) { finishOrder.push(s); break } }
+       }
+
+       let message = (names[p] || 'CPU') + ' played ' + playedCards.map(x => x.rank + x.suit).join(' ')
+       if (finished) message += ' — FINISHED! 🎉'
+
+       let update = {
+         ['hands/' + p]: newHand,
+         current: isGameOver ? -1 : next,
+         lastPlayed: sortHand(playedCards),
+         lastPlayer: p,
+         passCount: 0, passedPlayers: currentPassedList,
+         finishOrder, gameOver: isGameOver, message
+       }
+
+       if (isGameOver) {
+         const scores = [...(gameState.scores || [0,0,0,0])]
+         const numPlayers = activeSts.length
+         for (let i = 0; i < finishOrder.length; i++) {
+            scores[finishOrder[i]] += Math.max(numPlayers - 1 - i, 0)
+         }
+         update.scores = scores
+       }
+       showPlayerAction(p, combo ? combo.label : 'Played')
+       await fb.updateGameState(roomCode.value, update)
+    } else {
+       await mpPassForCpu(gameState, p)
+    }
+  }
+
+  async function mpPassForCpu(gameState, p) {
+    if (!isHost.value) return;
+    SFX.pass()
+    showPlayerAction(p, 'PASS')
+
+    const passedList = gameState.passedPlayers || []
+    const finishOrder = gameState.finishOrder || []
+    const activeSts = gameState.activeSeats || [0, 1, 2, 3]
+    const names = gameState.names || {}
+
+    const newPassedPlayers = [...passedList, p]
+
+    const alivePlayers = activeSts.filter(s => {
+       return (gameState.hands[s] || []).length > 0 && !finishOrder.includes(s)
+    })
+
+    const isLastPlayerAlive = alivePlayers.includes(gameState.lastPlayer)
+    const requiredPasses = isLastPlayerAlive ? alivePlayers.length - 1 : alivePlayers.length
+
+    if (newPassedPlayers.length >= requiredPasses) {
+      let roundWinner = gameState.lastPlayer
+      const winnerHand = gameState.hands[roundWinner] || []
+      if (winnerHand.length === 0 || finishOrder.includes(roundWinner)) {
+         roundWinner = findNextPlayer(roundWinner, finishOrder, activeSts, [])
+      }
+
+      await fb.updateGameState(roomCode.value, {
+         current: roundWinner, lastPlayed: [], lastPlayer: -1,
+         passCount: 0, passedPlayers: [],
+         message: (names[roundWinner] || 'Player') + "'s free turn"
+      })
+      return
+    }
+
+    const next = findNextPlayer(p, finishOrder, activeSts, newPassedPlayers)
+    await fb.updateGameState(roomCode.value, {
+      current: next, passCount: (gameState.passCount || 0) + 1,
+      passedPlayers: newPassedPlayers,
+      message: (names[p] || 'CPU') + ' passed'
+    })
   }
 
   // ── Game Start ─────────────────────────────────────────────────────────────
@@ -235,11 +363,23 @@ export function usePlayWithFriends() {
 
     const nameMap  = {}
     const activeSts = []
+    const cpuSeats  = []
+    let cpuIndex    = 1
+    
     Object.entries(slots.value).forEach(([seat, data]) => {
       const s = parseInt(seat)
       nameMap[s] = data.name
       activeSts.push(s)
     })
+
+    // Auto-fill CPU players for missing seats
+    for (let c = 0; c < 4; c++) {
+      if (!activeSts.includes(c)) {
+        nameMap[c] = `CPU ${cpuIndex++}`
+        activeSts.push(c)
+        cpuSeats.push(c)
+      }
+    }
     activeSts.sort((a, b) => a - b)
 
     const deck  = createDeck()
@@ -268,7 +408,7 @@ export function usePlayWithFriends() {
         hands, current: -1, lastPlayed: [], lastPlayer: -1, passCount: 0,
         finishOrder: fo, scores, wallets: [1000, 1000, 1000, 1000], betAmount: 100,
         gameOver: true, message: '💣 ' + nameMap[boomWinner] + ' has ' + boomReason + ' — INSTANT WIN! 💣',
-        names: nameMap, activeSeats: activeSts, passedPlayers: [],
+        names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
         fourTwosBoom: boomWinner, boomReason,
       })
     } else {
@@ -276,7 +416,7 @@ export function usePlayWithFriends() {
         hands, current: starter, lastPlayed: [], lastPlayer: -1, passCount: 0,
         finishOrder: [], scores: [0, 0, 0, 0], wallets: [1000, 1000, 1000, 1000], betAmount: 100,
         gameOver: false, message: nameMap[starter] + ' starts (has 3♠)',
-        names: nameMap, activeSeats: activeSts, passedPlayers: [],
+        names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
       })
     }
     await fb.setStatus(roomCode.value, 'playing')
@@ -480,11 +620,21 @@ export function usePlayWithFriends() {
 
     const nameMap   = {}
     const activeSts = []
+    const cpuSeats  = []
+    let cpuIndex    = 1
     Object.entries(slots.value).forEach(([seat, data]) => {
       const s = parseInt(seat)
       nameMap[s] = data.name
       activeSts.push(s)
     })
+
+    for (let c = 0; c < 4; c++) {
+      if (!activeSts.includes(c)) {
+        nameMap[c] = `CPU ${cpuIndex++}`
+        activeSts.push(c)
+        cpuSeats.push(c)
+      }
+    }
     activeSts.sort((a, b) => a - b)
 
     const deck  = createDeck()
@@ -522,7 +672,7 @@ export function usePlayWithFriends() {
         finishOrder: fo, scores, wallets: gs.value?.wallets || [1000, 1000, 1000, 1000],
         betAmount: gs.value?.betAmount || 100, gameOver: true,
         message: '💣 ' + nameMap[boomWinner] + ' has ' + boomReason + ' — INSTANT WIN! 💣',
-        names: nameMap, activeSeats: activeSts, passedPlayers: [],
+        names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
         fourTwosBoom: boomWinner, boomReason,
       })
     } else {
@@ -531,7 +681,7 @@ export function usePlayWithFriends() {
         finishOrder: [], scores, wallets: gs.value?.wallets || [1000, 1000, 1000, 1000],
         betAmount: gs.value?.betAmount || 100, gameOver: false,
         message: nameMap[starter] + ' starts (winner goes first)',
-        names: nameMap, activeSeats: activeSts, passedPlayers: [],
+        names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
       })
     }
   }
