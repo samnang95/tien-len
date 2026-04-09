@@ -125,8 +125,10 @@
       </div>
     </div>
 
-    <!-- TABLE SURFACE -->
-    <div class="r2-table-surface relative z-1 flex-1 w-[min(1200px,99vw)] max-[480px]:w-[98vw]" style="min-height: 0;">
+    <!-- TABLE WRAPPER -->
+    <div class="relative z-1 p-2 flex flex-col flex-1 w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-[2px]">
+      <div class="r2-rope-border"></div>
+      <div class="r2-table-surface flex-1 w-full" style="min-height: 0;">
 
         <!-- Opponent top -->
         <div v-if="activeSeats.includes(topSeat)" class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
@@ -228,6 +230,7 @@
           </div>
         </div>
       </div>
+    </div>
 
     <!-- Win Overlay -->
     <div v-if="showGameOverlay" class="overlay-backdrop">

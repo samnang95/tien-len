@@ -40,8 +40,11 @@
       </div>
     </div>
 
-    <!-- TABLE SURFACE -->
-    <div class="table-surface relative z-1 flex-1 w-[min(1200px,99vw)] max-md:w-screen" style="min-height: 0;">
+    <!-- TABLE WRAPPER -->
+    <div class="relative z-1 p-1.5 flex flex-col flex-1 w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5">
+      <div class="rope-border"></div>
+      <div class="table-surface flex-1 w-full" style="min-height: 0;">
+
         <!-- CPU 3 (top) -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
           <div class="relative">
@@ -51,7 +54,7 @@
           </div>
           <div class="flex flex-nowrap justify-center min-h-[72px] max-[480px]:min-h-[50px] max-[400px]:min-h-[40px]">
             <template v-if="showCpuCards(3)">
-              <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default!" />
+              <PlayingCard v-for="(c, j) in hands[3]" :key="j" :card="c" class="cpu-reveal-card-h cursor-default!" />
             </template>
             <template v-else>
               <div v-for="j in hands[3].length" :key="j" class="card-sm"
@@ -72,7 +75,7 @@
             </div>
             <div class="flex flex-col items-center">
               <template v-if="showCpuCards(1)">
-                <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default! side-card-reveal" />
+                <PlayingCard v-for="(c, j) in hands[1]" :key="j" :card="c" class="cpu-reveal-card-v cursor-default!" />
               </template>
               <template v-else>
                 <div v-for="j in hands[1].length" :key="j" class="card-sm-v"
@@ -117,7 +120,7 @@
           <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
             <div class="flex flex-col items-center">
               <template v-if="showCpuCards(2)">
-                <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="w-[90px]! h-[128px]! text-[1rem]! cursor-default! side-card-reveal" />
+                <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="cpu-reveal-card-v cursor-default!" />
               </template>
               <template v-else>
                 <div v-for="j in hands[2].length" :key="j" class="card-sm-v"
@@ -157,6 +160,7 @@
           </div>
         </div>
       </div>
+    </div>
 
     <!-- Win Overlay -->
     <div v-if="showOverlay" class="overlay-backdrop" @click.self>
@@ -284,8 +288,10 @@ const playAnimClass = computed(() => {
 .card-sm-v { width: 72px; height: 48px; border-radius: 6px; background: url('/images/card_back.png') center/cover !important; border: 1.5px solid rgba(255,255,255,0.2); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); margin-bottom: -36px; flex-shrink: 0; }
 .card-sm-v:last-child { margin-bottom: 0; }
 
-.side-card-reveal { margin-bottom: -86px; }
-.side-card-reveal:last-child { margin-bottom: 0; }
+.cpu-reveal-card-h { margin-right: calc(var(--card-w) * -0.5); }
+.cpu-reveal-card-h:last-child { margin-right: 0; }
+.cpu-reveal-card-v { margin-bottom: calc(var(--card-h) * -0.7); }
+.cpu-reveal-card-v:last-child { margin-bottom: 0; }
 
 .your-card { margin-right: -36px; }
 .your-card:last-child { margin-right: 0; }

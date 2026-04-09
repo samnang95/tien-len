@@ -20,15 +20,15 @@
       ></div>
 
       <div
-        class="rounded-[10px] text-center relative overflow-hidden px-12 py-10 flex flex-col items-center gap-8"
+        class="rounded-[10px] text-center relative px-12 py-10 flex flex-col items-center gap-8 max-h-[92dvh] overflow-y-auto max-md:px-6 max-md:py-6 max-md:gap-5 max-[480px]:px-4 max-[480px]:py-5 max-[480px]:gap-4"
         style="background: linear-gradient(180deg, #0a2a16 0%, #0f3d25 30%, #134a2c 60%, #0a2a16 100%);"
       >
         <!-- Deco cards -->
-        <div class="flex justify-center gap-2 w-full">
+        <div class="flex justify-center gap-2 w-full max-md:gap-1.5">
           <span
             v-for="(card, i) in decoCards"
             :key="i"
-            class="text-[1.875rem]"
+            class="text-[1.875rem] max-md:text-[1.3rem] max-[480px]:text-[1.1rem]"
             :style="{
               animationDelay: i * 0.15 + 's',
               color: card.color,
@@ -43,7 +43,7 @@
         <img
           src="/images/game_logo.png"
           alt="Tiến Lên"
-          class="rounded-xl w-[min(160px,40vw)]"
+          class="rounded-xl w-[min(160px,35vw)] max-md:w-[min(110px,28vw)] max-[480px]:w-[80px]"
           style="filter: drop-shadow(0 0 20px rgba(212,168,67,0.4)); animation: logoFloat 3s ease-in-out infinite alternate;"
         />
 
@@ -63,7 +63,7 @@
         </p>
 
         <!-- Buttons -->
-        <div class="flex gap-5 justify-center flex-wrap relative z-2">
+        <div class="flex gap-4 justify-center flex-wrap relative z-2 max-md:gap-3">
           <button @click="enterRoom('vs-computer')" class="pixel-play-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
             <span>VS COMPUTER</span>
@@ -142,6 +142,12 @@ const { fadingOut, enterRoom } = useStartScreen()
   border: 2px solid rgba(255, 200, 100, 0.5);
   pointer-events: none;
   animation: btnBorderGlow 1.5s ease-in-out infinite alternate;
+}
+@media (max-width: 768px), (max-height: 550px) {
+  .pixel-play-btn {
+    padding: 10px 24px;
+    font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+  }
 }
 .pixel-play-btn:hover {
   transform: translateY(-3px);
