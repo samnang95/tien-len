@@ -125,10 +125,6 @@
       </div>
     </div>
 
-    <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-2 flex flex-col flex-1 w-[min(1200px,99vw)] max-lg:p-[3px] max-lg:w-screen max-[480px]:p-[2px]">
-      <div class="r2-rope-border"></div>
-      <div class="r2-table-surface flex-1 w-full" style="min-height: 0;">
 
         <!-- Opponent top -->
         <div v-if="activeSeats.includes(topSeat)" class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
@@ -229,8 +225,7 @@
             <button class="btn btn-pass" :disabled="!canPass" @click="mpPass">Pass</button>
           </div>
         </div>
-      </div>
-    </div>
+
 
     <!-- Win Overlay -->
     <div v-if="showGameOverlay" class="overlay-backdrop">

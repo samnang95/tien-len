@@ -40,11 +40,6 @@
       </div>
     </div>
 
-    <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-1.5 flex flex-col flex-1 w-[min(1200px,99vw)] max-lg:p-[3px] max-lg:w-screen max-[480px]:p-0.5">
-      <div class="rope-border"></div>
-      <div class="table-surface flex-1 w-full" style="min-height: 0;">
-
         <!-- CPU 3 (top) -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
           <div class="relative">
@@ -159,8 +154,7 @@
             <button class="btn btn-pass" :disabled="!isMyTurn || lastPlayed.length === 0" @click="pass">Pass</button>
           </div>
         </div>
-      </div>
-    </div>
+
 
     <!-- Win Overlay -->
     <div v-if="showOverlay" class="overlay-backdrop" @click.self>
