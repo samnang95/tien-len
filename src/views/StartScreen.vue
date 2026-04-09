@@ -74,6 +74,13 @@
           </button>
         </div>
 
+        <div class="mt-2 text-center relative z-2 w-full">
+          <router-link to="/presentation" class="presentation-link">
+             <span style="filter: drop-shadow(0 0 4px rgba(100,255,200,0.5));" class="mr-2">📊</span>
+             VIEW PRESENTATION
+          </router-link>
+        </div>
+
         <p
           class="tracking-widest text-[rgba(240,201,110,0.35)]"
           style="font-family: 'Press Start 2P', monospace; font-size: clamp(0.35rem, 1vw, 0.5rem); animation: hintBlink 2s ease-in-out infinite;"
@@ -182,5 +189,32 @@ const { fadingOut, enterRoom } = useStartScreen()
     0 7px 0 #145a32,
     0 10px 30px rgba(39, 174, 96, 0.5),
     0 0 60px rgba(39, 174, 96, 0.3) !important;
+}
+
+.presentation-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #a7f3d0;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(0.45rem, 1.2vw, 0.65rem);
+  text-decoration: none;
+  background: rgba(6, 78, 59, 0.4);
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  transition: all 0.2s ease;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+  letter-spacing: 0.1em;
+}
+.presentation-link:hover {
+  background: rgba(6, 78, 59, 0.7);
+  border-color: rgba(52, 211, 153, 0.8);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+}
+.presentation-link:active {
+  transform: translateY(0);
 }
 </style>
