@@ -103,7 +103,8 @@
 
   <!-- GAME TABLE -->
   <div v-if="screen === 'game'"
-    class="flex flex-col items-center w-full min-h-dvh pb-2.5 relative overflow-x-hidden animate-[gameRoomFadeIn_0.6s_ease-out] bg-felt-dark bg-[url('/images/felt_background.png')] bg-center bg-cover bg-fixed gap-1.5">
+    class="flex flex-col items-center w-full min-h-dvh pb-2.5 relative overflow-x-hidden animate-[gameRoomFadeIn_0.6s_ease-out] bg-felt-dark bg-[url('/images/felt_background.png')] bg-center bg-cover bg-fixed gap-1.5"
+    style="padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
 
     <!-- Filigree overlay -->
     <div class="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"

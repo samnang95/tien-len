@@ -29,7 +29,8 @@
 body {
   font-family: var(--font-body);
   color: var(--color-cream);
-  min-height: 100vh;
+  background-color: var(--color-felt-dark);
+  min-height: 100dvh;
   overflow-x: hidden;
   user-select: none;
   -webkit-user-select: none;

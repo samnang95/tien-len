@@ -1,5 +1,6 @@
 <template>
-  <div class="flex flex-col items-center w-full min-h-dvh pb-2.5 relative overflow-x-hidden animate-[gameRoomFadeIn_0.6s_ease-out] bg-felt-dark bg-[url('/images/felt_background.png')] bg-center bg-cover bg-fixed gap-1.5">
+  <div class="flex flex-col items-center w-full min-h-dvh pb-2.5 relative overflow-x-hidden animate-[gameRoomFadeIn_0.6s_ease-out] bg-felt-dark bg-[url('/images/felt_background.png')] bg-center bg-cover bg-fixed gap-1.5"
+    style="padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
     <!-- Filigree overlay -->
     <div class="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"
       style="background-image: radial-gradient(ellipse 80px 80px at 20% 30%, rgba(212,168,67,0.6) 0%, transparent 70%), radial-gradient(ellipse 60px 60px at 80% 20%, rgba(212,168,67,0.4) 0%, transparent 70%), radial-gradient(ellipse 100px 100px at 50% 70%, rgba(212,168,67,0.5) 0%, transparent 70%), radial-gradient(ellipse 50px 50px at 10% 80%, rgba(212,168,67,0.3) 0%, transparent 70%), radial-gradient(ellipse 70px 70px at 90% 85%, rgba(212,168,67,0.4) 0%, transparent 70%); background-size: 200px 200px; background-repeat: repeat;"></div>
