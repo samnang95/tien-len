@@ -29,7 +29,7 @@
 body {
   font-family: var(--font-body);
   color: var(--color-cream);
-  min-height: 100dvh;
+  min-height: 100vh;
   overflow-x: hidden;
   user-select: none;
   -webkit-user-select: none;
@@ -264,7 +264,7 @@ body {
    MOBILE RESPONSIVE
    ════════════════════════════════════════════════════════════ */
 
-@media (max-width: 1024px), (max-height: 500px) {
+@media (max-width: 1024px) {
   :root {
     --card-w: 48px;
     --card-h: 70px;
@@ -282,7 +282,7 @@ body {
   .boom-player-name { font-size: 0.65rem; }
 }
 
-@media (max-width: 480px), (max-height: 400px) {
+@media (max-width: 480px) {
   :root {
     --card-w: 42px;
     --card-h: 60px;
@@ -309,7 +309,7 @@ body {
 }
 
 /* Extra small phones (iPhone SE, etc.) */
-@media (max-width: 400px), (max-height: 350px) {
+@media (max-width: 400px) {
   :root {
     --card-w: 36px;
     --card-h: 52px;

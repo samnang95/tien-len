@@ -297,7 +297,7 @@ const playAnimClass = computed(() => {
 .bet-preset { background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.35); color: var(--color-gold-light); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 0.82rem; font-family: var(--font-body); transition: background 0.12s; }
 .bet-preset:hover { background: rgba(212,168,67,0.3); color: #fff; }
 
-@media (max-width: 1024px), (max-height: 500px) {
+@media (max-width: 1024px) {
   .rope-border { border-radius: 20px; border-width: 3px; }
   .rope-border::before { border-radius: 22px; }
   .rope-border::after { border-radius: 18px; }
@@ -309,7 +309,7 @@ const playAnimClass = computed(() => {
   .your-card { margin-right: -24px; }
   .played-card { margin-right: -22px; }
 }
-@media (max-width: 480px), (max-height: 400px) {
+@media (max-width: 480px) {
   .rope-border { border-radius: 16px; border-width: 2px; }
   .rope-border::before { border-radius: 18px; border-width: 1px; }
   .rope-border::after { border-radius: 14px; border-width: 1px; }
@@ -322,7 +322,7 @@ const playAnimClass = computed(() => {
   .your-card { margin-right: -20px; }
   .played-card { margin-right: -18px; }
 }
-@media (max-width: 400px), (max-height: 350px) {
+@media (max-width: 400px) {
   .table-surface { padding: 4px 3px; gap: 2px; }
   .player-label-side { font-size: 0.3rem; padding: 1px 2px; }
   .card-sm { width: 14px; height: 20px; margin-right: -8px; border-radius: 2px; }

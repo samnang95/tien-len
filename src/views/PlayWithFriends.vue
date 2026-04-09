@@ -351,7 +351,7 @@ const playAnimClass = computed(() => {
 .your-card:last-child { margin-right: 0; }
 .played-card { margin-right: -36px; cursor: default; }
 
-@media (max-width: 1024px), (max-height: 500px) {
+@media (max-width: 1024px) {
   .r2-rope-border { border-radius: 20px; border-width: 3px; }
   .r2-rope-border::before { border-radius: 22px; }
   .r2-rope-border::after { border-radius: 18px; }
@@ -363,7 +363,7 @@ const playAnimClass = computed(() => {
   .your-card { margin-right: -24px; }
   .played-card { margin-right: -22px; }
 }
-@media (max-width: 480px), (max-height: 400px) {
+@media (max-width: 480px) {
   .r2-rope-border { border-radius: 16px; border-width: 2px; }
   .r2-rope-border::before { border-radius: 18px; border-width: 1px; }
   .r2-rope-border::after { border-radius: 14px; border-width: 1px; }
@@ -375,7 +375,7 @@ const playAnimClass = computed(() => {
   .your-card { margin-right: -20px; }
   .played-card { margin-right: -18px; }
 }
-@media (max-width: 400px), (max-height: 350px) {
+@media (max-width: 400px) {
   .r2-table-surface { padding: 4px 3px; gap: 2px; }
   .player-label-side { font-size: 0.28rem !important; padding: 1px 2px; }
   .r2-card-sm-h { width: 14px; height: 20px; margin-right: -8px; border-radius: 2px; }
