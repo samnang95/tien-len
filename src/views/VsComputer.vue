@@ -6,18 +6,18 @@
 
     <h1 class="sr-only">TIẾN LÊN</h1>
     <img src="/images/game_logo.png" alt="Tiến Lên"
-      class="rounded-xl w-[min(120px,35vw)] relative z-1 max-md:w-20 max-[480px]:w-[60px] max-[400px]:w-[50px]"
+      class="rounded-xl w-[min(120px,35vw)] relative z-1 max-lg:w-20 max-[480px]:w-[60px] max-[400px]:w-[50px]"
       style="filter: drop-shadow(0 4px 20px rgba(212,168,67,0.4));" />
-    <p class="text-[0.6rem] text-white/35 tracking-[0.2em] relative z-1 max-md:text-[0.5rem] max-[480px]:text-[0.45rem] max-[400px]:hidden">
+    <p class="text-[0.6rem] text-white/35 tracking-[0.2em] relative z-1 max-lg:text-[0.5rem] max-[480px]:text-[0.45rem] max-[400px]:hidden">
       Southern Vietnamese Card Game
     </p>
 
     <!-- Money Board -->
-    <div class="flex gap-3 flex-wrap justify-center relative z-1 max-md:gap-1.5 max-[480px]:gap-1">
+    <div class="flex gap-3 flex-wrap justify-center relative z-1 max-lg:gap-1.5 max-[480px]:gap-1">
       <div v-for="(name, i) in playerNames" :key="'w'+i"
-        class="border border-gold/40 text-[0.85rem] text-gold-light flex items-center justify-center gap-2 backdrop-blur-sm max-md:text-[0.72rem] max-[480px]:text-[0.6rem] max-[400px]:text-[0.52rem]"
+        class="border border-gold/40 text-[0.85rem] text-gold-light flex items-center justify-center gap-2 backdrop-blur-sm max-lg:text-[0.72rem] max-[480px]:text-[0.6rem] max-[400px]:text-[0.52rem]"
         style="background: #0f3d25; border-radius: 48px; padding: 4px 18px;">
-        <span class="text-[0.9rem] max-md:hidden max-[480px]:hidden">{{ i === 0 ? '👤' : '🤖' }}</span>
+        <span class="text-[0.9rem] max-lg:hidden max-[480px]:hidden">{{ i === 0 ? '👤' : '🤖' }}</span>
         {{ name }} <span class="font-bold" :class="walletClass(i)">${{ wallets[i] }}</span>
       </div>
     </div>
@@ -25,23 +25,23 @@
 
 
     <!-- Bet Bar -->
-    <div class="flex items-center gap-2 text-[0.72rem] text-white/60 backdrop-blur-sm relative z-1 border border-gold/40 max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[480px]:gap-1.5 max-[400px]:text-[0.5rem]"
+    <div class="flex items-center gap-2 text-[0.72rem] text-white/60 backdrop-blur-sm relative z-1 border border-gold/40 max-lg:text-[0.65rem] max-[480px]:text-[0.55rem] max-[480px]:gap-1.5 max-[400px]:text-[0.5rem]"
       style="background: #0f3d25; border-radius: 48px; padding: 2px 18px;">
       <strong class="text-gold">Bet per game:</strong> <span>${{ betAmount }}</span>
       <button @click="betModalOpen = true" class="bet-change-btn max-[480px]:text-[0.55rem] max-[480px]:px-2 max-[480px]:py-0.5">⚙ Change</button>
     </div>
 
     <!-- Scoreboard -->
-    <div class="flex gap-3 relative z-1 max-md:gap-1.5 max-[480px]:gap-1">
+    <div class="flex gap-3 relative z-1 max-lg:gap-1.5 max-[480px]:gap-1">
       <div v-for="(name, i) in playerNames" :key="'s'+i"
-        class="border border-gold/40 text-[0.7rem] text-gold-light max-md:text-[0.6rem] max-[480px]:text-[0.52rem] max-[400px]:text-[0.48rem]"
+        class="border border-gold/40 text-[0.7rem] text-gold-light max-lg:text-[0.6rem] max-[480px]:text-[0.52rem] max-[400px]:text-[0.48rem]"
         style="background: #0f3d25; border-radius: 48px; padding: 2px 18px;">
         {{ name }} <span class="text-white font-bold">{{ scores[i] }}</span>
       </div>
     </div>
 
     <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-1.5 flex flex-col flex-1 w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5">
+    <div class="relative z-1 p-1.5 flex flex-col flex-1 w-[min(1200px,99vw)] max-lg:p-[3px] max-lg:w-screen max-[480px]:p-0.5">
       <div class="rope-border"></div>
       <div class="table-surface flex-1 w-full" style="min-height: 0;">
 
@@ -65,9 +65,9 @@
         </div>
 
         <!-- Middle row -->
-        <div class="flex-1 flex w-full gap-2.5 items-stretch max-md:gap-[3px] max-[480px]:gap-0.5">
+        <div class="flex-1 flex w-full gap-2.5 items-stretch max-lg:gap-[3px] max-[480px]:gap-0.5">
           <!-- CPU 1 left -->
-          <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
+          <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-lg:w-[15%] max-[480px]:w-[12%]">
             <div class="relative">
               <div class="player-label-side -rotate-90" :class="{ 'active-player': current === 1 }">{{ cpuLabel(1) }}</div>
               <div v-if="playerAction.player === 1" :key="playerAction.id" class="player-action-bubble"
@@ -86,7 +86,7 @@
           </div>
 
           <!-- Play Area -->
-          <div class="flex-1 min-h-[320px] rounded-[14px] border border-white/6 flex flex-col items-center justify-center gap-1 p-2 max-md:min-h-[100px] max-md:p-1.5 max-md:gap-[3px] max-[480px]:min-h-[70px] max-[480px]:p-1 max-[480px]:gap-0.5 max-[480px]:rounded-[10px] max-[400px]:min-h-[55px] max-[400px]:p-[3px]"
+          <div class="flex-1 min-h-[320px] rounded-[14px] border border-white/6 flex flex-col items-center justify-center gap-1 p-2 max-lg:min-h-[100px] max-lg:p-1.5 max-lg:gap-[3px] max-[480px]:min-h-[70px] max-[480px]:p-1 max-[480px]:gap-0.5 max-[480px]:rounded-[10px] max-[400px]:min-h-[55px] max-[400px]:p-[3px]"
             style="background: radial-gradient(ellipse at center, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.35) 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.3);">
             <!-- Dealing visual -->
             <template v-if="isDealing">
@@ -100,16 +100,16 @@
             </template>
             <!-- Normal play area -->
             <template v-else>
-              <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-md:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
+              <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-lg:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center">
                 <PlayingCard v-for="(c, j) in lastPlayed" :key="c.rank + c.suit" :card="c"
                   class="cursor-default! played-card played-card-glow" :class="playAnimClass"
                   :style="{ animationDelay: j * 80 + 'ms' }" />
               </div>
-              <div class="text-[0.72rem] italic text-gold-light max-md:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
-              <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-md:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
+              <div class="text-[0.72rem] italic text-gold-light max-lg:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
+              <div class="text-[0.82rem] min-h-[1.2em] text-[#f9ca24] max-lg:text-[0.65rem] max-[480px]:text-[0.55rem] max-[400px]:text-[0.48rem]"
                 style="font-family: var(--font-cinzel);">{{ msg }}</div>
-              <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-md:min-h-5 max-md:mt-0.5 max-[480px]:min-h-4 max-[480px]:mt-px">
+              <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-lg:min-h-5 max-lg:mt-0.5 max-[480px]:min-h-4 max-[480px]:mt-px">
                 <span v-if="!gameOver && current === 0" class="turn-text pulse-glow">YOUR TURN</span>
                 <span v-else-if="!gameOver && current > 0" class="turn-text">CPU {{ current }} THINKING</span>
               </div>
@@ -117,7 +117,7 @@
           </div>
 
           <!-- CPU 2 right -->
-          <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-md:w-[15%] max-[480px]:w-[12%]">
+          <div class="shrink-0 w-1/4 flex flex-row items-center justify-center gap-1 max-lg:w-[15%] max-[480px]:w-[12%]">
             <div class="flex flex-col items-center">
               <template v-if="showCpuCards(2)">
                 <PlayingCard v-for="(c, j) in hands[2]" :key="j" :card="c" class="cpu-reveal-card-v cursor-default!" />
@@ -145,7 +145,7 @@
             <div v-if="playerAction.player === 0" :key="playerAction.id" class="player-action-bubble"
               :class="{ 'pass-action': playerAction.text === 'PASS' }">{{ playerAction.text }}</div>
           </div>
-          <div class="flex flex-nowrap justify-center px-5 transition-opacity duration-300 max-md:px-1 max-[480px]:px-0.5"
+          <div class="flex flex-nowrap justify-center px-5 transition-opacity duration-300 max-lg:px-1 max-[480px]:px-0.5"
             :style="{ opacity: passedPlayers.has(0) && !gameOver ? 0.5 : 1, minHeight: 'var(--card-h)' }">
             <PlayingCard v-for="(c, j) in hands[0]" :key="j"
               :card="c" :selected="selected.includes(j)"
@@ -154,7 +154,7 @@
               :style="isDealing ? { animationDelay: (j * 4) * 45 + 'ms', pointerEvents: 'none' } : {}"
               @click="toggleSelect(j)" />
           </div>
-          <div class="flex gap-2.5 mt-1 max-md:gap-2 max-md:mt-0.5 max-[480px]:gap-1.5">
+          <div class="flex gap-2.5 mt-1 max-lg:gap-2 max-lg:mt-0.5 max-[480px]:gap-1.5">
             <button class="btn btn-play" :disabled="!isMyTurn || selected.length === 0" @click="playSelected">Play</button>
             <button class="btn btn-pass" :disabled="!isMyTurn || lastPlayed.length === 0" @click="pass">Pass</button>
           </div>
@@ -303,7 +303,7 @@ const playAnimClass = computed(() => {
 .bet-preset { background: rgba(212,168,67,0.12); border: 1px solid rgba(212,168,67,0.35); color: var(--color-gold-light); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 0.82rem; font-family: var(--font-body); transition: background 0.12s; }
 .bet-preset:hover { background: rgba(212,168,67,0.3); color: #fff; }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .rope-border { border-radius: 20px; border-width: 3px; }
   .rope-border::before { border-radius: 22px; }
   .rope-border::after { border-radius: 18px; }

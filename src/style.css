@@ -264,7 +264,7 @@ body {
    MOBILE RESPONSIVE
    ════════════════════════════════════════════════════════════ */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   :root {
     --card-w: 48px;
     --card-h: 70px;
