@@ -126,9 +126,9 @@
     </div>
 
     <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-2 flex flex-col w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-[2px]">
+    <div class="relative z-1 p-2 flex-1 flex flex-col w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-[2px]" style="min-height: max(60vh, 300px);">
       <div class="r2-rope-border"></div>
-      <div class="r2-table-surface" style="min-height: 800px;">
+      <div class="r2-table-surface flex-1 w-full">
 
         <!-- Opponent top -->
         <div v-if="activeSeats.includes(topSeat)" class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
