@@ -20,7 +20,7 @@
       ></div>
 
       <div
-        class="rounded-[10px] text-center relative overflow-hidden px-12 py-10 flex flex-col items-center gap-8"
+        class="rounded-[10px] text-center relative overflow-hidden px-[clamp(1.5rem,5vw,3rem)] py-[clamp(1rem,4vh,2.5rem)] flex flex-col items-center gap-[clamp(12px,3vh,32px)]"
         style="background: linear-gradient(180deg, #0a2a16 0%, #0f3d25 30%, #134a2c 60%, #0a2a16 100%);"
       >
         <!-- Deco cards -->
@@ -43,14 +43,14 @@
         <img
           src="/images/game_logo.png"
           alt="Tiến Lên"
-          class="rounded-xl w-[min(160px,40vw)]"
+          class="rounded-xl w-[clamp(60px,20vh,160px)]"
           style="filter: drop-shadow(0 0 20px rgba(212,168,67,0.4)); animation: logoFloat 3s ease-in-out infinite alternate;"
         />
 
         <!-- Title -->
         <h1
           class="tracking-[0.08em] text-gold"
-          style="font-family: 'Press Start 2P', monospace; font-size: clamp(1.5rem, 5vw, 2.8rem); text-shadow: 0 0 10px rgba(212,168,67,0.8), 0 0 30px rgba(212,168,67,0.4), 0 4px 0 #0a2a16, 0 5px 0 #061a0e; animation: titleGlow 2s ease-in-out infinite alternate;"
+          style="font-family: 'Press Start 2P', monospace; font-size: clamp(1.2rem, 5vh, 2.8rem); text-shadow: 0 0 10px rgba(212,168,67,0.8), 0 0 30px rgba(212,168,67,0.4), 0 4px 0 #0a2a16, 0 5px 0 #061a0e; animation: titleGlow 2s ease-in-out infinite alternate;"
         >
           TIẾN LÊN
         </h1>
@@ -63,7 +63,7 @@
         </p>
 
         <!-- Buttons -->
-        <div class="flex gap-5 justify-center flex-wrap relative z-2">
+        <div class="flex gap-[clamp(10px,2vh,20px)] justify-center flex-wrap relative z-2">
           <button @click="enterRoom('vs-computer')" class="pixel-play-btn">
             <span style="font-size: 0.85em; filter: drop-shadow(0 0 4px rgba(255,255,100,0.5));">▶</span>
             <span>VS COMPUTER</span>
@@ -111,8 +111,8 @@ const { fadingOut, enterRoom } = useStartScreen()
 .pixel-play-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 36px;
+  gap: clamp(6px, 1.5vh, 10px);
+  padding: clamp(10px, 2vh, 14px) clamp(16px, 3vw, 36px);
   border: none;
   border-radius: 8px;
   background: linear-gradient(180deg, #ff8844 0%, #ff6622 50%, #dd4400 100%);

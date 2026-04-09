@@ -41,9 +41,9 @@
     </div>
 
     <!-- TABLE WRAPPER -->
-    <div class="relative z-1 p-1.5 flex-1 flex flex-col w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5" style="min-height: max(60vh, 300px);">
+    <div class="relative z-1 p-1.5 flex flex-col flex-1 w-[min(1200px,99vw)] max-md:p-[3px] max-md:w-screen max-[480px]:p-0.5">
       <div class="rope-border"></div>
-      <div class="table-surface flex-1 w-full">
+      <div class="table-surface flex-1 w-full" style="min-height: 0;">
 
         <!-- CPU 3 (top) -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-1.5">
