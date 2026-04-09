@@ -8,6 +8,7 @@
     </button>
     <button v-if="showReset" @click="emit('newGame')" class="toolbar-btn" title="New Game">🔄</button>
     <button @click="emit('leave')" class="toolbar-btn" title="Leave Game">🚪</button>
+    <button @click="toggleFullscreen" class="toolbar-btn" title="Toggle Fullscreen">⛶</button>
     <button @click="rulesOpen = !rulesOpen" class="toolbar-btn" title="Rules">?</button>
   </div>
 
@@ -61,6 +62,16 @@ defineProps({
 })
 const emit = defineEmits(['toggleMute', 'newGame', 'leave'])
 const rulesOpen = ref(false)
+
+const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.warn(`Error attempting to enable fullscreen: ${err.message}`)
+    })
+  } else {
+    document.exitFullscreen()
+  }
+}
 </script>
 
 <style scoped>
