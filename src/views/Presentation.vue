@@ -224,6 +224,10 @@
                     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </span>
                </button>
+               <a href="https://canva.link/x5y22hju5x7bimc" target="_blank" rel="noopener noreferrer" class="px-6 py-3 md:px-10 md:py-4 bg-linear-to-r from-blue-600 to-indigo-600 border border-blue-400/50 shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_rgba(59,130,246,0.8)] text-white rounded-full font-bold text-base md:text-xl transition-all flex items-center justify-center gap-4 md:gap-6">
+                  View Canva Deck
+                  <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+               </a>
                <button @click="currentSlide = 1" class="px-6 py-3 md:px-10 md:py-4 bg-white/5 border border-white/20 hover:border-emerald-500/50 text-white rounded-full font-bold text-base md:text-xl transition-all hover:bg-white/10 backdrop-blur-sm">
                   Restart Deck
                </button>
