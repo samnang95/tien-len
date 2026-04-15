@@ -4,9 +4,7 @@
     :class="fadingOut ? 'opacity-0 scale-110 pointer-events-none' : ''"
     style="background: linear-gradient(180deg, #061a0e 0%, #0a2a16 25%, #0f3d25 45%, #1a5c38 60%, #237a4b 75%, #1a5c38 90%, #0a2a16 100%);"
   >
-    <PixelStars />
-    <PixelClouds />
-    <PixelUfo />
+    <PremiumBackground />
 
     <!-- Start Panel -->
     <div
@@ -96,19 +94,12 @@
       ></div>
     </div>
 
-    <!-- Ground -->
-    <div
-      class="absolute bottom-0 left-0 right-0 h-10 pointer-events-none"
-      style="background: linear-gradient(180deg, transparent 0%, rgba(6,26,14,0.8) 100%);"
-    ></div>
   </div>
 </template>
 
 <script setup>
 import { useStartScreen, decoCards } from '../composables/useStartScreen.js'
-import PixelStars from '../components/PixelStars.vue'
-import PixelClouds from '../components/PixelClouds.vue'
-import PixelUfo from '../components/PixelUfo.vue'
+import PremiumBackground from '../components/PremiumBackground.vue'
 
 const { fadingOut, enterRoom } = useStartScreen()
 </script>

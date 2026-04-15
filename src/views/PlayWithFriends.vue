@@ -3,8 +3,7 @@
   <!-- LOBBY SCREEN -->
   <div v-if="screen === 'lobby'" class="fixed inset-0 z-9999 flex items-center justify-center overflow-hidden"
     style="background: linear-gradient(180deg, #061a0e 0%, #0a2a16 25%, #0f3d25 45%, #1a5c38 60%, #237a4b 75%, #1a5c38 90%, #0a2a16 100%);">
-    <PixelStars />
-    <PixelClouds />
+    <PremiumBackground />
 
     <div class="lobby-panel">
       <div class="absolute -inset-0.5 rounded-[14px] border-2 pointer-events-none" style="border-color: rgba(212,168,67,0.5); animation: glowBorder 2s ease-in-out infinite alternate;"></div>
@@ -62,7 +61,7 @@
   <!-- WAITING ROOM -->
   <div v-if="screen === 'waiting'" class="fixed inset-0 z-9998 flex items-center justify-center overflow-hidden"
     style="background: linear-gradient(180deg, #061a0e 0%, #0a2a16 25%, #0f3d25 45%, #1a5c38 60%, #237a4b 75%, #1a5c38 90%, #0a2a16 100%);">
-    <PixelStars />
+    <PremiumBackground />
 
     <div class="lobby-panel" style="width: min(560px, 92vw);">
       <div class="absolute -inset-0.5 rounded-[14px] border-2 pointer-events-none" style="border-color: rgba(212,168,67,0.5); animation: glowBorder 2s ease-in-out infinite alternate;"></div>
@@ -271,8 +270,7 @@ import { usePlayWithFriends } from '../composables/usePlayWithFriends.js'
 import { computed } from 'vue'
 import PlayingCard from '../components/PlayingCard.vue'
 import GameToolbar from '../components/GameToolbar.vue'
-import PixelStars from '../components/PixelStars.vue'
-import PixelClouds from '../components/PixelClouds.vue'
+import PremiumBackground from '../components/PremiumBackground.vue'
 
 const {
   screen, lobbyView, lobbyError, nickname, roomCodeInput, roomCode,
