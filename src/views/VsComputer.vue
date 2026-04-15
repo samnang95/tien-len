@@ -107,6 +107,9 @@
               <div class="flex items-center justify-center gap-2 mt-1 min-h-7 max-lg:min-h-5 max-lg:mt-0.5 max-[480px]:min-h-4 max-[480px]:mt-px">
                 <span v-if="!gameOver && current === 0" class="turn-text pulse-glow">YOUR TURN</span>
                 <span v-else-if="!gameOver && current > 0" class="turn-text">CPU {{ current }} THINKING</span>
+                <span v-if="turnTimeLeft > 0 && !gameOver" class="font-bold transition-colors duration-500"
+                  :class="turnTimeLeft <= 5 ? 'text-[#e74c3c]' : turnTimeLeft <= 15 ? 'text-[#f39c12]' : 'text-[#2ecc71]'"
+                  style="font-family: var(--font-cinzel); font-size: 0.9rem;">{{ turnTimeLeft }}s</span>
               </div>
             </template>
           </div>
@@ -171,8 +174,7 @@
         <div v-if="loserCards.length > 0" class="mb-4">
           <div class="text-xs text-white/50 tracking-widest mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
           <div class="flex gap-1 justify-center flex-wrap">
-            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c"
-              class="w-[46px]! h-[66px]! text-[0.7rem]! cursor-default! hover:transform-none! max-sm:w-[38px]! max-sm:h-[54px]!" />
+            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card" />
           </div>
           <div v-if="loserPenaltyText" class="mt-2 text-sm text-[#e74c3c] font-bold tracking-[0.03em]">{{ loserPenaltyText }}</div>
         </div>
@@ -235,7 +237,7 @@ const {
   selected, scores, gameOver, isDealing, betAmount, betInput, betModalOpen,
   wallets, finishOrder, msg, showOverlay,
   overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,
-  overlayWallets, overlayScore, loserCards, loserName, loserPenaltyText, boomHands,
+  overlayWallets, overlayScore, loserCards, loserName, loserPenaltyText, boomHands, turnTimeLeft,
   isMyTurn, whosePlayText,
   isMuted, toggleMute,
   walletClass, cpuLabel, showCpuCards,

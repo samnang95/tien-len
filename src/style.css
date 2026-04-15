@@ -255,6 +255,20 @@ body {
 .boom-card .center-suit { font-size: 1rem; }
 
 /* ════════════════════════════════════════════════════════════
+   MINI CARD STYLES (Used for remaining cards, etc)
+   ════════════════════════════════════════════════════════════ */
+.mini-card {
+  width: 46px !important;
+  height: 66px !important;
+  cursor: default !important;
+}
+.mini-card:hover { transform: none !important; }
+.mini-card .card-face { padding: 3px 3px !important; }
+.mini-card .rank { font-size: 0.75rem !important; }
+.mini-card .suit { font-size: 0.55rem !important; }
+.mini-card .center-suit { font-size: 1rem !important; }
+
+/* ════════════════════════════════════════════════════════════
    UTILITY CLASSES NOT IN TAILWIND
    ════════════════════════════════════════════════════════════ */
 
@@ -306,6 +320,12 @@ body {
   .boom-player-name { font-size: 0.6rem; }
   .boom-player-row { margin: 4px 0; }
   .boom-hand { flex-wrap: wrap; justify-content: center; }
+
+  .mini-card { width: 36px !important; height: 52px !important; }
+  .mini-card .card-face { padding: 2px 2px !important; }
+  .mini-card .rank { font-size: 0.6rem !important; }
+  .mini-card .suit { font-size: 0.45rem !important; }
+  .mini-card .center-suit { font-size: 0.75rem !important; }
 }
 
 /* Extra small phones (iPhone SE, etc.) */

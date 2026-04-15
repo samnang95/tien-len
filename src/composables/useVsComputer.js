@@ -1,4 +1,4 @@
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSound } from './useSound.js'
 import {
@@ -45,10 +45,38 @@ export function useVsComputer() {
   const boomHands      = ref([])
   const isDealing      = ref(false)
   const playerAction   = ref({ player: -1, text: '', id: 0 })
+  const turnTimeLeft   = ref(0)
 
   let aiActionTimer = null
   let dealTimer = null
   let actionTimer = null
+  let turnTimer = null
+  const TURN_TIME = 30
+
+  function startTurnCountdown() {
+    clearInterval(turnTimer)
+    turnTimeLeft.value = 0
+
+    if (gameOver.value || current.value !== 0 || isDealing.value) return
+
+    const isFreePlay = lastPlayed.value.length === 0 || lastPlayer.value === current.value
+    if (isFreePlay) return
+
+    turnTimeLeft.value = TURN_TIME
+
+    turnTimer = setInterval(() => {
+      turnTimeLeft.value--
+      if (turnTimeLeft.value <= 0 && current.value === 0 && !isDealing.value) {
+        clearInterval(turnTimer)
+        pass()
+      } else if (turnTimeLeft.value <= 0) {
+        clearInterval(turnTimer)
+      }
+    }, 1000)
+  }
+
+  watch(current, startTurnCountdown)
+  watch(isDealing, startTurnCountdown)
 
   // ── Computed ───────────────────────────────────────────────────────────────
   const isMyTurn = computed(() =>
@@ -203,8 +231,6 @@ export function useVsComputer() {
 
     const winner = finishOrder.value[0]
     lastWinner.value = winner
-    if (winner === 0) SFX.win(); else SFX.lose()
-    scores.value[winner]++
 
     const rankLabels  = ['1st', '2nd', '3rd', '4th']
     const rankDetails = []
@@ -229,34 +255,38 @@ export function useVsComputer() {
     })
     if (twoPenalty > 0) wallets.value[loserPlayer] -= twoPenalty
 
-    showOverlay.value   = true
-    overlayTitle.value  = winner === 0 ? '🎉 You Win!' : 'CPU ' + winner + ' Wins!'
-    overlayMsg.value    = rankDetails.join('  •  ')
+    setTimeout(() => {
+      if (winner === 0) SFX.win(); else SFX.lose()
+      scores.value[winner]++
+      showOverlay.value   = true
+      overlayTitle.value  = winner === 0 ? '🎉 You Win!' : 'CPU ' + winner + ' Wins!'
+      overlayMsg.value    = rankDetails.join('  •  ')
 
-    const yourRank    = finishOrder.value.indexOf(0)
-    const yourReward  = RANK_REWARDS[yourRank]
-    let yourTotal     = yourReward
-    if (yourRank === 3) yourTotal -= twoPenalty
-    if (yourTotal >= 0) {
-      overlayMoney.value    = '+$' + yourTotal + ' 🤑 (' + rankLabels[yourRank] + ')'
-      overlayMoneyWin.value = true
-    } else {
-      overlayMoney.value    = '-$' + Math.abs(yourTotal) + ' (' + rankLabels[yourRank] + ')'
-      overlayMoneyWin.value = false
-    }
+      const yourRank    = finishOrder.value.indexOf(0)
+      const yourReward  = RANK_REWARDS[yourRank]
+      let yourTotal     = yourReward
+      if (yourRank === 3) yourTotal -= twoPenalty
+      if (yourTotal >= 0) {
+        overlayMoney.value    = '+$' + yourTotal + ' 🤑 (' + rankLabels[yourRank] + ')'
+        overlayMoneyWin.value = true
+      } else {
+        overlayMoney.value    = '-$' + Math.abs(yourTotal) + ' (' + rankLabels[yourRank] + ')'
+        overlayMoneyWin.value = false
+      }
 
-    overlayWallets.value = `You $${wallets.value[0]}  •  CPU1 $${wallets.value[1]}  •  CPU2 $${wallets.value[2]}  •  CPU3 $${wallets.value[3]}`
-    overlayScore.value   = `Wins — You ${scores.value[0]}  •  CPU1 ${scores.value[1]}  •  CPU2 ${scores.value[2]}  •  CPU3 ${scores.value[3]}`
+      overlayWallets.value = `You $${wallets.value[0]}  •  CPU1 $${wallets.value[1]}  •  CPU2 $${wallets.value[2]}  •  CPU3 $${wallets.value[3]}`
+      overlayScore.value   = `Wins — You ${scores.value[0]}  •  CPU1 ${scores.value[1]}  •  CPU2 ${scores.value[2]}  •  CPU3 ${scores.value[3]}`
 
-    if (lCards.length > 0) {
-      loserCards.value       = lCards
-      loserName.value        = loserPlayer === 0 ? 'Your' : 'CPU ' + loserPlayer + "'s"
-      loserPenaltyText.value = twoPenalty > 0
-        ? '🐷 Holding 2s penalty: ' + twoPenaltyDetails.join(', ') + ' → Total -$' + twoPenalty
-        : ''
-    } else {
-      loserCards.value = []
-    }
+      if (lCards.length > 0) {
+        loserCards.value       = lCards
+        loserName.value        = loserPlayer === 0 ? 'Your' : 'CPU ' + loserPlayer + "'s"
+        loserPenaltyText.value = twoPenalty > 0
+          ? '🐷 Holding 2s penalty: ' + twoPenaltyDetails.join(', ') + ' → Total -$' + twoPenalty
+          : ''
+      } else {
+        loserCards.value = []
+      }
+    }, 1500)
   }
 
   // ── Player Actions ─────────────────────────────────────────────────────────
@@ -436,7 +466,12 @@ export function useVsComputer() {
     router.push({ name: 'home' })
   }
 
-  onUnmounted(() => { clearAiTimer(); clearDealTimer(); if (actionTimer) clearTimeout(actionTimer) })
+  onUnmounted(() => {
+    clearAiTimer()
+    clearDealTimer()
+    if (actionTimer) clearTimeout(actionTimer)
+    if (turnTimer) clearInterval(turnTimer)
+  })
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
@@ -446,6 +481,7 @@ export function useVsComputer() {
     wallets, finishOrder, lastWinner, msg, showOverlay,
     overlayTitle, overlayMsg, overlayMoney, overlayMoneyWin,
     overlayWallets, overlayScore, loserCards, loserName, loserPenaltyText, boomHands,
+    turnTimeLeft,
     // computed
     isMyTurn, whosePlayText,
     // sound

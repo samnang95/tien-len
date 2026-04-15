@@ -31,6 +31,9 @@ export function usePlayWithFriends() {
   const gameOverMsg    = ref('')
   const gameOverScores = ref('')
   const boomHands      = ref([])
+  const loserCards     = ref([])
+  const loserName      = ref('')
+  const loserPenaltyText = ref('')
   const isBoom         = ref(false)
   const isDealing      = ref(false)
   const playerAction   = ref({ player: -1, text: '', id: 0 })
@@ -208,12 +211,15 @@ export function usePlayWithFriends() {
       selectedSet.value  = new Set()
 
     // Detect new game start: transition from gameOver to not gameOver
-      if (wasGameOver && !gameState.gameOver) {
+      if (wasGameOver && !gameState.gameOver && isDealing.value === false) {
         triggerDealAnimation()
       }
 
       startTurnCountdown()
-      if (gameState.gameOver) showGameOver()
+      if (gameState.gameOver) {
+        if (!wasGameOver) setTimeout(() => showGameOver(), 1500)
+        else showGameOver()
+      }
       else showGameOverlay.value = false
 
       if (!isDealing.value) handleCpuTurn(gameState)
@@ -556,8 +562,21 @@ export function usePlayWithFriends() {
   // ── Timer ──────────────────────────────────────────────────────────────────
   function startTurnCountdown() {
     clearInterval(turnTimer)
+    
+    if (!gs.value || gs.value.gameOver || gs.value.current === -1) {
+      turnTimeLeft.value = 0
+      return
+    }
+
+    const lastP = gs.value.lastPlayed || []
+    const isFreePlay = lastP.length === 0 || gs.value.lastPlayer === gs.value.current
+
+    if (isFreePlay) {
+      turnTimeLeft.value = 0 // Hide timer and disable auto-pass for free turns
+      return
+    }
+
     turnTimeLeft.value = TURN_TIME
-    if (!gs.value || gs.value.gameOver || gs.value.current === -1) return
 
     turnTimer = setInterval(() => {
       turnTimeLeft.value--
@@ -605,6 +624,33 @@ export function usePlayWithFriends() {
         '<div>' + (titles[i] || (i + 1) + 'th') + ': <strong>' + (names[seat] || 'Player') + '</strong></div>'
       ).join('')
       boomHands.value = []
+
+      const loserSeat = fo[fo.length - 1]
+      if (loserSeat !== undefined && gs.value.hands?.[loserSeat] && gs.value.hands[loserSeat].length > 0) {
+        let loserNameStr = names[loserSeat] || 'Player'
+        if (loserSeat === mySeat.value) loserNameStr = 'Your'
+        else loserNameStr += "'s"
+        
+        loserCards.value = gs.value.hands[loserSeat]
+        loserName.value = loserNameStr
+        
+        let twoPenalty = 0
+        const twoPenaltyDetails = []
+        gs.value.hands[loserSeat].forEach(c => {
+          if (c.rank === '2') {
+            const penalty = c.suit === '♠' ? 10 : c.suit === '♣' ? 20 : c.suit === '♦' ? 30 : 40
+            twoPenalty += penalty
+            twoPenaltyDetails.push('2' + c.suit + ' (-$' + penalty + ')')
+          }
+        })
+        if (twoPenalty > 0) {
+          loserPenaltyText.value = '🐷 Holding 2s penalty: ' + twoPenaltyDetails.join(', ') + ' → Total -$' + twoPenalty
+        } else {
+          loserPenaltyText.value = ''
+        }
+      } else {
+        loserCards.value = []
+      }
     }
 
     const scores         = gs.value.scores || [0, 0, 0, 0]
@@ -714,6 +760,7 @@ export function usePlayWithFriends() {
     isHost, mySeat, playerCount, copied, slots, gs,
     selectedSet, turnTimeLeft, showGameOverlay, isDealing, playerAction,
     gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
+    loserCards, loserName, loserPenaltyText,
     // computed
     activeSeats, topSeat, leftSeat, rightSeat, myHand,
     mpIsMyTurn, canPass, amPassed, whosePlayText,

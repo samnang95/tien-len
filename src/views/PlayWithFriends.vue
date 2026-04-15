@@ -233,6 +233,16 @@
         <h2>{{ gameOverTitle }}</h2>
         <div v-html="gameOverMsg" class="mb-3"></div>
         <div class="text-xs text-white/40 mb-3">{{ gameOverScores }}</div>
+        
+        <!-- Loser cards -->
+        <div v-if="loserCards && loserCards.length > 0" class="mb-4">
+          <div class="text-xs text-white/50 tracking-widest mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
+          <div class="flex gap-1 justify-center flex-wrap">
+            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card" />
+          </div>
+          <div v-if="loserPenaltyText" class="mt-2 text-sm text-[#e74c3c] font-bold tracking-[0.03em]">{{ loserPenaltyText }}</div>
+        </div>
+
         <div v-if="boomHands.length > 0">
           <div v-for="(bh, i) in boomHands" :key="i" class="boom-player-row">
             <div class="boom-player-name">{{ bh.name }}{{ bh.winner ? ' 👑' : '' }}</div>
@@ -269,6 +279,7 @@ const {
   isHost, mySeat, playerCount, copied, slots, gs,
   selectedSet, turnTimeLeft, showGameOverlay, isDealing, playerAction,
   gameOverTitle, gameOverMsg, gameOverScores, boomHands, isBoom,
+  loserCards, loserName, loserPenaltyText,
   activeSeats, topSeat, leftSeat, rightSeat, myHand,
   mpIsMyTurn, canPass, amPassed, whosePlayText,
   isMuted, toggleMute,

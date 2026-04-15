@@ -186,7 +186,7 @@ export function aiRespond(p, lp, hands, lastPlayer) {
   const beaters = all.filter(cards => { const c = classify(cards); return c && beats(c, lp) })
   if (beaters.length === 0) return null
 
-  const lastHandSize = lastPlayer >= 0 ? hands[lastPlayer].length : 99
+  const lastHandSize = lastPlayer >= 0 ? (hands[lastPlayer]?.length || 0) : 99
   const urgent = lastHandSize <= 3
 
   const isBomb = (cCombo) => {
