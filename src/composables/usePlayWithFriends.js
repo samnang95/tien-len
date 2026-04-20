@@ -257,12 +257,18 @@ export function usePlayWithFriends() {
     const hand = gameState.hands[p] || []
     if (hand.length === 0) return mpPassForCpu(gameState, p)
 
-    const lastPlayed = gameState.lastPlayed || []
-    const isFree = lastPlayed.length === 0 || gameState.lastPlayer === p
+    let actualLastPlayed = [...lastPlayed]
+    let mustPlaySingle = false
+    if (gameState.isFirstGame && actualLastPlayed.some(c => c.rank === '3') && gameState.lastPlayer === p) {
+      actualLastPlayed = [] // Clear the discarded 3s for a free lead
+      mustPlaySingle = true
+    }
     
+    const isFree = actualLastPlayed.length === 0 || gameState.lastPlayer === p
+
     let playedCards = isFree
-       ? aiLead(p, gameState.hands)
-       : aiRespond(p, lastPlayed, gameState.hands, gameState.lastPlayer)
+         ? (mustPlaySingle ? [gameState.hands[p][0]] : aiLead(p, gameState.hands))
+         : aiRespond(p, actualLastPlayed, gameState.hands, gameState.lastPlayer)
 
     if (playedCards && playedCards.length > 0) {
        SFX.play()
@@ -416,16 +422,54 @@ export function usePlayWithFriends() {
         gameOver: true, message: '💣 ' + nameMap[boomWinner] + ' has ' + boomReason + ' — INSTANT WIN! 💣',
         names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
         fourTwosBoom: boomWinner, boomReason,
+        isFirstGame: true,
       })
     } else {
       await fb.setGameState(roomCode.value, {
-        hands, current: starter, lastPlayed: [], lastPlayer: -1, passCount: 0,
+        hands, current: -1, 
+        lastPlayed: [],
+        lastPlayer: starter, // Gives starter a free throw
+        passCount: 0,
         finishOrder: [], scores: [0, 0, 0, 0], wallets: [1000, 1000, 1000, 1000], betAmount: 100,
-        gameOver: false, message: nameMap[starter] + ' starts (has 3♠)',
+        gameOver: false, message: 'Discarding 3s...',
         names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
+        isFirstGame: true,
       })
+      await fb.setStatus(roomCode.value, 'playing')
+
+      // Wait for deal animation
+      setTimeout(() => {
+        let currentHands = [...hands]
+        let currentLastPlayed = []
+        let seq = 0
+        const throwSequence = async () => {
+          if (seq >= activeSts.length) {
+            await fb.updateGameState(roomCode.value, {
+               message: 'All 3s discarded! ' + nameMap[starter] + ' starts',
+               current: starter
+            })
+            return
+          }
+          const seat = activeSts[seq]
+          const threes = currentHands[seat].filter(c => c.rank === '3')
+          if (threes.length > 0) {
+            threes.forEach(c => c.fromPlayer = seat)
+            currentLastPlayed = [...currentLastPlayed, ...threes]
+            currentHands[seat] = currentHands[seat].filter(c => c.rank !== '3')
+            
+            await fb.updateGameState(roomCode.value, {
+               [`hands/${seat}`]: currentHands[seat],
+               lastPlayed: currentLastPlayed
+            })
+            SFX.play()
+            setTimeout(() => { seq++; throwSequence() }, 500)
+          } else {
+            seq++; throwSequence()
+          }
+        }
+        throwSequence()
+      }, 2800)
     }
-    await fb.setStatus(roomCode.value, 'playing')
   }
 
   // ── Play / Pass ────────────────────────────────────────────────────────────
@@ -447,9 +491,18 @@ export function usePlayWithFriends() {
     const combo = classify(cards)
     if (!combo) { SFX.error(); return }
 
-    const lastP      = gs.value.lastPlayed || []
-    const isFreePlay = lastP.length === 0 || gs.value.lastPlayer === mySeat.value
-    if (!isFreePlay && !beats(combo, lastP)) { SFX.error(); return }
+    let actualLastPlayed = gs.value.lastPlayed || []
+    if (gs.value.isFirstGame && actualLastPlayed.some(c => c.rank === '3') && gs.value.lastPlayer === mySeat.value) {
+      if (cards.length !== 1) {
+        SFX.error()
+        showPlayerAction(mySeat.value, 'Must play a single card!')
+        return
+      }
+      actualLastPlayed = [] // Clear the discarded 3s so the player gets a free lead
+    }
+
+    const isFreePlay = actualLastPlayed.length === 0 || gs.value.lastPlayer === mySeat.value
+    if (!isFreePlay && !beats(combo, actualLastPlayed)) { SFX.error(); return }
 
     SFX.play()
 
@@ -728,6 +781,7 @@ export function usePlayWithFriends() {
         betAmount: gs.value?.betAmount || 100, gameOver: false,
         message: nameMap[starter] + ' starts (winner goes first)',
         names: nameMap, activeSeats: activeSts, passedPlayers: [], cpuSeats,
+        isFirstGame: false,
       })
     }
   }

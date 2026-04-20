@@ -98,7 +98,7 @@
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-lg:text-[0.45rem] max-[480px]:text-[0.38rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.32rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center">
                 <PlayingCard v-for="(c, j) in lastPlayed" :key="c.rank + c.suit" :card="c"
-                  class="cursor-default! played-card played-card-glow" :class="playAnimClass"
+                  class="cursor-default! played-card played-card-glow" :class="getAnimClass(c)"
                   :style="{ animationDelay: j * 80 + 'ms' }" />
               </div>
               <div class="text-[0.72rem] italic text-gold-light max-lg:text-[0.55rem] max-[480px]:text-[0.48rem] max-[400px]:text-[0.42rem]">{{ whosePlayText }}</div>
@@ -247,11 +247,11 @@ const {
 
 newGame()
 
-const playAnimClass = computed(() => {
-  const p = lastPlayer.value
+const getAnimClass = (c) => {
+  const p = c.fromPlayer !== undefined ? c.fromPlayer : lastPlayer.value
   if (p < 0 || lastPlayed.value.length === 0) return ''
   return ['play-from-bottom', 'play-from-left', 'play-from-right', 'play-from-top'][p] || ''
-})
+}
 </script>
 
 

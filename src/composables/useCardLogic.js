@@ -232,6 +232,8 @@ export function countPairs(hand) {
 export function checkInstantWin(hand) {
   const twos = hand.filter(c => c.rank === '2')
   if (twos.length === 4) return 'FOUR 2s'
+  const threes = hand.filter(c => c.rank === '3')
+  if (threes.length === 4) return 'FOUR 3s'
   if (countPairs(hand) >= 6) return 'SIX PAIRS'
   return null
 }

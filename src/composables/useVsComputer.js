@@ -175,16 +175,7 @@ export function useVsComputer() {
     dealTimer = setTimeout(() => {
       isDealing.value = false
 
-      if (lastWinner.value >= 0) {
-        current.value = lastWinner.value
-      } else {
-        current.value = 0
-        for (let p = 0; p < 4; p++) {
-          if (h[p].some(c => c.rank === '3' && c.suit === '♠')) { current.value = p; break }
-        }
-      }
-
-      // Check instant win
+      // 1. Check instant win
       for (let p = 0; p < 4; p++) {
         const reason = checkInstantWin(h[p])
         if (reason) {
@@ -200,9 +191,7 @@ export function useVsComputer() {
           overlayTitle.value = '💣 ' + reason + ' BOOM! 💣'
           const winnerName   = p === 0 ? '🎉 You' : 'CPU ' + p
           overlayMsg.value   = winnerName + ' has ' + reason.toLowerCase() + ' — INSTANT WIN!'
-          overlayMoney.value = ''
           overlayMoneyWin.value = true
-          overlayWallets.value = `You $${wallets.value[0]}  •  CPU1 $${wallets.value[1]}  •  CPU2 $${wallets.value[2]}  •  CPU3 $${wallets.value[3]}`
           overlayScore.value   = `Wins — You ${scores.value[0]}  •  CPU1 ${scores.value[1]}  •  CPU2 ${scores.value[2]}  •  CPU3 ${scores.value[3]}`
           boomHands.value = [0, 1, 2, 3].map(q => ({
             name: q === 0 ? 'You' : 'CPU ' + q,
@@ -213,12 +202,43 @@ export function useVsComputer() {
         }
       }
 
-      if (current.value !== 0) scheduleAiTurn()
-      else {
-        const startMsg = lastWinner.value >= 0
-          ? 'Your turn — winner goes first!'
-          : 'Your turn — you have 3♠, lead freely!'
-        setMsg(startMsg)
+      // 2. Start game logic
+      if (lastWinner.value >= 0) {
+        current.value = lastWinner.value
+        hands.value = h
+        if (current.value !== 0) scheduleAiTurn()
+        else setMsg('Your turn — winner goes first!')
+      } else {
+        let starter = 0
+        for (let p = 0; p < 4; p++) {
+          if (h[p].some(c => c.rank === '3' && c.suit === '♠')) { starter = p; break }
+        }
+        
+        current.value = -1 // Block interactions during discard sequence
+        hands.value = h
+        lastPlayer.value = starter
+        setMsg('Discarding 3s...')
+        
+        let seq = 0
+        const throwSequence = () => {
+          if (seq >= 4) {
+            current.value = starter
+            if (current.value !== 0) scheduleAiTurn()
+            else setMsg('All 3s discarded! You have the 3♠, lead freely!')
+            return
+          }
+          const threes = hands.value[seq].filter(c => c.rank === '3')
+          if (threes.length > 0) {
+            threes.forEach(c => c.fromPlayer = seq)
+            lastPlayed.value = [...lastPlayed.value, ...threes]
+            hands.value[seq] = hands.value[seq].filter(c => c.rank !== '3')
+            SFX.play()
+            setTimeout(() => { seq++; throwSequence() }, 500)
+          } else {
+            seq++; throwSequence()
+          }
+        }
+        throwSequence()
       }
     }, 2800)
   }
@@ -303,6 +323,17 @@ export function useVsComputer() {
     const cards = selected.value.map(i => hands.value[0][i])
     const combo = classify(cards)
     if (!combo) { SFX.error(); setMsg('❌ Invalid combination'); return }
+
+    // If the table is currently holding the automatically thrown 3s from the start of the first game
+    if (lastWinner.value < 0 && lastPlayed.value.some(c => c.rank === '3') && lastPlayer.value === 0) {
+      if (cards.length !== 1) {
+        SFX.error()
+        setMsg('❌ First play must be a SINGLE card')
+        return
+      }
+      lastPlayed.value = [] // clear so the play becomes a free lead
+    }
+
     if (lastPlayed.value.length > 0) {
       if (!beats(combo, lastPlayed.value)) { SFX.error(); setMsg('❌ Cannot beat the last play'); return }
     }
@@ -411,9 +442,17 @@ export function useVsComputer() {
       return
     }
 
-    let played = lastPlayed.value.length === 0
-      ? aiLead(p, hands.value)
-      : aiRespond(p, lastPlayed.value, hands.value, lastPlayer.value)
+    // If the table is currently holding the automatically thrown 3s from the start of the first game
+    let actualLastPlayed = [...lastPlayed.value]
+    let mustPlaySingle = false
+    if (lastWinner.value < 0 && actualLastPlayed.some(c => c.rank === '3') && lastPlayer.value === p) {
+      actualLastPlayed = []
+      mustPlaySingle = true
+    }
+
+    let played = actualLastPlayed.length === 0
+        ? (mustPlaySingle ? [hands.value[p][0]] : aiLead(p, hands.value))
+        : aiRespond(p, actualLastPlayed, hands.value, lastPlayer.value)
 
     if (played) {
       if (lastPlayed.value.length > 0) applyCutTwoPenalty(p, lastPlayed.value, lastPlayer.value)

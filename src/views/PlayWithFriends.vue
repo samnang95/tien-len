@@ -174,7 +174,7 @@
               <div class="text-[0.6rem] tracking-[0.25em] text-white/25 uppercase max-lg:text-[0.4rem] max-[480px]:text-[0.35rem] max-[480px]:tracking-[0.15em] max-[400px]:text-[0.3rem]">LAST PLAYED</div>
               <div class="flex flex-nowrap justify-center min-h-[90px] my-2 max-lg:min-h-[60px] max-lg:my-[3px] max-[480px]:min-h-[50px] max-[480px]:my-0.5">
                 <PlayingCard v-for="(c, j) in (gs?.lastPlayed || [])" :key="c.rank + c.suit" :card="c"
-                  class="cursor-default! played-card played-card-glow" :class="playAnimClass"
+                  class="cursor-default! played-card played-card-glow" :class="getAnimClass(c)"
                   :style="{ animationDelay: j * 80 + 'ms' }" />
               </div>
               <div class="text-[0.82rem] italic text-gold-light max-lg:text-[0.5rem] max-[480px]:text-[0.42rem] max-[400px]:text-[0.38rem]">{{ whosePlayText }}</div>
@@ -288,16 +288,16 @@ const {
   doStartGame, doHostNewGame, doLeaveRoom,
 } = usePlayWithFriends()
 
-const playAnimClass = computed(() => {
+const getAnimClass = (c) => {
   if (!gs.value) return ''
-  const p = gs.value.lastPlayer
+  const p = c.fromPlayer !== undefined ? c.fromPlayer : gs.value.lastPlayer
   if (p === undefined || p < 0 || (gs.value.lastPlayed || []).length === 0) return ''
   if (p === mySeat.value) return 'play-from-bottom'
   if (p === topSeat.value) return 'play-from-top'
   if (p === leftSeat.value) return 'play-from-left'
   if (p === rightSeat.value) return 'play-from-right'
   return ''
-})
+}
 </script>
 
 
