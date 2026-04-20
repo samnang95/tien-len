@@ -89,6 +89,11 @@
                 <div class="deal-deck-pile">
                   <div v-for="i in 6" :key="i" class="deal-deck-card"
                     :style="{ transform: `translateX(${(i-3)*0.8}px) translateY(${-i*1.5}px)`, opacity: 1 - i * 0.06 }"></div>
+                  <!-- Spread animations -->
+                  <div class="spear-card spear-out-top"></div>
+                  <div class="spear-card spear-out-bottom"></div>
+                  <div class="spear-card spear-out-left"></div>
+                  <div class="spear-card spear-out-right"></div>
                 </div>
                 <div class="deal-label">DEALING<span class="deal-ellipsis"></span></div>
               </div>
