@@ -109,77 +109,101 @@ const { fadingOut, enterRoom } = useStartScreen()
 .pixel-play-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 36px;
+  gap: 12px;
+  padding: 16px 40px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #ff8844 0%, #ff6622 50%, #dd4400 100%);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ff9955 0%, #ff5511 40%, #cc3300 100%);
   color: #fff;
   font-family: "Press Start 2P", monospace;
-  font-size: clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  font-weight: bold;
   cursor: pointer;
   position: relative;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow:
-    0 4px 0 #aa3300,
-    0 6px 20px rgba(255, 100, 30, 0.4),
-    0 0 40px rgba(255, 100, 30, 0.2);
-  animation: playPulse 1.5s ease-in-out infinite;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+    0 6px 0 #992200,
+    0 8px 25px rgba(255, 90, 20, 0.6),
+    inset 0 2px 5px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
   letter-spacing: 0.12em;
   image-rendering: pixelated;
   z-index: 2;
+  overflow: visible;
 }
 .pixel-play-btn::before {
   content: "";
   position: absolute;
-  inset: -3px;
-  border-radius: 11px;
-  border: 2px solid rgba(255, 200, 100, 0.5);
+  inset: -4px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 230, 150, 0.6);
   pointer-events: none;
   animation: btnBorderGlow 1.5s ease-in-out infinite alternate;
 }
+.pixel-play-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 30%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 12px 12px 0 0;
+  pointer-events: none;
+}
 @media (max-width: 768px), (max-height: 550px) {
   .pixel-play-btn {
-    padding: 10px 24px;
-    font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+    padding: 12px 28px;
+    font-size: clamp(0.6rem, 1.8vw, 0.85rem);
+    box-shadow:
+      0 4px 0 #992200,
+      0 6px 15px rgba(255, 90, 20, 0.5),
+      inset 0 1px 3px rgba(255, 255, 255, 0.5);
   }
 }
 .pixel-play-btn:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.03);
   box-shadow:
-    0 7px 0 #aa3300,
-    0 10px 30px rgba(255, 100, 30, 0.5),
-    0 0 60px rgba(255, 100, 30, 0.3);
+    0 10px 0 #992200,
+    0 15px 35px rgba(255, 90, 20, 0.7),
+    inset 0 2px 5px rgba(255, 255, 255, 0.6);
 }
 .pixel-play-btn:active {
-  transform: translateY(2px);
+  transform: translateY(4px) scale(0.98);
   box-shadow:
-    0 1px 0 #aa3300,
-    0 2px 10px rgba(255, 100, 30, 0.4);
+    0 2px 0 #992200,
+    0 4px 10px rgba(255, 90, 20, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
+
 .room-2-btn {
-  background: linear-gradient(
-    180deg,
-    #27ae60 0%,
-    #1e8449 50%,
-    #196f3d 100%
-  ) !important;
+  background: linear-gradient(180deg, #33cc66 0%, #1e9944 40%, #116622 100%) !important;
   box-shadow:
-    0 4px 0 #145a32,
-    0 6px 20px rgba(39, 174, 96, 0.4),
-    0 0 40px rgba(39, 174, 96, 0.2) !important;
+    0 6px 0 #0d4d1a,
+    0 8px 25px rgba(40, 200, 90, 0.6),
+    inset 0 2px 5px rgba(255, 255, 255, 0.5) !important;
 }
 .room-2-btn::before {
-  border: 2px solid rgba(100, 255, 150, 0.5) !important;
+  border: 2px solid rgba(150, 255, 180, 0.6) !important;
+  animation: btnBorderGlowGreen 1.5s ease-in-out infinite alternate;
 }
 .room-2-btn:hover {
   box-shadow:
-    0 7px 0 #145a32,
-    0 10px 30px rgba(39, 174, 96, 0.5),
-    0 0 60px rgba(39, 174, 96, 0.3) !important;
+    0 10px 0 #0d4d1a,
+    0 15px 35px rgba(40, 200, 90, 0.7),
+    inset 0 2px 5px rgba(255, 255, 255, 0.6) !important;
+}
+.room-2-btn:active {
+  box-shadow:
+    0 2px 0 #0d4d1a,
+    0 4px 10px rgba(40, 200, 90, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+}
+
+@keyframes btnBorderGlow {
+  0%   { opacity: 0.4; transform: scale(1); box-shadow: 0 0 10px rgba(255, 200, 100, 0.3) inset; }
+  100% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 200, 100, 0.8) inset, 0 0 15px rgba(255, 200, 100, 0.5); }
+}
+@keyframes btnBorderGlowGreen {
+  0%   { opacity: 0.4; transform: scale(1); box-shadow: 0 0 10px rgba(100, 255, 150, 0.3) inset; }
+  100% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 20px rgba(100, 255, 150, 0.8) inset, 0 0 15px rgba(100, 255, 150, 0.5); }
 }
 
 .presentation-link {

@@ -234,17 +234,17 @@
     <!-- Win Overlay -->
     <div v-if="showGameOverlay" class="overlay-backdrop">
       <div class="overlay-box max-lg:p-4 max-lg:w-[92vw] max-lg:max-w-[400px] max-lg:max-h-[85vh] max-lg:overflow-y-auto" :class="{ 'max-w-[700px]! w-[94vw]!': isBoom }">
-        <h2>{{ gameOverTitle }}</h2>
-        <div v-html="gameOverMsg" class="mb-3"></div>
-        <div class="text-xs text-white/40 mb-3">{{ gameOverScores }}</div>
+        <h2 class="mb-8 max-sm:mb-4">{{ gameOverTitle }}</h2>
+        <div v-html="gameOverMsg" class="text-lg max-sm:text-base leading-relaxed mb-8 max-sm:mb-4"></div>
+        <div class="text-sm max-sm:text-xs text-white/50 tracking-widest leading-relaxed mb-8 max-sm:mb-4">{{ gameOverScores }}</div>
         
         <!-- Loser cards -->
-        <div v-if="loserCards && loserCards.length > 0" class="mb-4">
-          <div class="text-xs text-white/50 tracking-widest mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
-          <div class="flex gap-1 justify-center flex-wrap">
-            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card" />
+        <div v-if="loserCards && loserCards.length > 0" class="border-t border-white/10 mt-8 pt-6 mb-10 max-sm:mt-4 max-sm:pt-4 max-sm:mb-6">
+          <div class="text-sm max-sm:text-xs text-white/60 tracking-widest mb-4 max-sm:mb-2">🃏 {{ loserName }} remaining cards (4th place):</div>
+          <div class="flex gap-2 max-sm:gap-1 justify-center flex-wrap mb-4 max-sm:mb-2">
+            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card max-sm:scale-90" />
           </div>
-          <div v-if="loserPenaltyText" class="mt-2 text-sm text-[#e74c3c] font-bold tracking-[0.03em]">{{ loserPenaltyText }}</div>
+          <div v-if="loserPenaltyText" class="text-base max-sm:text-sm text-[#e74c3c] font-bold tracking-[0.03em] mt-6 max-sm:mt-3">{{ loserPenaltyText }}</div>
         </div>
 
         <div v-if="boomHands.length > 0">
@@ -255,13 +255,13 @@
             </div>
           </div>
         </div>
-        <div class="flex gap-3 justify-center flex-wrap">
-          <button v-if="isHost" class="btn btn-new" @click="doHostNewGame">▶ New Game</button>
+        <div class="flex gap-4 max-sm:gap-2 justify-center flex-wrap mt-10 max-sm:mt-5">
+          <button v-if="isHost" class="btn btn-new max-sm:text-sm max-sm:px-6 max-sm:py-3" style="padding: 14px 40px; font-size: 1.1rem; border-radius: 50px;" @click="doHostNewGame">▶ NEW GAME</button>
         </div>
-        <p v-if="!isHost" style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: rgba(240,201,110,0.7); margin-top: 12px; animation: hintBlink 2s ease-in-out infinite;">
+        <p v-if="!isHost" class="mt-10 max-sm:mt-5" style="font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: rgba(240,201,110,0.7); animation: hintBlink 2s ease-in-out infinite;">
           ⏳ Waiting for host to start next game...
         </p>
-        <button @click="doLeaveRoom" class="lobby-back-btn mt-3">← Leave Game</button>
+        <button @click="doLeaveRoom" class="lobby-back-btn mt-10 max-sm:mt-5" style="border-radius: 50px;">← Leave Game</button>
       </div>
     </div>
 

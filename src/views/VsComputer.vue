@@ -167,21 +167,21 @@
     <!-- Win Overlay -->
     <div v-if="showOverlay" class="overlay-backdrop" @click.self>
       <div class="overlay-box max-sm:max-h-[85vh] max-sm:overflow-y-auto">
-        <h2>{{ overlayTitle }}</h2>
-        <p>{{ overlayMsg }}</p>
-        <div class="text-lg font-bold my-1.5 mb-3.5" :class="overlayMoneyWin ? 'text-[#2ecc71]' : 'text-[#e74c3c]'">
+        <h2 class="mb-8 max-sm:mb-4">{{ overlayTitle }}</h2>
+        <p class="text-lg mb-5 max-sm:mb-3 max-sm:text-base">{{ overlayMsg }}</p>
+        <div class="text-2xl max-sm:text-xl font-bold mb-6 max-sm:mb-3" :class="overlayMoneyWin ? 'text-[#2ecc71]' : 'text-[#e74c3c]'">
           {{ overlayMoney }}
         </div>
-        <div class="text-xs text-white/45 mb-4.5">{{ overlayWallets }}</div>
-        <div class="text-xs text-white/40 mb-3">{{ overlayScore }}</div>
+        <div class="text-sm max-sm:text-xs text-white/50 mb-4 max-sm:mb-2">{{ overlayWallets }}</div>
+        <div class="text-sm max-sm:text-xs text-white/40 leading-relaxed mb-8 max-sm:mb-4">{{ overlayScore }}</div>
 
         <!-- Loser cards -->
-        <div v-if="loserCards.length > 0" class="mb-4">
-          <div class="text-xs text-white/50 tracking-widest mb-1.5">🃏 {{ loserName }} remaining cards (4th place):</div>
-          <div class="flex gap-1 justify-center flex-wrap">
-            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card" />
+        <div v-if="loserCards.length > 0" class="border-t border-white/10 mt-8 pt-6 mb-10 max-sm:mt-4 max-sm:pt-4 max-sm:mb-6">
+          <div class="text-sm max-sm:text-xs text-white/50 tracking-widest mb-4 max-sm:mb-2">🃏 {{ loserName }} remaining cards (4th place):</div>
+          <div class="flex gap-2 max-sm:gap-1 justify-center flex-wrap mb-4 max-sm:mb-2">
+            <PlayingCard v-for="(c, j) in loserCards" :key="j" :card="c" class="mini-card max-sm:scale-90" />
           </div>
-          <div v-if="loserPenaltyText" class="mt-2 text-sm text-[#e74c3c] font-bold tracking-[0.03em]">{{ loserPenaltyText }}</div>
+          <div v-if="loserPenaltyText" class="text-base max-sm:text-sm text-[#e74c3c] font-bold tracking-[0.03em] mt-6 max-sm:mt-3">{{ loserPenaltyText }}</div>
         </div>
 
         <!-- Boom overlay -->
@@ -194,9 +194,9 @@
           </div>
         </div>
 
-        <div class="flex gap-3 justify-center flex-wrap">
-          <button class="btn btn-new" @click="newGame()">▶ New Game</button>
-          <button class="btn-reset" @click="resetScore()">↺ Reset Score</button>
+        <div class="flex gap-4 max-sm:gap-2 justify-center flex-wrap mt-10 max-sm:mt-5">
+          <button class="btn btn-new max-sm:text-sm max-sm:px-6 max-sm:py-3" style="padding: 14px 40px; font-size: 1.1rem; border-radius: 50px;" @click="newGame()">▶ NEW GAME</button>
+          <button class="btn-reset max-sm:text-[0.7rem] max-sm:px-4 max-sm:py-3" style="padding: 14px 24px; font-size: 0.8rem; border-radius: 50px; background: rgba(255,255,255,0.05);" @click="resetScore()">↺ RESET SCORE</button>
         </div>
       </div>
     </div>

@@ -278,7 +278,13 @@ body {
   .card:hover { transform: translateY(-6px); }
   .card.selected { transform: translateY(-10px); }
   .btn { padding: 5px 14px; font-size: 0.7rem; }
-  .overlay-box { padding: 18px 18px; max-height: 85vh; overflow-y: auto; }
+  .overlay-box { 
+    padding: 16px 14px; 
+    max-height: 85vh; 
+    overflow-y: auto; 
+    width: 92vw;
+    max-width: 400px;
+  }
   .overlay-box h2 { font-size: 1.2rem; }
   .overlay-box p { font-size: 0.75rem; }
   .boom-card { width: 30px !important; height: 50px !important; margin-right: -4px !important; }
@@ -313,5 +319,19 @@ body {
   .card:hover { transform: translateY(-4px); }
   .card.selected { transform: translateY(-8px); }
   .btn { padding: 4px 12px; font-size: 0.65rem; }
+  .overlay-box {
+    transform: scale(0.9);
+    transform-origin: center center;
+    width: 96vw;
+  }
+}
+
+/* Extremely tiny phones */
+@media (max-width: 350px) {
+  .overlay-box {
+    transform: scale(0.85);
+    width: 98vw;
+    padding: 12px 10px;
+  }
 }
 
