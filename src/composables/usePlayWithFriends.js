@@ -257,7 +257,7 @@ export function usePlayWithFriends() {
     const hand = gameState.hands[p] || []
     if (hand.length === 0) return mpPassForCpu(gameState, p)
 
-    let actualLastPlayed = [...lastPlayed]
+    let actualLastPlayed = [...(gameState.lastPlayed || [])]
     let mustPlaySingle = false
     if (gameState.isFirstGame && actualLastPlayed.some(c => c.rank === '3') && gameState.lastPlayer === p) {
       actualLastPlayed = [] // Clear the discarded 3s for a free lead
